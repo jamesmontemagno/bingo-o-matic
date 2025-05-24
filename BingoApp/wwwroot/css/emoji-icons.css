@@ -1,0 +1,48 @@
+/* Emoji Icon Styles */
+
+/* Common emoji styles for all locations */
+.emoji-icon {
+    font-size: 1.3rem;
+    display: inline-block;
+    margin-right: 0.4rem;
+    line-height: 1;
+    vertical-align: middle;
+    transition: transform 0.3s ease;
+}
+
+button:hover .emoji-icon,
+a:hover .emoji-icon {
+    transform: scale(1.2);
+}
+
+/* Feature card emojis */
+.feature-card .emoji-icon {
+    font-size: 3rem;
+    display: block;
+    margin: 0 auto 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .emoji-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Button emojis */
+.btn .emoji-icon {
+    font-size: 1.2em;
+    margin-right: 0.4rem;
+}
+
+/* Immersive toggle button */
+.immersive-toggle .emoji-icon {
+    font-size: 1.6rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+}
+
+/* For the close button */
+.popup-close .emoji-icon {
+    font-size: 1rem;
+    margin-right: 0;
+}

@@ -33,10 +33,10 @@
                 </select>
             </div>
             <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
-                <i class="bi bi-shuffle"></i> Draw Item
+                <span class="emoji-icon">🎯</span> Draw Item
             </button>
             <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null)">
-                <i class="bi bi-arrow-repeat"></i> Reset
+                <span class="emoji-icon">🔄</span> Reset
             </button>
         </div>
     </div>

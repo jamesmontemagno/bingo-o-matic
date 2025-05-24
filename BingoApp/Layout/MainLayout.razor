@@ -23,25 +23,22 @@
                 </a>
             </div>
         </div>
-    </footer>
-
-    <button @onclick="ToggleImmersive" class="immersive-toggle" title="Toggle immersive mode (Spacebar)">
+    </footer>    <button @onclick="ToggleImmersive" class="immersive-toggle" title="Toggle immersive mode (Spacebar)">
         @if (isImmersive)
         {
-            <i class="bi bi-fullscreen-exit"></i>
+            <span class="emoji-icon">🔍</span>
         }
         else
         {
-            <i class="bi bi-fullscreen"></i>
+            <span class="emoji-icon">🔎</span>
         }
     </button>
 
     @if (showPopup)
     {
         <div class="popup-hint">
-            Press Spacebar to toggle immersive mode
-            <button @onclick="@(() => showPopup = false)" class="popup-close">
-                <i class="bi bi-x"></i>
+            Press Spacebar to toggle immersive mode            <button @onclick="@(() => showPopup = false)" class="popup-close">
+                <span class="emoji-icon">❌</span>
             </button>
         </div>
     }

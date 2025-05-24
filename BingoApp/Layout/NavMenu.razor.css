@@ -132,6 +132,18 @@
     transform: scale(1.1) rotate(5deg);
 }
 
+/* Styles for emoji icons */
+.nav-emoji {
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+    margin-right: 0.3rem;
+    display: inline-block;
+}
+
+.nav-link:hover .nav-emoji {
+    transform: scale(1.1) rotate(5deg);
+}
+
 /* Custom Games Dropdown */
 .dropdown {
     position: relative;
