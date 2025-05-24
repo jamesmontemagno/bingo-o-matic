@@ -1,6 +1,6 @@
 # Bingo-o-matic
 
-A modern, interactive bingo game web application built with Blazor WebAssembly. Create custom bingo games or play with standard bingo rules.
+A modern, interactive bingo game web application built with [Blazor WebAssembly](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor). Create custom bingo games or play with standard bingo rules.
 
 ## Features
 
@@ -9,6 +9,13 @@ A modern, interactive bingo game web application built with Blazor WebAssembly. 
 - Immersive Mode: Toggle fullscreen mode for better visibility during play
 - Mobile-friendly design
 - Smooth animations and visual feedback
+
+## Technology Used
+
+- **[Blazor WebAssembly](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)** — Modern .NET web UI framework
+- **[C#](https://learn.microsoft.com/dotnet/csharp/)**
+- Developed with **[Visual Studio Code](https://code.visualstudio.com/)** for a streamlined developer experience
+- Powered by **[GitHub Copilot](https://github.com/features/copilot)** for AI-assisted code completion
 
 ## Play Now
 
