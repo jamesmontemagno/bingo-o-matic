@@ -63,7 +63,7 @@
                     <div class="mb-3">
                         <label class="form-label">Items (separate by new lines, commas, or semicolons)</label>
                         <textarea class="form-control" rows="10" @bind="newSetItems" 
-                                placeholder="Enter items here...&#13;&#10;One per line&#13;&#10;Or separated by commas&#13;&#10;Or separated by semicolons"></textarea>
+                                placeholder="Enter items here... One per line, or separated by comma, or separated by semicolons."></textarea>
                         @{
                             var itemCount = BingoSetService.ParseItems(newSetItems).Length;
                         }

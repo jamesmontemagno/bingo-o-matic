@@ -23,7 +23,7 @@
         </div>
         <div class="bingo-controls">
             <div class="form-group me-2">
-                <select class="form-select" id="bingoSet" @bind="selectedSetName" @bind:after="OnBingoSetSelected">
+                <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
                     <option value="">Select a set...</option>
                     @foreach (var set in BingoService.GetAll())
                     {
@@ -34,25 +34,19 @@
             <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
                 <i class="bi bi-shuffle"></i> Draw Item
             </button>
-            <button class="btn btn-outline-primary me-2" @onclick="NewGame" disabled="@(selectedSet == null)">
+            <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null)">
                 <i class="bi bi-arrow-repeat"></i> Reset
             </button>
-            <a href="custom-bingo/manage" class="btn btn-outline-secondary">
-                <i class="bi bi-gear"></i> Manage Sets
-            </a>
         </div>
     </div>
 
     @if (selectedSet != null)
     {
-        @if (currentItem != null)
-        {
-            <div class="current-item @(isSelecting ? "selecting" : "") @(isAnimating ? "animate" : "")" aria-live="polite">
-                <div class="item-display @(isSelected ? "selected" : "")">
-                    <span class="item">@displayItem</span>
-                </div>
+        <div class="current-item @(isSelecting ? "selecting" : "") @(isAnimating ? "animate" : "")" aria-live="polite">
+            <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
+                <span class="item">@(displayItem ?? "Ready to draw...")</span>
             </div>
-        }
+        </div>
 
         <div class="called-items">
             <h4>Called Items</h4>
@@ -61,7 +55,7 @@
                 {
                     @foreach (var item in calledItems)
                     {
-                        <div class="item-cell called">
+                        <div class="item-cell called" style="background-color: @currentThemeColor">
                             <span>@item</span>
                         </div>
                     }
@@ -75,8 +69,32 @@
     }
 </div>
 
+@* Confirmation Dialog *@
+@if (showConfirmDialog)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@confirmTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CancelConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@confirmMessage</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="ConfirmAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private string selectedSetName = "";
+    private string pendingSetName = "";
     private BingoSet? selectedSet;
     private bool isSelecting = false;
     private bool isSelected = false;
@@ -89,6 +107,26 @@
     private string? displayItem;
     private bool isAnimating = false;
     private CancellationTokenSource? animationCts;
+    private string currentThemeColor = "";
+    private readonly string[] darkColors = new[]
+    {
+        "#1E40AF", // Deep Blue
+        "#065F46", // Forest Green
+        "#831843", // Dark Pink
+        "#3730A3", // Indigo
+        "#7E22CE", // Purple
+        "#9D174D", // Raspberry
+        "#B45309", // Burnt Orange
+        "#064E3B", // Dark Emerald
+        "#134E4A", // Dark Teal
+        "#450A0A"  // Dark Red
+    };
+
+    // Confirmation dialog state
+    private bool showConfirmDialog = false;
+    private string confirmTitle = "";
+    private string confirmMessage = "";
+    private Func<Task>? confirmAction;
 
     protected override void OnInitialized()
     {
@@ -99,16 +137,33 @@
         if (!string.IsNullOrEmpty(setName))
         {
             selectedSetName = setName;
+            pendingSetName = setName;
             LoadSelectedSet();
         }
     }
 
-    private void OnBingoSetSelected()
+    private void OnBingoSetSelectionChanged()
     {
-        LoadSelectedSet();
-        if (selectedSet != null)
+        if (pendingSetName != selectedSetName && 
+            selectedSet != null && 
+            calledItems.Count > 0)
         {
-            NewGame(); // Reset the game when selecting a new set
+            // Game in progress, confirm the change
+            confirmTitle = "Change Bingo Set";
+            confirmMessage = $"You're about to switch to a new bingo set. This will reset the current game. Are you sure?";
+            showConfirmDialog = true;
+            confirmAction = () =>
+            {
+                selectedSetName = pendingSetName;
+                LoadSelectedSet();
+                return Task.CompletedTask;
+            };
+        }
+        else
+        {
+            // No game in progress or no change, just load
+            selectedSetName = pendingSetName;
+            LoadSelectedSet();
         }
     }
 
@@ -136,13 +191,58 @@
             calledItems.Clear();
             currentItem = null;
             isAnimating = false;
+            // Assign a new random color theme
+            string previousColor = currentThemeColor;
+            string newColor;
+            do
+            {
+                newColor = darkColors[random.Next(darkColors.Length)];
+            } while (darkColors.Length > 1 && newColor == previousColor);
+            currentThemeColor = newColor;
             StateHasChanged();
+        }
+    }
+
+    private void ConfirmNewGame()
+    {
+        if (calledItems.Count > 0)
+        {
+            confirmTitle = "Confirm New Game";
+            confirmMessage = "Are you sure you want to start a new game? This will reset the current game.";
+            showConfirmDialog = true;
+            confirmAction = () =>
+            {
+                NewGame();
+                return Task.CompletedTask;
+            };
+        }
+        else
+        {
+            // No game in progress, just reset
+            NewGame();
         }
     }
 
     private void NewGame()
     {
         ResetGame();
+    }
+
+    private void CancelConfirmation()
+    {
+        showConfirmDialog = false;
+        pendingSetName = selectedSetName; // Reset pending selection if canceled
+        StateHasChanged();
+    }
+
+    private async Task ConfirmAction()
+    {
+        showConfirmDialog = false;
+        if (confirmAction != null)
+        {
+            await confirmAction.Invoke();
+            confirmAction = null;
+        }
     }
 
     private async Task SelectNext()
@@ -156,7 +256,8 @@
         {
             isSelecting = true;
             isSelected = false;
-            displayItem = null;
+            // Start with a random item visible right away
+            displayItem = availableItems[random.Next(availableItems.Count)];
             currentItem = null;
             isAnimating = true;
             StateHasChanged();
@@ -166,15 +267,31 @@
             animationCts = new CancellationTokenSource();
             var token = animationCts.Token;
 
-            // Animate through available items
-            var rotations = 35; // Increased number of items to show before final selection
-            for (int i = 0; i < rotations && !token.IsCancellationRequested; i++)
+            // Fast cycling at the beginning
+            var fastRotations = 15;
+            for (int i = 0; i < fastRotations && !token.IsCancellationRequested; i++)
             {
                 displayItem = availableItems[random.Next(availableItems.Count)];
                 StateHasChanged();
-                // Gradually slow down the animation
-                var delay = 50 + (i * 2); // Start at 50ms and gradually increase
-                await Task.Delay(delay, token);
+                await Task.Delay(40, token); // Fast speed - items changing quickly
+            }
+            
+            // Medium speed cycling
+            var mediumRotations = 10;
+            for (int i = 0; i < mediumRotations && !token.IsCancellationRequested; i++)
+            {
+                displayItem = availableItems[random.Next(availableItems.Count)];
+                StateHasChanged();
+                await Task.Delay(80 + (i * 5), token); // Medium speed - slowing down
+            }
+            
+            // Slow down dramatically for final selections
+            var slowRotations = 7;
+            for (int i = 0; i < slowRotations && !token.IsCancellationRequested; i++)
+            {
+                displayItem = availableItems[random.Next(availableItems.Count)];
+                StateHasChanged();
+                await Task.Delay(150 + (i * 50), token); // Progressively slower
             }
 
             if (token.IsCancellationRequested)
@@ -187,19 +304,12 @@
             availableItems.RemoveAt(randomIndex);
             calledItems.Add(currentItem);
 
-            // Show selection animation
+            // Show final selection without animation
             isSelecting = false;
             isSelected = true;
-            isAnimating = true;
+            // Don't use the spinning animation
+            isAnimating = false;
             StateHasChanged();
-
-            // Reset animation state after delay
-            await Task.Delay(1000, token);
-            if (!token.IsCancellationRequested)
-            {
-                isAnimating = false;
-                StateHasChanged();
-            }
         }
         catch (OperationCanceledException)
         {
@@ -229,14 +339,5 @@
             availableItems.Remove(item);
         }
         StateHasChanged();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (animationCts != null)
-        {
-            animationCts.Cancel();
-            animationCts.Dispose();
-        }
     }
 }
