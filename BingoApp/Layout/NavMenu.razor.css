@@ -27,9 +27,9 @@
 .navbar-toggler-icon {
     background-image: none !important;
     position: relative;
-    width: 24px;
-    height: 2px;
-    background-color: var(--pnw-light);
+    width: 28px;
+    height: 3px;
+    background-color: var(--pnw-forest);
     transition: background-color 0.2s ease;
 }
 
@@ -38,18 +38,18 @@
     content: '';
     position: absolute;
     left: 0;
-    width: 24px;
-    height: 2px;
-    background-color: var(--pnw-light);
+    width: 28px;
+    height: 3px;
+    background-color: var(--pnw-forest);
     transition: transform 0.2s ease;
 }
 
 .navbar-toggler-icon::before {
-    top: -8px;
+    top: -9px;
 }
 
 .navbar-toggler-icon::after {
-    bottom: -8px;
+    bottom: -9px;
 }
 
 .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
@@ -57,11 +57,13 @@
 }
 
 .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::before {
-    transform: translateY(8px) rotate(45deg);
+    transform: translateY(9px) rotate(45deg);
+    background-color: var(--pnw-forest);
 }
 
 .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::after {
-    transform: translateY(-8px) rotate(-45deg);
+    transform: translateY(-9px) rotate(-45deg);
+    background-color: var(--pnw-forest);
 }
 
 /* Brand styling */

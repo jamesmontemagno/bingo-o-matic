@@ -1,7 +1,49 @@
 /**
+ * Check if the device is mobile
+ */
+window.isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(navigator.userAgent) 
+        || (window.innerWidth <= 768);
+};
+
+/**
  * Helper functions for Navbar Bootstrap integration
  */
 window.navbarHelpers = {
+    // Toggle the navbar programmatically
+    toggleNavbar: function() {
+        const navbarContent = document.querySelector('#navbarContent');
+        if (!navbarContent) return;
+        
+        const bsCollapse = bootstrap.Collapse.getInstance(navbarContent) || 
+                          new bootstrap.Collapse(navbarContent, { toggle: false });
+        bsCollapse.toggle();
+        
+        // Update the aria-expanded attribute on the toggler
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        if (navbarToggler) {
+            const isExpanded = navbarToggler.getAttribute('aria-expanded') === 'true';
+            navbarToggler.setAttribute('aria-expanded', (!isExpanded).toString());
+        }
+    },
+    
+    // Close the navbar programmatically
+    closeNavbar: function() {
+        const navbarContent = document.querySelector('#navbarContent');
+        if (!navbarContent) return;
+        
+        const bsCollapse = bootstrap.Collapse.getInstance(navbarContent);
+        if (bsCollapse) {
+            bsCollapse.hide();
+        }
+        
+        // Update the aria-expanded attribute on the toggler
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        if (navbarToggler) {
+            navbarToggler.setAttribute('aria-expanded', 'false');
+        }
+    },
+    
     // Close the navbar when clicking outside
     setupNavbarAutoClose: function () {
         document.addEventListener('click', function (event) {

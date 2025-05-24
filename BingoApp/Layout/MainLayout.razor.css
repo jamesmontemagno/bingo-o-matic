@@ -26,25 +26,7 @@
     transition: padding 0.3s ease-in-out;
 }
 
-/* Immersive mode styles */
-.immersive .app-main {
-    padding: 0;
-    height: 100vh;
-    max-height: 100vh;
-    overflow: hidden;
-    background-color: white;
-}
-
-.immersive .content {
-    height: 100vh;
-    margin: 0;
-    border-radius: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    max-width: none;
-    width: 100%;
-}
+/* Main content styles */
 
 .content {
     background-color: white;
@@ -96,97 +78,11 @@
     text-decoration: none;
 }
 
-.immersive .app-header,
-.immersive .app-footer {
-    transform: scaleY(0);
-    opacity: 0;
-    pointer-events: none;
-}
+/* Footer styles */
 
-/* Improved immersive toggle button styling */
-.immersive-toggle {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1000;
-    width: 52px;
-    height: 52px;
-    border-radius: 26px;
-    border: 3px solid rgba(255, 255, 255, 0.4);
-    background-color: rgba(0, 0, 0, 0.85);
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease-in-out;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(4px);
-}
+/* Responsive design */
 
-.immersive-toggle:hover {
-    background-color: rgba(0, 0, 0, 0.95);
-    transform: scale(1.05);
-    border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.2),
-                0 0 20px rgba(255, 255, 255, 0.1);
-}
 
-.immersive-toggle:active {
-    transform: scale(0.95);
-}
-
-.immersive-toggle i {
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    font-size: 1.6rem;
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
-}
-
-.popup-hint {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 0.75rem 2.5rem 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    z-index: 1000;
-    animation: slide-up 0.3s ease-out;
-}
-
-.popup-close {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 0.25rem;
-    opacity: 0.7;
-}
-
-.popup-close:hover {
-    opacity: 1;
-}
-
-@keyframes slide-up {
-    from {
-        transform: translate(-50%, 100%);
-        opacity: 0;
-    }
-    to {
-        transform: translate(-50%, 0);
-        opacity: 1;
-    }
-}
 
 @media (max-width: 768px) {
     .app-main {

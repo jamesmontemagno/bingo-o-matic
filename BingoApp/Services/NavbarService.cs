@@ -21,9 +21,7 @@ namespace BingoApp.Services
         {
             try 
             {
-                await _jsRuntime.InvokeVoidAsync("eval", 
-                    "const collapse = bootstrap.Collapse.getInstance(document.querySelector('#navbarContent')); " +
-                    "if(collapse) collapse.hide();");
+                await _jsRuntime.InvokeVoidAsync("navbarHelpers.closeNavbar");
             }
             catch
             {
@@ -38,10 +36,7 @@ namespace BingoApp.Services
         {
             try
             {
-                await _jsRuntime.InvokeVoidAsync("eval", 
-                    "const navbarContent = document.querySelector('#navbarContent'); " +
-                    "const collapse = bootstrap.Collapse.getInstance(navbarContent) || new bootstrap.Collapse(navbarContent); " +
-                    "collapse.toggle();");
+                await _jsRuntime.InvokeVoidAsync("navbarHelpers.toggleNavbar");
             }
             catch
             {
