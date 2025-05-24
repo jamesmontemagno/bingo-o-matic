@@ -1,0 +1,239 @@
+@page "/custom-bingo/manage"
+@using BingoApp.Models
+@using BingoApp.Services
+@inject BingoSetService BingoService
+
+<h1>Manage Bingo Sets</h1>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Available Bingo Sets</h5>
+                <button class="btn btn-primary" @onclick="() => ShowSetEditor()">
+                    <i class="bi bi-plus"></i> Add New Set
+                </button>
+            </div>
+            <div class="list-group list-group-flush">
+                @foreach (var set in BingoService.GetAll())
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">@set.Name</h6>
+                                <small class="text-muted">@set.Items.Length items</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm me-2" @onclick="() => ViewSet(set)">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm me-2" @onclick="() => EditSet(set)">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteSetPrompt(set)">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (showEditor)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(editingSet?.Name != null ? "Edit Set" : "Add New Set")</h5>
+                    <button type="button" class="btn-close" @onclick="CloseEditor"></button>
+                </div>
+                <div class="modal-body">
+                    @if (errorMessage != null)
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">Set Name</label>
+                        <input type="text" class="form-control" @bind="newSetName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Items (separate by new lines, commas, or semicolons)</label>
+                        <textarea class="form-control" rows="10" @bind="newSetItems" 
+                                placeholder="Enter items here...&#13;&#10;One per line&#13;&#10;Or separated by commas&#13;&#10;Or separated by semicolons"></textarea>
+                        @{
+                            var itemCount = BingoSetService.ParseItems(newSetItems).Length;
+                        }
+                        <small class="text-muted">@itemCount unique items</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseEditor">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveSet">Save Set</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (selectedSet != null)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@selectedSet.Name Items</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        @foreach (var item in selectedSet.Items)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="card">
+                                    <div class="card-body p-2">
+                                        @item
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (deleteSet != null)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Set</h5>
+                    <button type="button" class="btn-close" @onclick="() => deleteSet = null"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the set "@deleteSet.Name"?</p>
+                    <p>This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="() => deleteSet = null">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private BingoSet? selectedSet;
+    private BingoSet? editingSet;
+    private BingoSet? deleteSet;
+    private bool showEditor;
+    private string? newSetName;
+    private string? newSetItems;
+    private string? errorMessage;
+
+    private void ViewSet(BingoSet set)
+    {
+        selectedSet = set;
+    }
+
+    private void CloseModal()
+    {
+        selectedSet = null;
+    }
+
+    private void ShowSetEditor()
+    {
+        editingSet = null;
+        newSetName = "";
+        newSetItems = "";
+        errorMessage = null;
+        showEditor = true;
+    }
+
+    private void EditSet(BingoSet set)
+    {
+        editingSet = set;
+        newSetName = set.Name;
+        newSetItems = string.Join(Environment.NewLine, set.Items);
+        errorMessage = null;
+        showEditor = true;
+    }
+
+    private void CloseEditor()
+    {
+        showEditor = false;
+        editingSet = null;
+        newSetName = null;
+        newSetItems = null;
+        errorMessage = null;
+    }
+
+    private void DeleteSetPrompt(BingoSet set)
+    {
+        deleteSet = set;
+    }
+
+    private void ConfirmDelete()
+    {
+        if (deleteSet == null) return;
+
+        try
+        {
+            BingoService.DeleteSet(deleteSet.Id);
+            deleteSet = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void SaveSet()
+    {
+        try
+        {
+            errorMessage = null;
+
+            if (string.IsNullOrWhiteSpace(newSetName))
+                throw new ArgumentException("Please enter a set name");
+
+            var items = BingoSetService.ParseItems(newSetItems ?? "");
+            if (!items.Any())
+                throw new ArgumentException("Please enter at least one item");
+
+            var set = new BingoSet
+            {
+                Name = newSetName,
+                Items = items
+            };
+
+            if (editingSet != null)
+            {
+                BingoService.UpdateSet(editingSet.Id, set);
+            }
+            else
+            {
+                BingoService.AddSet(set);
+            }
+
+            CloseEditor();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}

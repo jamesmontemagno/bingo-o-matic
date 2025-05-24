@@ -1,10 +1,9 @@
 # Blazor WebAssembly Best Practices
 
 ## Project Structure
-- Use feature folders when components are tightly related
 - Keep shared components in a `Shared` folder
+- Keep Pages in the `Pages` folder
 - Place interfaces in separate files
-- Use partial classes to separate code-behind from markup
 
 ## Component Organization
 1. Component files should follow the pattern:

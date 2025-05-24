@@ -1,16 +1,52 @@
+.bingo-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.bingo-header {
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .bingo-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.bingo-title h1 {
+    margin-bottom: 0.5rem;
+}
+
+.bingo-title .lead {
+    margin-bottom: 0;
+}
+
+.bingo-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 /* Item display with animation */
 .current-item {
     width: 100%;
     max-width: 400px;
     margin: 2rem auto;
     padding: 1rem;
-    opacity: 0;
-    transform: scale(0.8);
+    opacity: 1;
+    transform: scale(1);
     transition: opacity 0.3s, transform 0.3s;
 }
 
 .current-item.animate {
-    animation: pop-in 1s forwards;
+    animation: pop-in 2s ease-in-out infinite;
 }
 
 .item-display {
@@ -67,15 +103,12 @@
 /* Animation */
 @keyframes pop-in {
     0% {
-        opacity: 0;
-        transform: scale(0.8);
+        transform: scale(1);
     }
     50% {
-        opacity: 1;
         transform: scale(1.1);
     }
     100% {
-        opacity: 1;
         transform: scale(1);
     }
 }

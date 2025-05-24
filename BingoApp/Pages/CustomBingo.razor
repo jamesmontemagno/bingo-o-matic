@@ -1,14 +1,12 @@
-@page "/custom-bingo/play"
+@page "/custom-bingo"
 @using BingoApp.Models
 @using BingoApp.Services
-@using BingoApp.Features.CustomBingo.Components
 @using Microsoft.AspNetCore.Components
 @using System.Web
+@using Microsoft.AspNetCore.Components.Web
 
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
-
-<PageTitle>Custom Bingo - Bingo-o-matic</PageTitle>
 
 <div class="bingo-container">
     <div class="bingo-header">
@@ -47,16 +45,47 @@
 
     @if (selectedSet != null)
     {
-        <BingoBoard @ref="bingoBoard" Items="@selectedSet.Items" @key="gameId" />
+        @if (currentItem != null)
+        {
+            <div class="current-item @(isAnimating ? "animate" : "")" aria-live="polite">
+                <div class="item-display">
+                    <span class="item">@currentItem</span>
+                </div>
+            </div>
+        }
+
+        <div class="called-items">
+            <h4>Called Items</h4>
+            <div class="called-items-grid">
+                @if (calledItems.Count > 0)
+                {
+                    @foreach (var item in calledItems)
+                    {
+                        <div class="item-cell called">
+                            <span>@item</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No items selected yet. Click "Draw Item" to begin.</p>
+                }
+            </div>
+        </div>
     }
 </div>
 
 @code {
     private string selectedSetName = "";
     private BingoSet? selectedSet;
-    private int gameId = 0; // Used to force new game board
     private bool isSelecting = false;
-    private BingoBoard? bingoBoard;
+    
+    // Bingo board state
+    private List<string> availableItems = new List<string>();
+    private List<string> calledItems = new List<string>();
+    private Random random = new Random();
+    private string? currentItem;
+    private bool isAnimating = false;
 
     protected override void OnInitialized()
     {
@@ -85,6 +114,10 @@
         if (!string.IsNullOrEmpty(selectedSetName))
         {
             selectedSet = BingoService.GetByName(selectedSetName);
+            if (selectedSet != null)
+            {
+                ResetGame();
+            }
         }
         else
         {
@@ -92,19 +125,67 @@
         }
     }
 
+    private void ResetGame()
+    {
+        if (selectedSet?.Items?.Length > 0)
+        {
+            availableItems = new List<string>(selectedSet.Items);
+            calledItems.Clear();
+            currentItem = null;
+            isAnimating = false;
+            StateHasChanged();
+        }
+    }
+
     private void NewGame()
     {
-        gameId++; // This will force the BingoBoard to reinitialize
-        StateHasChanged();
+        ResetGame();
     }
 
     private async Task SelectNext()
     {
-        if (bingoBoard != null && !isSelecting && selectedSet != null)
+        if (availableItems.Count == 0 || isSelecting)
         {
-            isSelecting = true;
-            await bingoBoard.SelectNextAsync();
+            return;
+        }
+
+        isSelecting = true;
+        
+        try
+        {
+            // Briefly stop animation for visual feedback
+            isAnimating = false;
+            StateHasChanged();
+            await Task.Delay(10);
+
+            // Select a random item that hasn't been called yet
+            int randomIndex = random.Next(0, availableItems.Count);
+            currentItem = availableItems[randomIndex];
+            availableItems.RemoveAt(randomIndex);
+            calledItems.Add(currentItem);
+
+            // Start the animation
+            isAnimating = true;
+            StateHasChanged();
+        }
+        finally
+        {
             isSelecting = false;
         }
+    }
+
+    private void ToggleItem(string item)
+    {
+        if (calledItems.Contains(item))
+        {
+            calledItems.Remove(item);
+            availableItems.Add(item);
+        }
+        else
+        {
+            calledItems.Add(item);
+            availableItems.Remove(item);
+        }
+        StateHasChanged();
     }
 }
