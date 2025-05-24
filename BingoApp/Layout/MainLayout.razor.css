@@ -33,9 +33,10 @@
 .app-footer {
     background-color: var(--pnw-deep-forest);
     color: var(--pnw-light);
-    padding: 1.5rem 0;
+    padding: 0.5rem 0;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    line-height: 1;
 }
 
 .footer-content {

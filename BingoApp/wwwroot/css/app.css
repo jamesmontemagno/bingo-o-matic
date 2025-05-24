@@ -16,6 +16,17 @@
     --text-color-muted: #6c757d;
     --light-bg: var(--pnw-mist);
     --font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    /* Additional theme variables for animations and gradients */
+    --bs-primary: var(--primary-color);
+    --bs-primary-rgb: 42, 90, 59;
+    --bs-secondary: var(--pnw-water);
+    --bs-secondary-rgb: 92, 138, 143;
+    --bs-info: var(--pnw-accent);
+    --bs-info-rgb: 199, 213, 160;
+    --bs-primary-rgb-soft: rgba(42, 90, 59, 0.1);
+    --bs-secondary-rgb-soft: rgba(92, 138, 143, 0.1);
+    --gradient-primary: linear-gradient(45deg, var(--primary-color), var(--pnw-water));
 }
 
 html, body {

@@ -1,0 +1,34 @@
+.settings-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.settings-container h1 {
+    margin-bottom: 2rem;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header h2 {
+    margin: 0;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.card-body p {
+    margin-bottom: 1rem;
+    color: #6c757d;
+}

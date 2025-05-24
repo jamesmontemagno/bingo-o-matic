@@ -5,24 +5,33 @@
 <div class="hero-section">
     <h1>Welcome to Bingo-o-matic</h1>
     <p class="tagline">The modern way to play bingo - online, offline, anywhere!</p>
-    <a href="/play" class="btn btn-primary btn-lg mt-4 animate-bounce">Start Playing Now</a>
+    <div class="hero-buttons">
+        <a href="standard-bingo" class="btn btn-primary btn-lg mt-4 me-3 animate-bounce">
+            <i class="bi bi-grid-3x3"></i> Play Standard Bingo
+        </a>
+        <a href="custom-bingo" class="btn btn-outline-primary btn-lg mt-4 animate-bounce">
+            <i class="bi bi-controller"></i> Try Custom Bingo
+        </a>
+    </div>
 </div>
 
 <div class="features-section">
     <h2>Features</h2>
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-4">
             <div class="feature-card">
                 <i class="bi bi-grid-3x3"></i>
-                <h3>Classic Bingo</h3>
+                <h3>Standard Bingo</h3>
                 <p>Traditional 5×5 grid with B-I-N-G-O headers and numbers 1-75</p>
+                <a href="standard-bingo" class="btn btn-outline-primary mt-2">Play Now</a>
             </div>
         </div>
         <div class="col-md-4">
             <div class="feature-card">
-                <i class="bi bi-pencil-square"></i>
+                <i class="bi bi-controller"></i>
                 <h3>Custom Bingo</h3>
                 <p>Create your own bingo cards with custom words or phrases</p>
+                <a href="custom-bingo" class="btn btn-outline-primary mt-2">Create Set</a>
             </div>
         </div>
         <div class="col-md-4">
@@ -30,16 +39,8 @@
                 <i class="bi bi-wifi-off"></i>
                 <h3>Works Offline</h3>
                 <p>Play anywhere - no internet connection required</p>
+                <a href="https://github.com/jamesmontemagno/bingo-o-matic#installation" class="btn btn-outline-primary mt-2">Learn More</a>
             </div>
         </div>
     </div>
 </div>
-
-<footer class="mt-5">
-    <div class="text-center">
-        <p>
-            Bingo-o-matic is open source under the MIT license. 
-            <a href="https://github.com/yourusername/bingo-o-matic" target="_blank">View on GitHub</a>
-        </p>
-    </div>
-</footer>

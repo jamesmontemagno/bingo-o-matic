@@ -47,9 +47,9 @@
     {
         @if (currentItem != null)
         {
-            <div class="current-item @(isAnimating ? "animate" : "")" aria-live="polite">
-                <div class="item-display">
-                    <span class="item">@currentItem</span>
+            <div class="current-item @(isSelecting ? "selecting" : "") @(isAnimating ? "animate" : "")" aria-live="polite">
+                <div class="item-display @(isSelected ? "selected" : "")">
+                    <span class="item">@displayItem</span>
                 </div>
             </div>
         }
@@ -79,13 +79,16 @@
     private string selectedSetName = "";
     private BingoSet? selectedSet;
     private bool isSelecting = false;
+    private bool isSelected = false;
     
     // Bingo board state
     private List<string> availableItems = new List<string>();
     private List<string> calledItems = new List<string>();
     private Random random = new Random();
     private string? currentItem;
+    private string? displayItem;
     private bool isAnimating = false;
+    private CancellationTokenSource? animationCts;
 
     protected override void OnInitialized()
     {
@@ -149,28 +152,63 @@
             return;
         }
 
-        isSelecting = true;
-        
         try
         {
-            // Briefly stop animation for visual feedback
-            isAnimating = false;
+            isSelecting = true;
+            isSelected = false;
+            isAnimating = true;
             StateHasChanged();
-            await Task.Delay(10);
 
-            // Select a random item that hasn't been called yet
+            // Cancel any existing animation
+            animationCts?.Cancel();
+            animationCts = new CancellationTokenSource();
+            var token = animationCts.Token;
+
+            // Animate through available items
+            var rotations = 20; // Number of items to show before final selection
+            for (int i = 0; i < rotations && !token.IsCancellationRequested; i++)
+            {
+                displayItem = availableItems[random.Next(availableItems.Count)];
+                StateHasChanged();
+                await Task.Delay(50, token);
+            }
+
+            if (token.IsCancellationRequested)
+                return;
+
+            // Select the final item
             int randomIndex = random.Next(0, availableItems.Count);
             currentItem = availableItems[randomIndex];
+            displayItem = currentItem;
             availableItems.RemoveAt(randomIndex);
             calledItems.Add(currentItem);
 
-            // Start the animation
+            // Show selection animation
+            isSelecting = false;
+            isSelected = true;
             isAnimating = true;
             StateHasChanged();
+
+            // Reset animation state after delay
+            await Task.Delay(1000, token);
+            if (!token.IsCancellationRequested)
+            {
+                isAnimating = false;
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Animation was cancelled
         }
         finally
         {
             isSelecting = false;
+            if (animationCts != null)
+            {
+                animationCts.Dispose();
+                animationCts = null;
+            }
         }
     }
 
@@ -187,5 +225,14 @@
             availableItems.Remove(item);
         }
         StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (animationCts != null)
+        {
+            animationCts.Cancel();
+            animationCts.Dispose();
+        }
     }
 }
