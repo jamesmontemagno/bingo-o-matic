@@ -1,0 +1,48 @@
+@namespace BingoApp.Features.CustomBingo.Components
+
+@if (Items != null && Items.Length > 0)
+{
+    <div class="bingo-board">
+        <div class="board-header">
+            @foreach (var letter in "BINGO")
+            {
+                <div class="header-cell">@letter</div>
+            }
+        </div>
+        <div class="board-grid">
+            @for (int i = 0; i < 25; i++)
+            {
+                var index = i;
+                var item = shuffledItems[i];
+                <div class="grid-cell @(selectedCells[i] ? "selected" : "")" @onclick="() => ToggleCell(index)">
+                    @item
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string[] Items { get; set; } = Array.Empty<string>();
+
+    private string[] shuffledItems = Array.Empty<string>();
+    private bool[] selectedCells = new bool[25];
+    private Random random = new Random();
+
+    protected override void OnParametersSet()
+    {
+        if (Items.Length > 0)
+        {
+            // Get 25 random items for the board
+            shuffledItems = Items.OrderBy(x => random.Next()).Take(25).ToArray();
+            selectedCells = new bool[25];
+        }
+    }
+
+    private void ToggleCell(int index)
+    {
+        selectedCells[index] = !selectedCells[index];
+        StateHasChanged();
+    }
+}

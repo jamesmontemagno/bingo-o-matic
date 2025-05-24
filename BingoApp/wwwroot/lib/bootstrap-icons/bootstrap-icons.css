@@ -1,0 +1,34 @@
+@font-face {
+  font-display: block;
+  font-family: "bootstrap-icons";
+  src: url("./fonts/bootstrap-icons.woff2?1fa40e8900654d2863d011707b9fb6f2") format("woff2"),
+       url("./fonts/bootstrap-icons.woff?1fa40e8900654d2863d011707b9fb6f2") format("woff");
+}
+
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  display: inline-block;
+  font-family: bootstrap-icons !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.bi-plus-lg::before { content: "\f646"; }
+.bi-grid-3x3::before { content: "\f3f5"; }
+.bi-pencil-square::before { content: "\f614"; }
+.bi-house-door::before { content: "\f42d"; }
+.bi-shuffle::before { content: "\f6b6"; }
+.bi-arrow-repeat::before { content: "\f1c2"; }
+.bi-grid::before { content: "\f3f0"; }
+.bi-check-lg::before { content: "\f633"; }
+.bi-magic::before { content: "\f510"; }
+.bi-pencil::before { content: "\f613"; }
+.bi-arrow-clockwise::before { content: "\f196"; }
+.bi-arrow-left-right::before { content: "\f1a9"; }

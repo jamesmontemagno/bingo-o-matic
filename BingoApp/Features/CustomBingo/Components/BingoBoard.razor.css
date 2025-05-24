@@ -1,0 +1,53 @@
+.bingo-board {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.board-header {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.header-cell {
+    background-color: var(--bs-primary);
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    text-align: center;
+    border-radius: 0.25rem;
+}
+
+.board-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+.grid-cell {
+    aspect-ratio: 1;
+    border: 2px solid var(--bs-primary);
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: white;
+}
+
+.grid-cell:hover {
+    background-color: var(--bs-primary-subtle);
+}
+
+.grid-cell.selected {
+    background-color: var(--bs-primary);
+    color: white;
+}

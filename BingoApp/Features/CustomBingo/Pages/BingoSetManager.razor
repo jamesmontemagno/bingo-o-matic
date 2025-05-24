@@ -1,0 +1,79 @@
+@page "/custom-bingo/manage"
+@using BingoApp.Models
+@using BingoApp.Services
+@inject BingoSetService BingoService
+
+<h1>Manage Bingo Sets</h1>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Available Bingo Sets</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                @foreach (var set in BingoService.GetAll())
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">@set.Name</h6>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary btn-sm" @onclick="() => ViewSet(set)">
+                                    View Items
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (selectedSet != null)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@selectedSet.Name Items</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        @foreach (var item in selectedSet.Items)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="card">
+                                    <div class="card-body p-2">
+                                        @item
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private BingoSet? selectedSet;
+
+    private void ViewSet(BingoSet set)
+    {
+        selectedSet = set;
+    }
+
+    private void CloseModal()
+    {
+        selectedSet = null;
+    }
+}

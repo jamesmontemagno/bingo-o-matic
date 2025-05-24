@@ -1,7 +1,12 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">BingoApp</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <a class="navbar-brand" href="">
+            <div class="brand-content">
+                <span class="brand-icon">🎯</span>
+                <span class="brand-text">Bingo-o-matic</span>
+            </div>
+        </a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu" aria-expanded="@(!collapseNavMenu)">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
@@ -9,20 +14,45 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+        <div class="nav-group">
+            <div class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-house-heart" aria-hidden="true"></i>
+                    <span class="nav-text">Home</span>
+                </NavLink>
+            </div>
+            <div class="nav-item">
+                <NavLink class="nav-link" href="standard-bingo">
+                    <i class="bi bi-grid-3x3" aria-hidden="true"></i>
+                    <span class="nav-text">Standard Bingo</span>
+                </NavLink>
+            </div>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Custom Games</div>
+            <div class="nav-item">
+                <NavLink class="nav-link" href="custom-bingo/play">
+                    <i class="bi bi-controller" aria-hidden="true"></i>
+                    <span class="nav-text">Play Custom Bingo</span>
+                </NavLink>
+            </div>
+            <div class="nav-item">
+                <NavLink class="nav-link" href="custom-bingo/manage">
+                    <i class="bi bi-collection" aria-hidden="true"></i>
+                    <span class="nav-text">Manage Sets</span>
+                </NavLink>
+            </div>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
+
+        <div class="nav-group mt-auto">
+            <div class="nav-group-title">Links</div>
+            <div class="nav-item">
+                <a href="https://github.com/jamesmontemagno/bingo-o-matic" target="_blank" class="nav-link">
+                    <i class="bi bi-github" aria-hidden="true"></i>
+                    <span class="nav-text">View on GitHub</span>
+                </a>
+            </div>
         </div>
     </nav>
 </div>

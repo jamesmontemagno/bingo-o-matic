@@ -1,0 +1,118 @@
+@page "/standard-bingo"
+
+<PageTitle>Standard Bingo - Bingo-o-matic</PageTitle>
+
+<div class="bingo-container">
+    <div class="bingo-header">
+        <div class="bingo-title">
+            <h1>Standard Bingo</h1>
+            <p class="lead">Classic 5×5 bingo with numbers 1-75</p>
+        </div>
+        <div class="bingo-controls">
+            <button class="btn btn-primary me-2" @onclick="DrawNextNumber">
+                <i class="bi bi-shuffle"></i> Draw Number
+            </button>
+            <button class="btn btn-outline-primary me-2" @onclick="ResetGame">
+                <i class="bi bi-arrow-repeat"></i> Reset
+            </button>
+            <button class="btn btn-outline-secondary" @onclick="ToggleViewMode">
+                <i class="bi bi-grid"></i> Toggle View
+            </button>
+        </div>
+    </div>
+
+    @if (currentNumber != null)
+    {
+        <div class="current-number @(isAnimating ? "animate" : "")">
+            <div class="number-display">
+                <span class="letter">@GetBingoLetter(currentNumber.Value)</span>
+                <span class="number">@currentNumber</span>
+            </div>
+        </div>
+    }
+
+    <div class="called-numbers">
+        <div class="called-numbers-grid">
+            @for (int i = 1; i <= 75; i++)
+            {
+                var number = i;
+                <div class="number-cell @(calledNumbers.Contains(number) ? "called" : "")"
+                     @onclick="() => ToggleNumber(number)">
+                    <span class="letter">@GetBingoLetter(number)</span>
+                    <span class="number">@number</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private int? currentNumber;
+    private bool isAnimating;
+    private HashSet<int> calledNumbers = new();
+    private List<int> availableNumbers;
+    private Random random = new Random();
+
+    protected override void OnInitialized()
+    {
+        ResetGame();
+    }
+
+    private void DrawNextNumber()
+    {
+        if (availableNumbers.Count == 0)
+            return;
+
+        int index = random.Next(availableNumbers.Count);
+        currentNumber = availableNumbers[index];
+        availableNumbers.RemoveAt(index);
+        calledNumbers.Add(currentNumber.Value);
+
+        // Trigger animation
+        isAnimating = true;
+        InvokeAsync(async () =>
+        {
+            await Task.Delay(1000);
+            isAnimating = false;
+            StateHasChanged();
+        });
+    }
+
+    private void ResetGame()
+    {
+        currentNumber = null;
+        calledNumbers.Clear();
+        availableNumbers = Enumerable.Range(1, 75).ToList();
+    }
+
+    private void ToggleNumber(int number)
+    {
+        if (calledNumbers.Contains(number))
+        {
+            calledNumbers.Remove(number);
+            availableNumbers.Add(number);
+        }
+        else
+        {
+            calledNumbers.Add(number);
+            availableNumbers.Remove(number);
+        }
+    }
+
+    private string GetBingoLetter(int number)
+    {
+        return number switch
+        {
+            <= 15 => "B",
+            <= 30 => "I",
+            <= 45 => "N",
+            <= 60 => "G",
+            _ => "O"
+        };
+    }
+
+    private void ToggleViewMode()
+    {
+        // TODO: Implement grid/list view toggle
+    }
+}
