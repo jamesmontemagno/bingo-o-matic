@@ -2,6 +2,17 @@
     padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
+    height: 100%;
+}
+
+:global(.immersive) .bingo-container {
+    max-width: none;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .game-content {
