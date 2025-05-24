@@ -1,16 +1,23 @@
 ﻿@inherits LayoutComponentBase
+
 <div class="page">
-    <div class="sidebar">
+    <header class="app-header">
         <NavMenu />
-    </div>
+    </header>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+    <main class="app-main">
+        <div class="container">
+            <article class="content">
+                @Body
+            </article>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
     </main>
+
+    <footer class="app-footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; @DateTime.Now.Year Bingo-o-matic. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </div>

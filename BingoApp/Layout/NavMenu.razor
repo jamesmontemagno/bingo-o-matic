@@ -1,69 +1,81 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
+﻿<nav class="navbar navbar-expand-lg">
+    <div class="container">
         <a class="navbar-brand" href="">
             <div class="brand-content">
                 <span class="brand-icon">🎯</span>
                 <span class="brand-text">Bingo-o-matic</span>
             </div>
         </a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu" aria-expanded="@(!collapseNavMenu)">
+        <button class="navbar-toggler" type="button" @onclick="HandleToggleNavMenu" aria-expanded="@(!IsNavMenuCollapsed)">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <div class="@NavMenuCssClass navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <i class="bi bi-house-heart" aria-hidden="true"></i>
+                        <span class="nav-text">Home</span>
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="standard-bingo">
+                        <i class="bi bi-grid-3x3" aria-hidden="true"></i>
+                        <span class="nav-text">Standard Bingo</span>
+                    </NavLink>
+                </li>                <li class="nav-item dropdown">
+                    <div class="nav-link dropdown-toggle" @onclick="HandleToggleCustomGamesMenu" 
+                         role="button" 
+                         tabindex="0" 
+                         @onkeydown="@(e => { if (e.Key == "Enter" || e.Key == " ") { HandleToggleCustomGamesMenu(); }})"
+                         aria-expanded="@IsCustomGamesMenuVisible"
+                         aria-haspopup="true">
+                        <i class="bi bi-controller" aria-hidden="true"></i>
+                        <span class="nav-text">Custom Games</span>
+                    </div>
+                    <div class="dropdown-menu @(IsCustomGamesMenuVisible ? "show" : "")" aria-label="Custom Games Menu">
+                        <NavLink class="dropdown-item" href="custom-bingo/play">
+                            <i class="bi bi-joystick" aria-hidden="true"></i>
+                            <span>Play Custom Bingo</span>
+                        </NavLink>
+                        <NavLink class="dropdown-item" href="custom-bingo/manage">
+                            <i class="bi bi-collection" aria-hidden="true"></i>
+                            <span>Manage Sets</span>
+                        </NavLink>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="https://github.com/jamesmontemagno/bingo-o-matic" target="_blank" class="nav-link">
+                        <i class="bi bi-github" aria-hidden="true"></i>
+                        <span class="nav-text">View on GitHub</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-group">
-            <div class="nav-item">
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <i class="bi bi-house-heart" aria-hidden="true"></i>
-                    <span class="nav-text">Home</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="standard-bingo">
-                    <i class="bi bi-grid-3x3" aria-hidden="true"></i>
-                    <span class="nav-text">Standard Bingo</span>
-                </NavLink>
-            </div>
-        </div>
-
-        <div class="nav-group">
-            <div class="nav-group-title">Custom Games</div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="custom-bingo/play">
-                    <i class="bi bi-controller" aria-hidden="true"></i>
-                    <span class="nav-text">Play Custom Bingo</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="custom-bingo/manage">
-                    <i class="bi bi-collection" aria-hidden="true"></i>
-                    <span class="nav-text">Manage Sets</span>
-                </NavLink>
-            </div>
-        </div>
-
-        <div class="nav-group mt-auto">
-            <div class="nav-group-title">Links</div>
-            <div class="nav-item">
-                <a href="https://github.com/jamesmontemagno/bingo-o-matic" target="_blank" class="nav-link">
-                    <i class="bi bi-github" aria-hidden="true"></i>
-                    <span class="nav-text">View on GitHub</span>
-                </a>
-            </div>
-        </div>
-    </nav>
-</div>
+</nav>
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool IsNavMenuCollapsed { get; set; } = true;
+    private bool IsCustomGamesMenuVisible { get; set; } = false;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string NavMenuCssClass => IsNavMenuCollapsed ? "collapse" : string.Empty;
 
-    private void ToggleNavMenu()
+    private void HandleToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        IsNavMenuCollapsed = !IsNavMenuCollapsed;
+    }
+
+    private void HandleToggleCustomGamesMenu()
+    {
+        IsCustomGamesMenuVisible = !IsCustomGamesMenuVisible;
+    }
+
+    protected override void OnInitialized()
+    {
+        // Implement proper disposal for any event handlers if needed
     }
 }
