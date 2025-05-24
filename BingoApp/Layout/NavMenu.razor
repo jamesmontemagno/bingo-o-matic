@@ -1,7 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using BingoApp.Services
+@implements IDisposable
 @inject NavigationManager NavigationManager
+@inject NavbarService NavbarService
 
 <nav class="navbar navbar-expand-lg">
     <div class="container">
@@ -10,13 +14,20 @@
                 <span class="brand-icon">🎯</span>
                 <span class="brand-text">Bingo-o-matic</span>
             </div>
-        </a>
-        <button class="navbar-toggler" type="button" @onclick="HandleToggleNavMenu" aria-expanded="@(!IsNavMenuCollapsed)">
+        </a>        <button class="navbar-toggler" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarContent" 
+                aria-controls="navbarContent" 
+                aria-expanded="@(!IsNavMenuCollapsed)" 
+                aria-label="Toggle navigation"
+                @onclick="async () => await HandleToggleNavMenuAsync()">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="@NavMenuCssClass navbar-collapse">
-            <ul class="navbar-nav me-auto">                <li class="nav-item">
+        <div class="collapse navbar-collapse @(IsNavMenuCollapsed ? "" : "show")" id="navbarContent">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
                     <NavLink class="nav-link" href="standard-bingo">
                         <span class="nav-emoji" aria-hidden="true">🎲</span>
                         <span class="nav-text">Standard</span>
@@ -30,7 +41,8 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav">                <li class="nav-item">
+            <ul class="navbar-nav">
+                <li class="nav-item">
                     <NavLink class="nav-link" href="settings">
                         <span class="nav-emoji" aria-hidden="true">⚙️</span>
                         <span class="nav-text">Settings</span>
@@ -53,21 +65,32 @@
 @code {
     private bool IsNavMenuCollapsed { get; set; } = true;
 
-    private string NavMenuCssClass => IsNavMenuCollapsed ? "collapse" : string.Empty;
-
-    private void HandleToggleNavMenu()
+    private async Task HandleToggleNavMenuAsync()
     {
         IsNavMenuCollapsed = !IsNavMenuCollapsed;
+        await NavbarService.ToggleNavbarAsync();
     }
-
+    
     protected override void OnInitialized()
     {
         NavigationManager.LocationChanged += HandleLocationChanged;
     }
 
-    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
+        // Collapse menu when navigating to a new page
         IsNavMenuCollapsed = true;
+        
+        try
+        {
+            // Close the navbar using Bootstrap's JavaScript
+            await NavbarService.CloseNavbarAsync();
+        }
+        catch
+        {
+            // Ignore errors if Bootstrap JS isn't loaded yet
+        }
+        
         StateHasChanged();
     }
 

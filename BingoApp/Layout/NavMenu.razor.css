@@ -100,132 +100,118 @@
 /* Navigation items */
 .nav-item {
     margin: 0 0.25rem;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+}
+
+.nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .nav-link {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: var(--bs-gray-700);
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.1);
-    transform: translateY(-2px);
+    color: var(--primary-color);
 }
 
-.nav-link.active {
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.1);
-}
-
-.nav-link i {
-    font-size: 1.2rem;
-    transition: transform 0.3s ease;
-}
-
-.nav-link:hover i {
-    transform: scale(1.1) rotate(5deg);
-}
-
-/* Styles for emoji icons */
 .nav-emoji {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     transition: transform 0.3s ease;
-    margin-right: 0.3rem;
-    display: inline-block;
 }
 
 .nav-link:hover .nav-emoji {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.2);
 }
 
-/* Custom Games Dropdown */
-.dropdown {
+.nav-text {
+    font-size: 0.95rem;
+}
+
+.nav-link.active {
     position: relative;
+    color: var(--primary-color);
 }
 
-.dropdown-toggle {
-    cursor: pointer;
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 1px;
 }
 
-.dropdown-menu {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    transition: all 0.3s ease;
-    transform-origin: top;
-    transform: scaleY(0);
-    opacity: 0;
-}
-
-.dropdown-menu.show {
-    transform: scaleY(1);
-    opacity: 1;
-}
-
-.dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    color: var(--bs-gray-700);
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.dropdown-item:hover {
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.1);
-    transform: translateX(5px);
-}
-
-.dropdown-item.active {
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.1);
-}
-
-.dropdown-item i {
-    font-size: 1.2rem;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
+/* Mobile Navigation Enhancements */
 @media (max-width: 991.98px) {
     .navbar-collapse {
-        background: rgba(255, 255, 255, 0.95);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.35s ease-in-out;
+        z-index: 1000;
+        border: 1px solid rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(10px);
-        border-radius: 1rem;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        padding: 1rem;
-        margin-top: 1rem;
     }
 
+    .navbar-collapse.show {
+        max-height: calc(100vh - 100px); /* Allow scrolling if needed */
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+    .nav-link.active::after {
+        width: 10%;
+        left: 1rem;
+        transform: none;
+    }
+    
+    .navbar-nav {
+        padding: 0.5rem 0;
+        width: 100%;
+    }
+    
     .nav-item {
         margin: 0.25rem 0;
+        width: 100%;
+    }
+    
+    .nav-link {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: rgba(0, 0, 0, 0.05);
     }
 
-    .dropdown-menu {
-        background: transparent;
-        box-shadow: none;
-        padding-left: 1rem;
+    /* Make the container positioned so the absolute navbar-collapse works properly */
+    .navbar .container {
+        position: relative;
     }
+}
 
-    .dropdown-item {
-        padding: 0.5rem 1rem;
-    }
+/* Animation for brand icon */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
