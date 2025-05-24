@@ -8,47 +8,46 @@
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
 
-<div class="container">
-    <div class="row mb-4">
-        <div class="col">
+<PageTitle>Custom Bingo - Bingo-o-matic</PageTitle>
+
+<div class="bingo-container">
+    <div class="bingo-header">
+        <div class="bingo-title">
             <h1>Custom Bingo</h1>
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="form-group" style="width: 300px;">
-                    <label for="bingoSet">Select Bingo Set</label>
-                    <select class="form-select" id="bingoSet" @bind="selectedSetName" @bind:after="OnBingoSetSelected">
-                        <option value="">Select a set...</option>
-                        @foreach (var set in BingoService.GetAll())
-                        {
-                            <option value="@set.Name">@set.Name</option>
-                        }
-                    </select>
-                </div>
-                <a href="custom-bingo/manage" class="btn btn-outline-primary">
-                    <i class="bi bi-gear"></i> Manage Sets
-                </a>
+            @if (selectedSet != null)
+            {
+                <p class="lead">Playing: @selectedSet.Name</p>
+            }
+            else
+            {
+                <p class="lead">Select a bingo set to play</p>
+            }
+        </div>
+        <div class="bingo-controls">
+            <div class="form-group me-2">
+                <select class="form-select" id="bingoSet" @bind="selectedSetName" @bind:after="OnBingoSetSelected">
+                    <option value="">Select a set...</option>
+                    @foreach (var set in BingoService.GetAll())
+                    {
+                        <option value="@set.Name">@set.Name</option>
+                    }
+                </select>
             </div>
+            <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
+                <i class="bi bi-shuffle"></i> Draw Item
+            </button>
+            <button class="btn btn-outline-primary me-2" @onclick="NewGame" disabled="@(selectedSet == null)">
+                <i class="bi bi-arrow-repeat"></i> Reset
+            </button>
+            <a href="custom-bingo/manage" class="btn btn-outline-secondary">
+                <i class="bi bi-gear"></i> Manage Sets
+            </a>
         </div>
     </div>
 
     @if (selectedSet != null)
     {
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-                            <span>@selectedSet.Name</span>
-                            <button class="btn btn-primary btn-sm" @onclick="NewGame">
-                                <i class="bi bi-arrow-clockwise"></i> New Game
-                            </button>
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <BingoBoard Items="@selectedSet.Items" @key="gameId" />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <BingoBoard @ref="bingoBoard" Items="@selectedSet.Items" @key="gameId" />
     }
 </div>
 
@@ -56,6 +55,8 @@
     private string selectedSetName = "";
     private BingoSet? selectedSet;
     private int gameId = 0; // Used to force new game board
+    private bool isSelecting = false;
+    private BingoBoard? bingoBoard;
 
     protected override void OnInitialized()
     {
@@ -73,7 +74,10 @@
     private void OnBingoSetSelected()
     {
         LoadSelectedSet();
-        gameId++; // Force board regeneration
+        if (selectedSet != null)
+        {
+            NewGame(); // Reset the game when selecting a new set
+        }
     }
 
     private void LoadSelectedSet()
@@ -92,5 +96,15 @@
     {
         gameId++; // This will force the BingoBoard to reinitialize
         StateHasChanged();
+    }
+
+    private async Task SelectNext()
+    {
+        if (bingoBoard != null && !isSelecting && selectedSet != null)
+        {
+            isSelecting = true;
+            await bingoBoard.SelectNextAsync();
+            isSelecting = false;
+        }
     }
 }

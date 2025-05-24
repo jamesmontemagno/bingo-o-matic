@@ -1,53 +1,81 @@
-.bingo-board {
+/* Item display with animation */
+.current-item {
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 1rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.current-item.animate {
+    animation: pop-in 1s forwards;
+}
+
+.item-display {
+    background-color: var(--bs-primary);
+    color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.item-display .item {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+}
+
+/* Called items display */
+.called-items {
+    margin-top: 2rem;
+    border: 1px solid var(--bs-gray-300);
+    border-radius: 0.5rem;
     padding: 1rem;
 }
 
-.board-header {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+.called-items h4 {
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
-.header-cell {
+.called-items-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.item-cell {
+    background-color: white;
+    border: 1px solid var(--bs-gray-400);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.item-cell.called {
     background-color: var(--bs-primary);
     color: white;
     font-weight: bold;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    text-align: center;
-    border-radius: 0.25rem;
 }
 
-.board-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.5rem;
-}
-
-.grid-cell {
-    aspect-ratio: 1;
-    border: 2px solid var(--bs-primary);
-    border-radius: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 0.5rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    background-color: white;
-}
-
-.grid-cell:hover {
-    background-color: var(--bs-primary-subtle);
-}
-
-.grid-cell.selected {
-    background-color: var(--bs-primary);
-    color: white;
+/* Animation */
+@keyframes pop-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
