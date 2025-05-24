@@ -270,6 +270,19 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Improve mobile responsiveness for called items grid */
+@media (max-width: 768px) {
+    .called-items-grid {
+        gap: 0.75rem;
+    }
+    
+    .item-cell.called {
+        min-width: 120px;
+        padding: 0.75rem;
+    }
 }
 
 :global(.immersive) .called-items-grid {
