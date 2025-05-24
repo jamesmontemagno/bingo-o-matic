@@ -156,6 +156,8 @@
         {
             isSelecting = true;
             isSelected = false;
+            displayItem = null;
+            currentItem = null;
             isAnimating = true;
             StateHasChanged();
 
@@ -165,12 +167,14 @@
             var token = animationCts.Token;
 
             // Animate through available items
-            var rotations = 20; // Number of items to show before final selection
+            var rotations = 35; // Increased number of items to show before final selection
             for (int i = 0; i < rotations && !token.IsCancellationRequested; i++)
             {
                 displayItem = availableItems[random.Next(availableItems.Count)];
                 StateHasChanged();
-                await Task.Delay(50, token);
+                // Gradually slow down the animation
+                var delay = 50 + (i * 2); // Start at 50ms and gradually increase
+                await Task.Delay(delay, token);
             }
 
             if (token.IsCancellationRequested)

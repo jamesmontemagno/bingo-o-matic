@@ -9,86 +9,251 @@
             <p class="lead">Classic 5×5 bingo with numbers 1-75</p>
         </div>
         <div class="bingo-controls">
-            <button class="btn btn-primary me-2" @onclick="DrawNextNumber">
+            <button class="btn btn-primary me-2" @onclick="DrawNextNumber" disabled="@isShowingAnimation">
                 <i class="bi bi-shuffle"></i> Draw Number
             </button>
-            <button class="btn btn-outline-primary me-2" @onclick="ResetGame">
+            <button class="btn btn-outline-primary me-2" @onclick="async () => await ResetGame(true)">
                 <i class="bi bi-arrow-repeat"></i> Reset
-            </button>
-            <button class="btn btn-outline-secondary" @onclick="ToggleViewMode">
-                <i class="bi bi-grid"></i> Toggle View
             </button>
         </div>
     </div>
 
-    @if (currentNumber != null)
-    {
-        <div class="current-number @(isAnimating ? "animate" : "")">
-            <div class="number-display">
-                <span class="letter">@GetBingoLetter(currentNumber.Value)</span>
-                <span class="number">@currentNumber</span>
-            </div>
-        </div>
-    }
-
-    <div class="called-numbers">
-        <div class="called-numbers-grid">
-            @for (int i = 1; i <= 75; i++)
+    <div class="game-content">
+        <div class="current-ball">
+            @if (currentNumber != null)
             {
-                var number = i;
-                <div class="number-cell @(calledNumbers.Contains(number) ? "called" : "")"
-                     @onclick="() => ToggleNumber(number)">
-                    <span class="letter">@GetBingoLetter(number)</span>
-                    <span class="number">@number</span>
+                <div class="current-number">
+                    @if (isShowingAnimation)
+                    {
+                        <svg class="progress-ring" viewBox="0 0 220 220">
+                            <circle r="100" cx="110" cy="110" 
+                                    fill="none"
+                                    stroke="@GetRingColor(displayNumber)"
+                                    stroke-width="4"
+                                    stroke-dasharray="@(2 * Math.PI * 100)"
+                                    stroke-dashoffset="@((1 - animationProgress) * 2 * Math.PI * 100)" />
+                        </svg>
+                    }
+                    <div class="number-display @(isAnimating ? "animate" : "") @(showGlow ? "selected" : "") letter-@(GetBingoLetter(displayNumber))-display">
+                        <span class="letter @GetLetterClass(displayNumber)">@GetBingoLetter(displayNumber)</span>
+                        <span class="number">@displayNumber</span>
+                    </div>
                 </div>
             }
+            else if (isShowingAnimation)
+            {
+                <div class="current-number">
+                    <svg class="progress-ring" viewBox="0 0 220 220">
+                        <circle r="100" cx="110" cy="110" 
+                                fill="none"
+                                stroke="@GetRingColor(displayNumber)"
+                                stroke-width="4"
+                                stroke-dasharray="@(2 * Math.PI * 100)"
+                                stroke-dashoffset="@((1 - animationProgress) * 2 * Math.PI * 100)" />
+                    </svg>
+                    <div class="number-display letter-@(GetBingoLetter(displayNumber))-display">
+                        <span class="letter @GetLetterClass(displayNumber)">@GetBingoLetter(displayNumber)</span>
+                        <span class="number">@displayNumber</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="called-numbers">
+            <div class="called-numbers-grid">
+                <div class="bingo-column">
+                    <span class="bingo-letter letter-B">B</span>
+                    <div class="numbers">
+                        @foreach (var number in GetCalledNumbersForLetter("B"))
+                        {
+                            <div class="number-mini" @onclick="async () => await ToggleNumber(number)">
+                                @number
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="bingo-column">
+                    <span class="bingo-letter letter-I">I</span>
+                    <div class="numbers">
+                        @foreach (var number in GetCalledNumbersForLetter("I"))
+                        {
+                            <div class="number-mini" @onclick="async () => await ToggleNumber(number)">
+                                @number
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="bingo-column">
+                    <span class="bingo-letter letter-N">N</span>
+                    <div class="numbers">
+                        @foreach (var number in GetCalledNumbersForLetter("N"))
+                        {
+                            <div class="number-mini" @onclick="async () => await ToggleNumber(number)">
+                                @number
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="bingo-column">
+                    <span class="bingo-letter letter-G">G</span>
+                    <div class="numbers">
+                        @foreach (var number in GetCalledNumbersForLetter("G"))
+                        {
+                            <div class="number-mini" @onclick="async () => await ToggleNumber(number)">
+                                @number
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="bingo-column">
+                    <span class="bingo-letter letter-O">O</span>
+                    <div class="numbers">
+                        @foreach (var number in GetCalledNumbersForLetter("O"))
+                        {
+                            <div class="number-mini" @onclick="async () => await ToggleNumber(number)">
+                                @number
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @code {
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
     private int? currentNumber;
     private bool isAnimating;
+    private bool isShowingAnimation;
+    private bool showGlow;
+    private int displayNumber;
+    private double animationProgress;
     private HashSet<int> calledNumbers = new();
-    private List<int> availableNumbers;
+    private List<int> availableNumbers = new();
     private Random random = new Random();
+    private int initialSpeed = 50; // initial speed for the animation
+    private int finalSpeed = 500; // final speed before selection
+    private int animationDuration = 6000; // total animation duration in milliseconds
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        ResetGame();
+        await ResetGame(false);
     }
 
-    private void DrawNextNumber()
+    private void ShuffleNumbers()
     {
-        if (availableNumbers.Count == 0)
+        // Fisher-Yates shuffle algorithm
+        int n = availableNumbers.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = random.Next(n + 1);
+            int temp = availableNumbers[k];
+            availableNumbers[k] = availableNumbers[n];
+            availableNumbers[n] = temp;
+        }
+    }
+
+    private string GetRingColor(int number)
+    {
+        var colors = new Dictionary<string, string>
+        {
+            { "B", "#FF595E" },
+            { "I", "#FFCA3A" },
+            { "N", "#8AC926" },
+            { "G", "#1982C4" },
+            { "O", "#6A4C93" }
+        };
+
+        return colors[GetBingoLetter(number)];
+    }
+
+    private async Task DrawNextNumber()
+    {
+        if (availableNumbers.Count == 0 || isShowingAnimation)
             return;
 
-        int index = random.Next(availableNumbers.Count);
-        currentNumber = availableNumbers[index];
-        availableNumbers.RemoveAt(index);
-        calledNumbers.Add(currentNumber.Value);
-
-        // Trigger animation
-        isAnimating = true;
-        InvokeAsync(async () =>
+        showGlow = false;
+        isShowingAnimation = true;
+        
+        // Select the final number before starting animation
+        ShuffleNumbers();
+        currentNumber = availableNumbers[0];
+        availableNumbers.RemoveAt(0);
+        
+        var startTime = DateTime.Now;
+        var endTime = startTime.AddMilliseconds(animationDuration);
+        
+        // Animation loop with gradually slowing speed
+        while (DateTime.Now < endTime)
         {
-            await Task.Delay(1000);
-            isAnimating = false;
+            ShuffleNumbers();
+            // During animation, show random numbers except for the last frame
+            var progress = (DateTime.Now - startTime).TotalMilliseconds / animationDuration;
+            if (progress >= 0.97) // In the last 3% of animation, show the selected number
+            {
+                displayNumber = currentNumber.Value;
+            }
+            else 
+            {
+                displayNumber = availableNumbers[0];
+            }
+            
+            // Update progress
+            animationProgress = progress;
             StateHasChanged();
-        });
+
+            // Calculate current speed based on time elapsed
+            var currentSpeed = initialSpeed + (finalSpeed - initialSpeed) * progress;
+            await Task.Delay((int)currentSpeed);
+        }
+
+        calledNumbers.Add(currentNumber.Value);
+        // Trigger final animations
+        isShowingAnimation = false;
+        isAnimating = true;
+        StateHasChanged();
+        await Task.Delay(500);
+        isAnimating = false;
+        showGlow = true;
+        displayNumber = currentNumber.Value;
+        StateHasChanged();
     }
 
-    private void ResetGame()
+    private async Task<bool> ConfirmAction(string message)
     {
+        return await JS.InvokeAsync<bool>("confirm", message);
+    }
+
+    private async Task ResetGame(bool isGameStarted = false)
+    {
+        if (isGameStarted && calledNumbers.Count > 0)
+        {
+            if (!await ConfirmAction("Are you sure you want to reset the game? This will clear all called numbers."))
+                return;
+        }
+
         currentNumber = null;
+        displayNumber = 0;
         calledNumbers.Clear();
         availableNumbers = Enumerable.Range(1, 75).ToList();
+        ShuffleNumbers();
+        isAnimating = false;
+        isShowingAnimation = false;
+        showGlow = false;
+        animationProgress = 0;
     }
 
-    private void ToggleNumber(int number)
+    private async Task ToggleNumber(int number)
     {
         if (calledNumbers.Contains(number))
         {
+            if (!await ConfirmAction($"Are you sure you want to remove number {number}?"))
+                return;
+
             calledNumbers.Remove(number);
             availableNumbers.Add(number);
         }
@@ -111,8 +276,25 @@
         };
     }
 
-    private void ToggleViewMode()
+    private string GetLetterClass(int number)
     {
-        // TODO: Implement grid/list view toggle
+        return $"letter-{GetBingoLetter(number)}";
+    }
+
+    private IEnumerable<int> GetCalledNumbersForLetter(string letter)
+    {
+        var range = letter switch
+        {
+            "B" => (1, 15),
+            "I" => (16, 30),
+            "N" => (31, 45),
+            "G" => (46, 60),
+            "O" => (61, 75),
+            _ => (0, 0)
+        };
+
+        return calledNumbers
+            .Where(n => n >= range.Item1 && n <= range.Item2)
+            .OrderBy(n => n);
     }
 }

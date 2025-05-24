@@ -1,4 +1,5 @@
 .page {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -13,6 +14,8 @@
     z-index: 1000;
     background: linear-gradient(135deg, var(--pnw-deep-forest) 0%, var(--pnw-mountain) 100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform-origin: top;
 }
 
 .app-main {
@@ -20,6 +23,24 @@
     padding-top: 4.5rem; /* Adjusted to account for fixed header */
     padding-bottom: 2rem;
     background-color: var(--pnw-mist);
+    transition: padding 0.3s ease-in-out;
+}
+
+/* Immersive mode styles */
+.immersive .app-main {
+    padding: 0;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+.immersive .content {
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .content {
@@ -33,16 +54,103 @@
 .app-footer {
     background-color: var(--pnw-deep-forest);
     color: var(--pnw-light);
-    padding: 0.5rem 0;
+    padding: 1rem 0;
     text-align: center;
     font-size: 0.875rem;
     line-height: 1;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform-origin: bottom;
+    background-color: #f8f9fa;
 }
 
 .footer-content {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.immersive .app-header,
+.immersive .app-footer {
+    transform: scaleY(0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.immersive-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    font-size: 1.4rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.immersive-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.immersive-toggle:active {
+    transform: scale(0.95);
+}
+
+.immersive-toggle i {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.popup-hint {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.75rem 2.5rem 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    animation: slide-up 0.3s ease-out;
+}
+
+.popup-close {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    opacity: 0.7;
+}
+
+.popup-close:hover {
+    opacity: 1;
+}
+
+@keyframes slide-up {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
 }
 
 @media (max-width: 768px) {
