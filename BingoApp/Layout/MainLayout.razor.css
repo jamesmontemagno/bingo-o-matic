@@ -20,7 +20,7 @@
 
 .app-main {
     flex: 1;
-    padding-top: 4.5rem; /* Adjusted to account for fixed header */
+    padding-top: 3.5rem; /* Adjusted to account for smaller fixed header */
     padding-bottom: 2rem;
     background-color: var(--pnw-mist);
     transition: padding 0.3s ease-in-out;
@@ -86,7 +86,7 @@
 
 @media (max-width: 768px) {
     .app-main {
-        padding-top: 4rem;
+        padding-top: 3rem;
         padding-left: 1rem;
         padding-right: 1rem;
     }
