@@ -57,6 +57,19 @@
     align-items: center;
 }
 
+/* Improve mobile responsiveness for bingo controls */
+@media (max-width: 768px) {
+    .bingo-controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
 /* Item display with animation */
 .current-item {
     width: 100%;
@@ -67,6 +80,14 @@
     transform: translateY(0);
     transition: transform 0.5s ease-out, opacity 0.3s;
     perspective: 1000px;
+}
+
+/* Mobile responsiveness for item display */
+@media (max-width: 768px) {
+    .current-item {
+        margin: 1rem auto;
+        padding: 0.5rem;
+    }
 }
 
 :global(.immersive) .current-item {
