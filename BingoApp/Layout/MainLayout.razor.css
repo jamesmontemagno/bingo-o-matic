@@ -94,4 +94,9 @@
     .content {
         padding: 1.5rem;
     }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }
