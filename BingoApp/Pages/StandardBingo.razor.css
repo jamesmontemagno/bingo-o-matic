@@ -13,6 +13,7 @@
     padding: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Prevent scrollbars */
 }
 
 .game-content {
@@ -21,10 +22,33 @@
     margin-top: 2rem;
 }
 
+:global(.immersive) .game-content {
+    flex: 1 1 auto;
+    margin-top: 0;
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
 .current-ball {
     flex: 0 0 200px;
     min-height: 200px;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:global(.immersive) .current-ball {
+    flex: 0 0 35%;
+    min-height: 0;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bingo-header {
@@ -32,6 +56,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+:global(.immersive) .bingo-header {
+    margin-bottom: 0;
+    padding: 1rem;
 }
 
 .current-number {
@@ -47,6 +76,11 @@
     transform: translate(-50%, -50%);
     width: 220px;
     height: 220px;
+}
+
+:global(.immersive) .progress-ring {
+    width: 300px;
+    height: 300px;
 }
 
 .progress-ring circle {
@@ -69,6 +103,13 @@
     align-items: center;
     position: relative;
     transform-style: preserve-3d;
+}
+
+:global(.immersive) .number-display {
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    box-shadow: 0 16px 32px rgba(0,0,0,0.3);
 }
 
 .number-display {
@@ -170,12 +211,21 @@
     z-index: 1;
 }
 
+:global(.immersive) .number-display .letter {
+    font-size: 5.5rem;
+    margin-bottom: -1.2rem;
+}
+
 .number-display .number {
     font-size: 5rem;
     font-weight: bold;
     line-height: 1;
     position: relative;
     z-index: 1;
+}
+
+:global(.immersive) .number-display .number {
+    font-size: 7rem;
 }
 
 /* BINGO Letter Colors are already defined above */
@@ -206,10 +256,26 @@
     margin-top: 0;
 }
 
+:global(.immersive) .called-numbers {
+    flex: 1 1 65%;
+    display: flex;
+    align-items: center;
+    overflow-y: auto;
+}
+
 .called-numbers-grid {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
+}
+
+:global(.immersive) .called-numbers-grid {
+    gap: 1.5rem;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .bingo-column {
@@ -222,6 +288,13 @@
     background: rgba(0,0,0,0.03);
 }
 
+:global(.immersive) .bingo-column {
+    height: 5rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.05);
+}
+
 .bingo-letter {
     font-size: 3rem;
     font-weight: bold;
@@ -229,11 +302,20 @@
     text-align: center;
 }
 
+:global(.immersive) .bingo-letter {
+    font-size: 3.5rem;
+    width: 5rem;
+}
+
 .numbers {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     align-items: center;
+}
+
+:global(.immersive) .numbers {
+    gap: 1rem;
 }
 
 .number-mini {
@@ -247,6 +329,13 @@
     min-width: 3.5rem;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+:global(.immersive) .number-mini {
+    padding: 0.6rem 1.2rem;
+    font-size: 2rem;
+    min-width: 4rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
 }
 
 .number-mini:hover {

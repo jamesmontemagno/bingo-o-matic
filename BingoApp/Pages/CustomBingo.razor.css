@@ -156,14 +156,37 @@
 }
 
 .item-cell.called {
-    color: white;
     padding: 1rem;
     border-radius: 0.5rem;
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     flex: 1;
     min-width: 150px;
+}
+
+.item-cell.called.latest {
+    color: white;
+    animation: pop-in 0.5s ease-out;
+}
+
+.item-cell.called.previous {
+    color: var(--bs-dark);
+    background-color: transparent;
+    border-width: 3px;
+    border-style: solid;
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .item-cell.called:hover {

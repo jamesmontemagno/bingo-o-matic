@@ -63,13 +63,37 @@
     line-height: 1;
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
     transform-origin: bottom;
-    background-color: #f8f9fa;
 }
 
 .footer-content {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+}
+
+.footer-text {
+    color: var(--pnw-light);
+    font-weight: 500;
+}
+
+.tip-button {
+    color: var(--pnw-light);
+    text-decoration: none;
+    background-color: var(--pnw-mountain);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tip-button:hover, .tip-button:focus {
+    background-color: var(--pnw-sunset);
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
 }
 
 .immersive .app-header,

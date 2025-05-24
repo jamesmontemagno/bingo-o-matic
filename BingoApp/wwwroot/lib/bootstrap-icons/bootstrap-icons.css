@@ -32,3 +32,14 @@
 .bi-pencil::before { content: "\f613"; }
 .bi-arrow-clockwise::before { content: "\f196"; }
 .bi-arrow-left-right::before { content: "\f1a9"; }
+.bi-fullscreen::before { content: "\f3df"; }
+.bi-fullscreen-exit::before { content: "\f3de"; }
+.bi-x::before { content: "\f62a"; }
+.bi-collection::before { content: "\f2cc"; }
+.bi-controller::before { content: "\f2e8"; }
+.bi-wifi-off::before { content: "\f83b"; }
+.bi-plus::before { content: "\f645"; }
+.bi-eye::before { content: "\f3a9"; }
+.bi-trash::before { content: "\f75e"; }
+.bi-gear::before { content: "\f3e7"; }
+.bi-github::before { content: "\f3ed"; }
