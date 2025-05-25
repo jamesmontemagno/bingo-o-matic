@@ -53,19 +53,20 @@
             {
                 <div class="wheel-overlay">
                     <div class="wheel-container">
-                        <div class="wheel" style="transform: rotate(@(wheelRotation)deg)">
-                            @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
-                            {
-                                var segmentAngle = 360.0 / availableItems.Count;
-                                var startAngle = segmentAngle * index;
-                                var endAngle = segmentAngle * (index + 1);
-                                var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
-                                var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((startAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((startAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((endAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((endAngle - 90) * Math.PI / 180)}%)";
-                                <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
-                                    <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateY(120px)">@item</span>
-                                </div>
-                            }
-                        </div>
+                    <div class="wheel" style="transform: rotate(@(wheelRotation)deg)">
+                        @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
+                        {
+                            var segmentAngle = 360.0 / availableItems.Count;
+                            var startAngle = segmentAngle * index;
+                            var endAngle = segmentAngle * (index + 1);
+                            var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
+                            var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((startAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((startAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((endAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((endAngle - 90) * Math.PI / 180)}%)";
+                            <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
+                            </div>
+                            <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(140px) translateY(-50%)">@item</span>
+
+                        }
+                    </div>
                         <div class="wheel-pointer"></div>
                     </div>
                 </div>

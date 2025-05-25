@@ -553,30 +553,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: visible; /* Make sure this is not hiding the text */
 }
+
 
 .wheel-text {
     position: absolute;
     top: 50%;
     left: 50%;
+    /* Set the origin to the top-left of the span (wheel's center) */
+    /* for rotation around the wheel's actual center. */
     transform-origin: 0 0;
     color: white;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: bold;
     white-space: nowrap;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
                 -2px -2px 4px rgba(0, 0, 0, 0.8),
                 2px -2px 4px rgba(0, 0, 0, 0.8),
                 -2px 2px 4px rgba(0, 0, 0, 0.8);
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    z-index: 10;
+    z-index: 100;
+    pointer-events: none;
+    backface-visibility: hidden;
+    text-align: center; /* Center text content within the span */
+    max-width: 120px; 
+    overflow: visible;
 }
+
 
 .wheel-pointer {
     position: absolute;
-    left: -40px;
+    right: -40px;
     top: 50%;
     transform: translateY(-50%);
     width: 0;

@@ -1,6 +1,6 @@
 {
-  "name": "BingoApp",
-  "short_name": "BingoApp",
+  "name": "Bingo-o-matic",
+  "short_name": "Bingo-o-matic",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
