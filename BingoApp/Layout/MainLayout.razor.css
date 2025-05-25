@@ -49,13 +49,55 @@
 
 .footer-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .footer-text {
     color: var(--pnw-light);
     font-weight: 500;
+}
+
+.footer-link {
+    color: var(--pnw-light);
+    text-decoration: none;
+    opacity: 0.85;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    position: relative;
+    padding: 0.2rem 0;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background: var(--pnw-accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.footer-link:hover {
+    color: white;
+    opacity: 1;
+    text-decoration: none;
+}
+
+.footer-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.footer-link-separator {
+    color: var(--pnw-light);
+    opacity: 0.5;
+    user-select: none;
 }
 
 .tip-button {
