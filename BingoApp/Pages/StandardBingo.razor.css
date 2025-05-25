@@ -261,7 +261,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    min-height: 4rem;
+    min-height: 5rem;
     border-radius: 8px;
     padding: 0.5rem;
     background: rgba(var(--bs-primary-rgb), 0.05);
@@ -287,20 +287,20 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     flex: 1;
-    max-height: 4rem;
+    max-height: 5rem;
     align-content: flex-start;
     overflow-y: auto;
 }
 
 .number-mini {
     background: var(--light-bg);
-    padding: 0.25rem 0.5rem;
+    padding: 0.35rem 0.6rem;
     border-radius: 12px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 0.875rem;
-    min-width: 1.75rem;
+    font-size: 1.1rem;
+    min-width: 2rem;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     color: var(--text-color);

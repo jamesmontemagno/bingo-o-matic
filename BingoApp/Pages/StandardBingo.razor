@@ -189,7 +189,7 @@
             ShuffleNumbers();
             // During animation, show random numbers except for the last frame
             var progress = (DateTime.Now - startTime).TotalMilliseconds / animationDuration;
-            if (progress >= 0.96) // In the last 3% of animation, show the selected number
+            if (progress >= 0.93) // In the last 3% of animation, show the selected number
             {
                 displayNumber = currentNumber.Value;
             }
