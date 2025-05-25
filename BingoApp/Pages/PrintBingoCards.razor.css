@@ -80,3 +80,93 @@
     font-size: 2.5em;
     text-transform: uppercase;
 }
+
+/* Theme selector styles */
+.theme-selector {
+    margin-bottom: 1.5rem;
+}
+
+.theme-option {
+    width: 80px;
+    height: 100px;
+    margin: 0.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+}
+
+.theme-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.theme-option.selected {
+    border-color: #007bff;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-preview {
+    height: 70px;
+    width: 100%;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-name {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 0;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+/* Color themes */
+.theme-color-blue .theme-preview {
+    background-color: #e6f2ff;
+    border-bottom: 2px solid #99ccff;
+}
+
+.theme-color-green .theme-preview {
+    background-color: #e6fff2;
+    border-bottom: 2px solid #99ffcc;
+}
+
+.theme-color-purple .theme-preview {
+    background-color: #f2e6ff;
+    border-bottom: 2px solid #cc99ff;
+}
+
+.theme-color-orange .theme-preview {
+    background-color: #fff2e6;
+    border-bottom: 2px solid #ffcc99;
+}
+
+.theme-color-pink .theme-preview {
+    background-color: #ffe6f2;
+    border-bottom: 2px solid #ff99cc;
+}
+
+/* Preview scaling for themes */
+.theme-preview .bingo-theme {
+    opacity: 0.6;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Bingo Card Preview */
+.bingo-card-container {
+    margin-top: 2rem;
+    min-height: 200px;
+}
