@@ -1,6 +1,4 @@
 @page "/custom-bingo"
-@using BingoApp.Models
-@using BingoApp.Services
 @using Microsoft.AspNetCore.Components
 @using System.Web
 @using Microsoft.AspNetCore.Components.Web
@@ -8,6 +6,7 @@
 
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
+@inject IBrowserStorageService StorageService
 
 <div class="bingo-container">
     <div class="bingo-header">
@@ -38,37 +37,67 @@
             <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null)">
                 Reset
             </button>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="useWheel" @bind="useWheel" @bind:after="OnWheelPreferenceChanged">
+                <label class="form-check-label" for="useWheel">
+                    Use Wheel
+                </label>
+            </div>
         </div>
     </div>
 
     @if (selectedSet != null)
     {
         <div class="game-content">
-            <div class="current-item @(isSelecting ? "selecting" : "") @(isAnimating ? "animate" : "")" aria-live="polite">
-                <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
-                    <span class="item">@(displayItem ?? "Ready to draw...")</span>
+            @if (isSelecting && useWheel)
+            {
+                <div class="wheel-overlay">
+                    <div class="wheel-container">
+                        <div class="wheel" style="transform: rotate(@(wheelRotation)deg)">
+                            @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
+                            {
+                                var segmentAngle = 360.0 / availableItems.Count;
+                                var startAngle = segmentAngle * index;
+                                var endAngle = segmentAngle * (index + 1);
+                                var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
+                                var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((startAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((startAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((endAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((endAngle - 90) * Math.PI / 180)}%)";
+                                <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
+                                    <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateY(120px)">@item</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="wheel-pointer"></div>
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="current-item @(isSelecting ? "selecting" : "") @(isAnimating ? "animate" : "")" aria-live="polite">
+                    <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
+                        <span class="item">@(displayItem ?? "Ready to draw...")</span>
+                    </div>
+                </div>
 
-            <div class="called-items">
-                <h4>Called Items</h4>
-                <div class="called-items-grid">
-                    @if (calledItems.Count > 0)
-                    {
-                        @foreach (var item in calledItems.AsEnumerable().Reverse())
+                <div class="called-items">
+                    <h4>Called Items</h4>
+                    <div class="called-items-grid">
+                        @if (calledItems.Count > 0)
                         {
-                            bool isLatestItem = calledItems.IndexOf(item) == calledItems.Count - 1;
-                            <div class="item-cell called @(isLatestItem ? "latest" : "previous")" style="@(isLatestItem ? $"background-color: {currentThemeColor}" : $"border-color: {currentThemeColor}")">
-                                <span>@item</span>
+                            @foreach (var item in calledItems.AsEnumerable().Reverse())
+                            {
+                                bool isLatestItem = calledItems.IndexOf(item) == calledItems.Count - 1;
+                                <div class="item-cell called @(isLatestItem ? "latest" : "previous")" style="@(isLatestItem ? $"background-color: {currentThemeColor}" : $"border-color: {currentThemeColor}")">
+                                    <span>@item</span>
                             </div>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <p>No items selected yet. Click "Draw Item" to begin.</p>
-                    }
+                        else
+                        {
+                            <p>No items selected yet. Click "Draw Item" to begin.</p>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     }
 </div>
@@ -141,16 +170,39 @@
         "#075985"  // Ocean Blue
     };
 
+    private readonly string[] wheelColors = new[]
+    {
+        "#E74C3C", // Red
+        "#3498DB", // Blue  
+        "#2ECC71", // Green
+        "#F39C12", // Orange
+        "#9B59B6", // Purple
+        "#1ABC9C"  // Teal
+    };
+    
+    private string GetWheelSegmentColor(int index)
+    {
+        return wheelColors[index % wheelColors.Length];
+    }
+
     // Confirmation dialog state
     private bool showConfirmDialog = false;
     private string confirmTitle = "";
     private string confirmMessage = "";
     private Func<Task>? confirmAction;
 
+    // Wheel state
+    private bool useWheel = false;
+    private double wheelRotation = 0;
+    private const string WheelPreferenceKey = "bingo_wheel_preference";
+
     protected override async Task OnInitializedAsync()
     {
         // Subscribe to changes
         BingoService.OnSetsChanged += OnBingoSetsChanged;
+        
+        // Load wheel preference
+        await LoadWheelPreferenceAsync();
         
         // Load all bingo sets
         await LoadBingoSetsAsync();
@@ -172,6 +224,32 @@
         bingoSets = (await BingoService.GetAllAsync()).ToList();
     }
     
+    private async Task LoadWheelPreferenceAsync()
+    {
+        try
+        {
+            var savedPreference = await StorageService.GetItemAsync<bool?>(WheelPreferenceKey);
+            useWheel = savedPreference ?? false;
+        }
+        catch
+        {
+            // If loading fails, default to false
+            useWheel = false;
+        }
+    }
+    
+    private async Task SaveWheelPreferenceAsync()
+    {
+        try
+        {
+            await StorageService.SetItemAsync(WheelPreferenceKey, useWheel);
+        }
+        catch
+        {
+            // Silently fail if saving doesn't work
+        }
+    }
+    
     private void OnBingoSetsChanged()
     {
         InvokeAsync(async () => 
@@ -179,6 +257,11 @@
             await LoadBingoSetsAsync();
             StateHasChanged();
         });
+    }
+
+    private async Task OnWheelPreferenceChanged()
+    {
+        await SaveWheelPreferenceAsync();
     }
 
     private void OnBingoSetSelectionChanged()
@@ -265,6 +348,7 @@
                 newColor = darkColors[random.Next(darkColors.Length)];
             } while (darkColors.Length > 1 && newColor == previousColor);
             currentThemeColor = newColor;
+            wheelRotation = 0;
             StateHasChanged();
         }
     }
@@ -322,58 +406,90 @@
         {
             isSelecting = true;
             isSelected = false;
-            // Start with a random item visible right away
-            displayItem = availableItems[random.Next(availableItems.Count)];
-            currentItem = null;
-            isAnimating = true;
-            StateHasChanged();
-
-            // Cancel any existing animation
-            animationCts?.Cancel();
-            animationCts = new CancellationTokenSource();
-            var token = animationCts.Token;
-
-            // Fast cycling at the beginning
-            var fastRotations = 15;
-            for (int i = 0; i < fastRotations && !token.IsCancellationRequested; i++)
-            {
-                displayItem = availableItems[random.Next(availableItems.Count)];
-                StateHasChanged();
-                await Task.Delay(40, token); // Fast speed - items changing quickly
-            }
             
-            // Medium speed cycling
-            var mediumRotations = 10;
-            for (int i = 0; i < mediumRotations && !token.IsCancellationRequested; i++)
+            if (useWheel)
             {
-                displayItem = availableItems[random.Next(availableItems.Count)];
+                // Select the final item first
+                int randomIndex = random.Next(0, availableItems.Count);
+                currentItem = availableItems[randomIndex];
+                
+                // Calculate the final rotation to make the selected item land at the pointer
+                double segmentAngle = 360.0 / availableItems.Count;
+                double itemAngle = segmentAngle * randomIndex;
+                // Add extra rotations for effect (5-7 full rotations) plus the specific angle
+                double targetRotation = (random.Next(5, 8) * 360) + (360 - itemAngle);
+                
+                // Start the wheel spinning animation
+                wheelRotation = 0;
                 StateHasChanged();
-                await Task.Delay(80 + (i * 5), token); // Medium speed - slowing down
+                
+                // Trigger the animation by setting the final rotation
+                await Task.Delay(50); // Small delay to ensure the initial state is rendered
+                wheelRotation = targetRotation;
+                StateHasChanged();
+                
+                // Wait for the animation to complete plus one second
+                await Task.Delay(5000);
+                
+                // Update the game state
+                availableItems.RemoveAt(randomIndex);
+                calledItems.Add(currentItem);
+                displayItem = currentItem;
             }
-            
-            // Slow down dramatically for final selections
-            var slowRotations = 7;
-            for (int i = 0; i < slowRotations && !token.IsCancellationRequested; i++)
+            else
             {
+                // Original card-based selection animation
                 displayItem = availableItems[random.Next(availableItems.Count)];
+                currentItem = null;
+                isAnimating = true;
                 StateHasChanged();
-                await Task.Delay(150 + (i * 50), token); // Progressively slower
+
+                // Cancel any existing animation
+                animationCts?.Cancel();
+                animationCts = new CancellationTokenSource();
+                var token = animationCts.Token;
+
+                // Fast cycling at the beginning
+                var fastRotations = 15;
+                for (int i = 0; i < fastRotations && !token.IsCancellationRequested; i++)
+                {
+                    displayItem = availableItems[random.Next(availableItems.Count)];
+                    StateHasChanged();
+                    await Task.Delay(50, token);
+                }
+                
+                // Medium speed cycling
+                var mediumRotations = 10;
+                for (int i = 0; i < mediumRotations && !token.IsCancellationRequested; i++)
+                {
+                    displayItem = availableItems[random.Next(availableItems.Count)];
+                    StateHasChanged();
+                    await Task.Delay(100, token);
+                }
+                
+                // Slow down dramatically for final selections
+                var slowRotations = 7;
+                for (int i = 0; i < slowRotations && !token.IsCancellationRequested; i++)
+                {
+                    displayItem = availableItems[random.Next(availableItems.Count)];
+                    StateHasChanged();
+                    await Task.Delay(200, token);
+                }
+
+                if (!token.IsCancellationRequested)
+                {
+                    // Select the final item
+                    int randomIndex = random.Next(0, availableItems.Count);
+                    currentItem = availableItems[randomIndex];
+                    displayItem = currentItem;
+                    availableItems.RemoveAt(randomIndex);
+                    calledItems.Add(currentItem);
+                }
             }
 
-            if (token.IsCancellationRequested)
-                return;
-
-            // Select the final item
-            int randomIndex = random.Next(0, availableItems.Count);
-            currentItem = availableItems[randomIndex];
-            displayItem = currentItem;
-            availableItems.RemoveAt(randomIndex);
-            calledItems.Add(currentItem);
-
-            // Show final selection without animation
+            // Show final selection
             isSelecting = false;
             isSelected = true;
-            // Don't use the spinning animation
             isAnimating = false;
             StateHasChanged();
         }
