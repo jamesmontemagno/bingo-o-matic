@@ -55,7 +55,7 @@
                 <div class="called-items-grid">
                     @if (calledItems.Count > 0)
                     {
-                        @foreach (var item in calledItems)
+                        @foreach (var item in calledItems.AsEnumerable().Reverse())
                         {
                             bool isLatestItem = calledItems.IndexOf(item) == calledItems.Count - 1;
                             <div class="item-cell called @(isLatestItem ? "latest" : "previous")" style="@(isLatestItem ? $"background-color: {currentThemeColor}" : $"border-color: {currentThemeColor}")">
