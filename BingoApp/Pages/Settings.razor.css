@@ -7,29 +7,104 @@
 
 .settings-container h1 {
     margin-bottom: 2rem;
+    color: var(--text-color);
 }
 
 .card {
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    border: 1px solid var(--border-color);
     border-radius: 0.25rem;
+    background-color: var(--card-background);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .card-header {
     background-color: rgba(0, 0, 0, 0.03);
     padding: 1rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .card-header h2 {
     margin: 0;
+    color: var(--text-color);
 }
 
 .card-body {
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 .card-body p {
     margin-bottom: 1rem;
-    color: #6c757d;
+    color: var(--text-color-muted);
+}
+
+/* Theme toggle specific styles */
+.form-check.form-switch {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+}
+
+.form-check-input {
+    width: 3rem !important;
+    height: 1.5rem !important;
+    margin: 0 !important;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color-dark);
+}
+
+.form-check-label {
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    margin: 0;
+    user-select: none;
+}
+
+.form-check-label i {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.form-check-label:hover i {
+    transform: scale(1.1);
+}
+
+/* Theme-specific icon colors */
+[data-bs-theme="light"] .form-check-label i.bi-sun {
+    color: #ffc107;
+}
+
+[data-bs-theme="dark"] .form-check-label i.bi-moon-stars {
+    color: #6f42c1;
+}
+
+/* Improve focus styles */
+.form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Animation for theme switch */
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.form-check-input:checked ~ .form-check-label i {
+    animation: rotate 0.5s ease-in-out;
 }

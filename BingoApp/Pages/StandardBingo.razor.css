@@ -92,7 +92,7 @@
     height: 200px;
     margin: 0 auto;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0);
+    background: radial-gradient(circle at 30% 30%, var(--card-background), var(--light-bg));
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
@@ -100,44 +100,46 @@
     align-items: center;
     position: relative;
     transform-style: preserve-3d;
+    --glow-color: rgba(100, 100, 100, 0.7);
+    --ball-color: var(--light-bg);
 }
 
-.number-display {
-    --glow-color: rgba(100, 100, 100, 0.7);
-    --ball-color: #e0e0e0;
+[data-bs-theme="dark"] .number-display {
+    background: radial-gradient(circle at 30% 30%, var(--card-background), var(--background-color));
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 
 .number-display.selected {
-    background: radial-gradient(circle at 30% 30%, #ffffff, var(--ball-color));
+    background: radial-gradient(circle at 30% 30%, var(--card-background), var(--ball-color));
 }
 
-/* Define colors by letter class */
+/* Define colors by letter class with dark mode support */
 .number-display.letter-B-display {
-    --glow-color: #FF595E;
-    --ball-color: #ffeded;
+    --glow-color: rgba(255, 89, 94, 0.7);
+    --ball-color: #3d1517;
 }
 
 .number-display.letter-I-display {
-    --glow-color: #FFCA3A;
-    --ball-color: #fff5d6;
+    --glow-color: rgba(255, 202, 58, 0.7);
+    --ball-color: #3d3014;
 }
 
 .number-display.letter-N-display {
-    --glow-color: #8AC926;
-    --ball-color: #f0fae6;
+    --glow-color: rgba(138, 201, 38, 0.7);
+    --ball-color: #1f3d0a;
 }
 
 .number-display.letter-G-display {
-    --glow-color: #1982C4;
-    --ball-color: #e6f4fa;
+    --glow-color: rgba(25, 130, 196, 0.7);
+    --ball-color: #0a3d5e;
 }
 
 .number-display.letter-O-display {
-    --glow-color: #6A4C93;
-    --ball-color: #eee6fa;
+    --glow-color: rgba(106, 76, 147, 0.7);
+    --ball-color: #2a1f3d;
 }
 
-/* Letter colors within the display */
+/* Letter colors */
 .letter-B { color: #FF595E; }
 .letter-I { color: #FFCA3A; }
 .letter-N { color: #8AC926; }
@@ -262,17 +264,13 @@
     height: 4rem;
     border-radius: 8px;
     padding: 0.5rem;
-    background: rgba(0,0,0,0.03);
+    background: rgba(var(--bs-primary-rgb), 0.05);
     width: 100%;
+    transition: background-color 0.3s ease;
 }
 
-@media (max-width: 768px) {
-    .bingo-column {
-        gap: 1rem;
-        padding: 0.5rem;
-        height: auto;
-        min-height: 3.5rem;
-    }
+[data-bs-theme="dark"] .bingo-column {
+    background: rgba(var(--bs-primary-rgb), 0.1);
 }
 
 .bingo-letter {
@@ -282,15 +280,8 @@
     text-align: center;
 }
 
-.numbers {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-}
-
 .number-mini {
-    background: #f0f0f0;
+    background: var(--light-bg);
     padding: 0.25rem 0.5rem;
     border-radius: 12px;
     font-weight: bold;
@@ -300,10 +291,15 @@
     min-width: 1.75rem;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .number-mini {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .number-mini:hover {
-    background: #e0e0e0;
+    background: var(--card-background);
     transform: scale(1.05);
 }
 

@@ -5,8 +5,6 @@
     height: 100%;
 }
 
-
-
 .bingo-header {
     margin-bottom: 2rem;
     display: flex;
@@ -14,22 +12,14 @@
     gap: 1rem;
 }
 
-
-
-@media (min-width: 768px) {
-    .bingo-header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
 .bingo-title h1 {
     margin-bottom: 0.5rem;
+    color: var(--text-color);
 }
 
 .bingo-title .lead {
     margin-bottom: 0;
+    color: var(--text-color-muted);
 }
 
 .bingo-controls {
@@ -257,10 +247,15 @@
 
 
 .item-cell.called.previous {
-    color: var(--bs-dark);
+    color: var(--text-color);
     background-color: transparent;
     border-width: 3px;
     border-style: solid;
+}
+
+[data-bs-theme="dark"] .item-cell.called.previous {
+    color: var(--text-color);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 @keyframes pop-in {
@@ -293,6 +288,10 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
+[data-bs-theme="dark"] .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
 .modal {
     position: fixed;
     top: 0;
@@ -322,41 +321,42 @@
     flex-direction: column;
     width: 100%;
     pointer-events: auto;
-    background-color: #fff;
+    background-color: var(--card-background);
     background-clip: padding-box;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
     border-radius: 0.3rem;
     outline: 0;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
     animation: modal-appear 0.3s ease-out forwards;
 }
 
-
+[data-bs-theme="dark"] .modal-content {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.8);
+}
 
 .modal-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     padding: 1rem 1rem;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--border-color);
     border-top-left-radius: calc(0.3rem - 1px);
     border-top-right-radius: calc(0.3rem - 1px);
+    background-color: var(--card-background);
 }
-
-
 
 .modal-title {
     margin-bottom: 0;
     line-height: 1.5;
+    color: var(--text-color);
 }
 
 .modal-body {
     position: relative;
     flex: 1 1 auto;
     padding: 1rem;
+    color: var(--text-color);
 }
-
-
 
 .modal-footer {
     display: flex;
@@ -364,15 +364,29 @@
     align-items: center;
     justify-content: flex-end;
     padding: 0.75rem;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--border-color);
     border-bottom-right-radius: calc(0.3rem - 1px);
     border-bottom-left-radius: calc(0.3rem - 1px);
+    background-color: var(--card-background);
 }
-
-
 
 .modal-footer > * {
     margin: 0.25rem;
+}
+
+/* Close button styling */
+.modal-header .btn-close {
+    color: var(--text-color);
+    opacity: 0.75;
+    transition: opacity 0.15s;
+}
+
+[data-bs-theme="dark"] .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
 }
 
 @keyframes select-animation {
@@ -572,4 +586,57 @@
     border-right: 40px solid var(--bs-danger);
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
     z-index: 20;
+}
+
+/* Form controls in dark mode */
+[data-bs-theme="dark"] .form-control {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .form-control:focus {
+    background-color: var(--card-background);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: var(--card-background);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+/* Cards in dark mode */
+[data-bs-theme="dark"] .card {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: var(--border-color);
+}
+
+/* Tables in dark mode */
+[data-bs-theme="dark"] .table {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .table thead th {
+    border-bottom-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .table td {
+    border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }

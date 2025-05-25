@@ -12,5 +12,6 @@ builder.Services.AddSingleton<IBrowserStorageService, LocalStorageService>();
 builder.Services.AddSingleton<BingoSetService>();
 builder.Services.AddSingleton<NavbarService>();
 builder.Services.AddScoped<BingoCardService>();
+builder.Services.AddSingleton<ThemeService>();
 
 await builder.Build().RunAsync();

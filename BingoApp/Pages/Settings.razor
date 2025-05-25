@@ -1,7 +1,27 @@
 @page "/settings"
+@using BingoApp.Services
+@inject ThemeService ThemeService
+@implements IAsyncDisposable
 
 <div class="settings-container">
     <h1>Settings</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Theme Settings</h2>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="themeToggle" 
+                       checked="@ThemeService.IsDarkMode" @onchange="OnThemeToggle" 
+                       aria-label="Toggle theme">
+                <label class="form-check-label" for="themeToggle">
+                    <i class="bi @(ThemeService.IsDarkMode ? "bi-moon-stars" : "bi-sun")"></i>
+                    <span>@(ThemeService.IsDarkMode ? "Dark" : "Light") Mode</span>
+                </label>
+            </div>
+        </div>
+    </div>
 
     <div class="card">
         <div class="card-header">
@@ -14,6 +34,28 @@
             </a>
         </div>
     </div>
-
-    <!-- Future settings sections will go here -->
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeThemeAsync();
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private async Task OnThemeToggle()
+    {
+        await ThemeService.ToggleThemeAsync();
+    }
+
+    private void OnThemeChanged(bool isDark)
+    {
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+        await ValueTask.CompletedTask;
+    }
+}
