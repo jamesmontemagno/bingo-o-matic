@@ -55,13 +55,34 @@
     }
 }
 
+/* Enhanced hero button styling with animation and shadow */
 .hero-buttons .btn {
     transform-origin: center;
-    transition: all 0.3s ease;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-width: 2px;
 }
 
 .hero-buttons .btn:hover {
-    transform: scale(1.05) rotate(-1deg);
+    transform: scale(1.03) translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-buttons .btn:active {
+    transform: scale(1.01) translateY(-1px);
+}
+
+[data-bs-theme="dark"] .hero-buttons .btn {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .hero-buttons .btn:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.hero-buttons .btn:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.3);
 }
 
 .hero-buttons .btn i {
@@ -129,8 +150,34 @@
     margin-bottom: 1.5rem;
 }
 
+/* Enhanced feature card buttons */
 .feature-card .btn {
     margin-top: auto;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card .btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card .btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+[data-bs-theme="dark"] .feature-card .btn {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] .feature-card .btn:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.35);
 }
 
 footer {
@@ -152,6 +199,7 @@ footer i {
     margin-right: 0.5rem;
 }
 
+/* Animation for gradient text */
 @keyframes gradient {
     0% {
         background-position: 0% 50%;

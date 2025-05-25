@@ -123,20 +123,43 @@
     color: var(--pnw-light);
     text-decoration: none;
     background-color: var(--pnw-mountain);
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.2rem;
     border-radius: 2rem;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    border: none;
 }
 
-.tip-button:hover, .tip-button:focus {
+.tip-button:hover {
     background-color: var(--pnw-sunset);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     color: white;
     text-decoration: none;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tip-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
+    color: white;
+    text-decoration: none;
+}
+
+.tip-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="dark"] .tip-button {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .tip-button:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* Footer styles */

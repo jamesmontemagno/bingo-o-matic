@@ -292,15 +292,32 @@
     text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     color: var(--text-color);
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 [data-bs-theme="dark"] .number-mini {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .number-mini:hover {
     background: var(--card-background);
-    transform: scale(1.05);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.number-mini:active {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 3px 5px rgba(0,0,0,0.12);
+}
+
+[data-bs-theme="dark"] .number-mini:hover {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+
+.number-mini:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--bs-primary-rgb), 0.25), 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .number-animation-container {
