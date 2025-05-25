@@ -26,7 +26,7 @@
             <div class="form-group me-2">
                 <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
                     <option value="">Select a set...</option>
-                    @foreach (var set in BingoService.GetAll())
+                    @foreach (var set in bingoSets)
                     {
                         <option value="@set.Name">@set.Name</option>
                     }
@@ -99,6 +99,7 @@
 @code {
     private string selectedSetName = "";
     private string pendingSetName = "";
+    private List<BingoSet> bingoSets = new();
     private BingoSet? selectedSet;
     private bool isSelecting = false;
     private bool isSelected = false;
@@ -132,8 +133,14 @@
     private string confirmMessage = "";
     private Func<Task>? confirmAction;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        // Subscribe to changes
+        BingoService.OnSetsChanged += OnBingoSetsChanged;
+        
+        // Load all bingo sets
+        await LoadBingoSetsAsync();
+        
         // Check if there's a set name in the query string
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var query = HttpUtility.ParseQueryString(uri.Query);
@@ -142,8 +149,22 @@
         {
             selectedSetName = setName;
             pendingSetName = setName;
-            LoadSelectedSet();
+            await LoadSelectedSetAsync();
         }
+    }
+    
+    private async Task LoadBingoSetsAsync()
+    {
+        bingoSets = (await BingoService.GetAllAsync()).ToList();
+    }
+    
+    private void OnBingoSetsChanged()
+    {
+        InvokeAsync(async () => 
+        {
+            await LoadBingoSetsAsync();
+            StateHasChanged();
+        });
     }
 
     private void OnBingoSetSelectionChanged()
@@ -156,21 +177,37 @@
             confirmTitle = "Change Bingo Set";
             confirmMessage = $"You're about to switch to a new bingo set. This will reset the current game. Are you sure?";
             showConfirmDialog = true;
-            confirmAction = () =>
+            confirmAction = async () =>
             {
                 selectedSetName = pendingSetName;
-                LoadSelectedSet();
-                return Task.CompletedTask;
+                await LoadSelectedSetAsync();
             };
         }
         else
         {
             // No game in progress or no change, just load
             selectedSetName = pendingSetName;
-            LoadSelectedSet();
+            _ = LoadSelectedSetAsync();
         }
     }
 
+    private async Task LoadSelectedSetAsync()
+    {
+        if (!string.IsNullOrEmpty(selectedSetName))
+        {
+            selectedSet = await BingoService.GetByNameAsync(selectedSetName);
+            if (selectedSet != null)
+            {
+                ResetGame();
+            }
+        }
+        else
+        {
+            selectedSet = null;
+        }
+    }
+    
+    // Keep the synchronous version for backward compatibility
     private void LoadSelectedSet()
     {
         if (!string.IsNullOrEmpty(selectedSetName))
@@ -359,6 +396,7 @@
     public void Dispose()
     {
         // Clean up any resources when the component is disposed
+        BingoService.OnSetsChanged -= OnBingoSetsChanged;
         animationCts?.Cancel();
         animationCts?.Dispose();
         animationCts = null;

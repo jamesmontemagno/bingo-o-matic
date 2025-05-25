@@ -1,34 +1,111 @@
 using BingoApp.Models;
 using BingoApp.Helpers;
+using System.Text.Json;
 
 namespace BingoApp.Services;
 
-public class BingoSetService
+public class BingoSetService : IAsyncDisposable
 {
     private readonly List<BingoSet> _sets;
+    private readonly IBrowserStorageService _storageService;
+    private const string StorageKey = "bingo_sets";
+    private bool _isInitialized = false;
+    
+    public event Action? OnSetsChanged;
 
-    public BingoSetService()
+    public BingoSetService(IBrowserStorageService storageService)
     {
         _sets = new List<BingoSet>();
-        InitializeIfEmpty();
+        _storageService = storageService;
+        // We'll load data asynchronously in LoadSetsAsync
     }
 
-    private void InitializeIfEmpty()
+    public async ValueTask DisposeAsync()
     {
-        if (!_sets.Any())
+        // Save any pending changes when the service is disposed
+        await SaveSetsAsync();
+    }
+
+    private async Task InitializeAsync()
+    {
+        if (_isInitialized)
+            return;
+            
+        var storedSets = await _storageService.GetItemAsync<List<BingoSet>>(StorageKey);
+        
+        if (storedSets != null && storedSets.Any())
         {
-            _sets.AddRange(MockBingoData.GetMockSets());
+            _sets.Clear();
+            _sets.AddRange(storedSets);
         }
+        else
+        {
+            // If no stored data, add mock data
+            _sets.AddRange(MockBingoData.GetMockSets());
+            await SaveSetsAsync();
+        }
+        
+        _isInitialized = true;
+    }
+    
+    private async Task SaveSetsAsync()
+    {
+        await _storageService.SetItemAsync(StorageKey, _sets);
+        OnSetsChanged?.Invoke();
     }
 
-    public IEnumerable<BingoSet> GetAll() => _sets;
-
-    public BingoSet? GetByName(string name) => _sets.FirstOrDefault(s => s.Name == name);
-
-    public BingoSet? GetById(Guid id) => _sets.FirstOrDefault(s => s.Id == id);
-
-    public void AddSet(BingoSet set)
+    public async Task<IEnumerable<BingoSet>> GetAllAsync()
     {
+        await InitializeAsync();
+        return _sets;
+    }
+    
+    public IEnumerable<BingoSet> GetAll()
+    {
+        if (!_isInitialized)
+        {
+            // This is a synchronous fallback that should be avoided
+            // Initialize as empty and then populate asynchronously elsewhere
+            return _sets;
+        }
+        
+        return _sets;
+    }
+
+    public async Task<BingoSet?> GetByNameAsync(string name)
+    {
+        await InitializeAsync();
+        return _sets.FirstOrDefault(s => s.Name == name);
+    }
+    
+    public BingoSet? GetByName(string name)
+    {
+        // Synchronous fallback
+        if (!_isInitialized)
+            return null;
+            
+        return _sets.FirstOrDefault(s => s.Name == name);
+    }
+
+    public async Task<BingoSet?> GetByIdAsync(Guid id)
+    {
+        await InitializeAsync();
+        return _sets.FirstOrDefault(s => s.Id == id);
+    }
+    
+    public BingoSet? GetById(Guid id)
+    {
+        // Synchronous fallback
+        if (!_isInitialized)
+            return null;
+            
+        return _sets.FirstOrDefault(s => s.Id == id);
+    }
+
+    public async Task AddSetAsync(BingoSet set)
+    {
+        await InitializeAsync();
+        
         if (string.IsNullOrWhiteSpace(set.Name))
             throw new ArgumentException("Set name cannot be empty");
             
@@ -47,10 +124,49 @@ public class BingoSetService
             throw new ArgumentException("Set must contain at least one item");
 
         _sets.Add(set);
+        await SaveSetsAsync();
+    }
+    
+    // Keep synchronous version for backward compatibility
+    public void AddSet(BingoSet set)
+    {
+        if (!_isInitialized)
+        {
+            Task.Run(async () => 
+            {
+                await InitializeAsync();
+                await AddSetAsync(set);
+            }).Wait();
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(set.Name))
+            throw new ArgumentException("Set name cannot be empty");
+            
+        if (_sets.Any(s => s.Name.Equals(set.Name, StringComparison.OrdinalIgnoreCase)))
+            throw new ArgumentException("A set with this name already exists");
+
+        // Remove duplicates and empty items
+        set = set with
+        {
+            Items = set.Items.Where(i => !string.IsNullOrWhiteSpace(i))
+                           .Distinct(StringComparer.OrdinalIgnoreCase)
+                           .ToArray()
+        };
+
+        if (!set.Items.Any())
+            throw new ArgumentException("Set must contain at least one item");
+
+        _sets.Add(set);
+        
+        // Save asynchronously
+        _ = SaveSetsAsync();
     }
 
-    public void UpdateSet(Guid id, BingoSet updatedSet)
+    public async Task UpdateSetAsync(Guid id, BingoSet updatedSet)
     {
+        await InitializeAsync();
+        
         var existingSet = _sets.FirstOrDefault(s => s.Id == id) 
             ?? throw new ArgumentException("Set not found");
 
@@ -73,17 +189,91 @@ public class BingoSetService
 
         var index = _sets.IndexOf(existingSet);
         _sets[index] = newSet;
+        
+        await SaveSetsAsync();
+    }
+    
+    // Keep synchronous version for backward compatibility
+    public void UpdateSet(Guid id, BingoSet updatedSet)
+    {
+        if (!_isInitialized)
+        {
+            Task.Run(async () => 
+            {
+                await InitializeAsync();
+                await UpdateSetAsync(id, updatedSet);
+            }).Wait();
+            return;
+        }
+        
+        var existingSet = _sets.FirstOrDefault(s => s.Id == id) 
+            ?? throw new ArgumentException("Set not found");
+
+        if (existingSet.Name != updatedSet.Name && 
+            _sets.Any(s => s.Name.Equals(updatedSet.Name, StringComparison.OrdinalIgnoreCase)))
+            throw new ArgumentException("A set with this name already exists");
+
+        // Create a new set with the existing ID
+        var newSet = new BingoSet
+        {
+            Id = id,
+            Name = updatedSet.Name,
+            Items = updatedSet.Items.Where(i => !string.IsNullOrWhiteSpace(i))
+                                  .Distinct(StringComparer.OrdinalIgnoreCase)
+                                  .ToArray()
+        };
+
+        if (!newSet.Items.Any())
+            throw new ArgumentException("Set must contain at least one item");
+
+        var index = _sets.IndexOf(existingSet);
+        _sets[index] = newSet;
+        
+        // Save asynchronously
+        _ = SaveSetsAsync();
     }
 
-    public void DeleteSet(Guid id)
+    public async Task DeleteSetAsync(Guid id)
     {
+        await InitializeAsync();
+        
         var set = _sets.FirstOrDefault(s => s.Id == id)
             ?? throw new ArgumentException("Set not found");
         
         _sets.Remove(set);
+        await SaveSetsAsync();
+    }
+    
+    // Keep synchronous version for backward compatibility
+    public void DeleteSet(Guid id)
+    {
+        if (!_isInitialized)
+        {
+            Task.Run(async () => 
+            {
+                await InitializeAsync();
+                await DeleteSetAsync(id);
+            }).Wait();
+            return;
+        }
+        
+        var set = _sets.FirstOrDefault(s => s.Id == id)
+            ?? throw new ArgumentException("Set not found");
+        
+        _sets.Remove(set);
+        
+        // Save asynchronously
+        _ = SaveSetsAsync();
     }
 
     // Keep the name-based methods for backward compatibility
+    public async Task UpdateSetAsync(string originalName, BingoSet updatedSet)
+    {
+        var existingSet = await GetByNameAsync(originalName) 
+            ?? throw new ArgumentException("Set not found");
+        await UpdateSetAsync(existingSet.Id, updatedSet);
+    }
+    
     public void UpdateSet(string originalName, BingoSet updatedSet)
     {
         var existingSet = GetByName(originalName) 
@@ -91,6 +281,13 @@ public class BingoSetService
         UpdateSet(existingSet.Id, updatedSet);
     }
 
+    public async Task DeleteSetAsync(string name)
+    {
+        var set = await GetByNameAsync(name)
+            ?? throw new ArgumentException("Set not found");
+        await DeleteSetAsync(set.Id);
+    }
+    
     public void DeleteSet(string name)
     {
         var set = GetByName(name)

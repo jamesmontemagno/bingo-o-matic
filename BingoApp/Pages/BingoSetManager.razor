@@ -2,6 +2,7 @@
 @using BingoApp.Models
 @using BingoApp.Services
 @inject BingoSetService BingoService
+@implements IDisposable
 
 <h1>Manage Bingo Sets</h1>
 
@@ -14,30 +15,41 @@
                     <span class="emoji-icon">➕</span> Add New Set
                 </button>
             </div>
-            <div class="list-group list-group-flush">
-                @foreach (var set in BingoService.GetAll())
-                {
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">@set.Name</h6>
-                                <small class="text-muted">@set.Items.Length items</small>
-                            </div>
-                            <div>
-                                <button class="btn btn-outline-primary btn-sm me-2" @onclick="() => ViewSet(set)">
-                                    <span class="emoji-icon">👁️</span> View
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm me-2" @onclick="() => EditSet(set)">
-                                    <span class="emoji-icon">✏️</span> Edit
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteSetPrompt(set)">
-                                    <span class="emoji-icon">🗑️</span> Delete
-                                </button>
+            @if (isLoading)
+            {
+                <div class="p-4 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var set in bingoSets)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">@set.Name</h6>
+                                    <small class="text-muted">@set.Items.Length items</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm me-2" @onclick="() => ViewSet(set)">
+                                        <span class="emoji-icon">👁️</span> View
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm me-2" @onclick="() => EditSet(set)">
+                                        <span class="emoji-icon">✏️</span> Edit
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteSetPrompt(set)">
+                                        <span class="emoji-icon">🗑️</span> Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -136,6 +148,8 @@
 }
 
 @code {
+    private List<BingoSet> bingoSets = new();
+    private bool isLoading = true;
     private BingoSet? selectedSet;
     private BingoSet? editingSet;
     private BingoSet? deleteSet;
@@ -143,6 +157,31 @@
     private string? newSetName;
     private string? newSetItems;
     private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        BingoService.OnSetsChanged += StateHasChanged;
+        await LoadBingoSetsAsync();
+    }
+
+    private async Task LoadBingoSetsAsync()
+    {
+        isLoading = true;
+        try
+        {
+            bingoSets = (await BingoService.GetAllAsync()).ToList();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        BingoService.OnSetsChanged -= StateHasChanged;
+    }
 
     private void ViewSet(BingoSet set)
     {
@@ -186,14 +225,15 @@
         deleteSet = set;
     }
 
-    private void ConfirmDelete()
+    private async Task ConfirmDelete()
     {
         if (deleteSet == null) return;
 
         try
         {
-            BingoService.DeleteSet(deleteSet.Id);
+            await BingoService.DeleteSetAsync(deleteSet.Id);
             deleteSet = null;
+            await LoadBingoSetsAsync();
         }
         catch (Exception ex)
         {
@@ -201,7 +241,7 @@
         }
     }
 
-    private void SaveSet()
+    private async Task SaveSet()
     {
         try
         {
@@ -222,13 +262,14 @@
 
             if (editingSet != null)
             {
-                BingoService.UpdateSet(editingSet.Id, set);
+                await BingoService.UpdateSetAsync(editingSet.Id, set);
             }
             else
             {
-                BingoService.AddSet(set);
+                await BingoService.AddSetAsync(set);
             }
 
+            await LoadBingoSetsAsync();
             CloseEditor();
         }
         catch (Exception ex)
