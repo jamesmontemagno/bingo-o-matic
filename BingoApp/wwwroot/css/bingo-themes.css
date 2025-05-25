@@ -1,0 +1,129 @@
+/* Bingo Themes CSS */
+
+/* Base theme styling */
+.bingo-theme {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.15;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bingo-card-container {
+    position: relative;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+/* Color Themes */
+.theme-color-blue .bingo-card-container {
+    background-color: #e6f2ff;
+    border: 2px solid #99ccff;
+}
+
+.theme-color-green .bingo-card-container {
+    background-color: #e6fff2;
+    border: 2px solid #99ffcc;
+}
+
+.theme-color-purple .bingo-card-container {
+    background-color: #f2e6ff;
+    border: 2px solid #cc99ff;
+}
+
+.theme-color-orange .bingo-card-container {
+    background-color: #fff2e6;
+    border: 2px solid #ffcc99;
+}
+
+.theme-color-pink .bingo-card-container {
+    background-color: #ffe6f2;
+    border: 2px solid #ff99cc;
+}
+
+/* Confetti Theme */
+.theme-confetti .bingo-card-container {
+    background-color: white;
+    border: 2px solid #ffd700;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-confetti .bingo-card-container::before {
+    content: '🎊';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+/* Outdoor Themes */
+.theme-hiking {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><path d="M0 350 L100 200 L200 300 L300 100 L400 250 L500 150 L500 500 L0 500 Z" fill="%23228B22"/><circle cx="450" cy="100" r="30" fill="%23FDB813"/><path d="M50 350 L150 200 L250 300 L350 100 L450 250 L500 150 L500 500 L0 500 Z" fill="%23006400"/><path d="M150 500 L200 450 L250 500" stroke="%23654321" stroke-width="10" fill="none"/><path d="M250 500 L275 400 L300 500" stroke="%23654321" stroke-width="10" fill="none"/><path d="M100 500 L125 450 L150 500" stroke="%23654321" stroke-width="10" fill="none"/></svg>');
+}
+
+.theme-beach {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="0" width="500" height="500" fill="%2387CEEB"/><rect x="0" y="350" width="500" height="150" fill="%23F5DEB3"/><circle cx="400" cy="100" r="40" fill="%23FDB813"/><path d="M200 350 C200 300, 300 300, 300 350 Z" fill="%231E90FF"/><path d="M350 350 C350 320, 400 320, 400 350 Z" fill="%231E90FF"/><path d="M100 350 C100 300, 200 300, 200 350 Z" fill="%231E90FF"/><path d="M300 380 L330 300 L270 300 Z" fill="%23F4A460"/></svg>');
+}
+
+.theme-camping {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="0" width="500" height="500" fill="%23002244"/><circle cx="400" cy="100" r="30" fill="%23FFFFFF"/><circle cx="380" cy="120" r="2" fill="%23002244"/><circle cx="430" cy="90" r="2" fill="%23002244"/><circle cx="390" cy="80" r="2" fill="%23002244"/><circle cx="410" cy="110" r="2" fill="%23002244"/><circle cx="100" cy="150" r="1" fill="%23FFFFFF"/><circle cx="200" cy="100" r="1" fill="%23FFFFFF"/><circle cx="300" cy="80" r="1" fill="%23FFFFFF"/><circle cx="150" cy="200" r="1" fill="%23FFFFFF"/><circle cx="250" cy="70" r="1" fill="%23FFFFFF"/><circle cx="350" cy="150" r="1" fill="%23FFFFFF"/><path d="M150 350 L250 200 L350 350 Z" fill="%23654321"/><rect x="230" y="350" width="40" height="40" fill="%23654321"/><path d="M150 350 L250 200 L350 350" stroke="%23FFFFFF" stroke-width="3" fill="none"/></svg>');
+}
+
+.theme-fishing {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="0" width="500" height="300" fill="%2387CEEB"/><rect x="0" y="300" width="500" height="200" fill="%234682B4"/><path d="M350 100 L350 300" stroke="%23654321" stroke-width="5" fill="none"/><path d="M350 100 L300 150" stroke="%23000000" stroke-width="2" fill="none"/><circle cx="300" cy="149" r="5" fill="%23FF0000"/><path d="M270 320 C290 310, 320 310, 330 320 C340 330, 340 350, 330 360 C320 370, 290 370, 270 360 C260 350, 260 330, 270 320 Z" fill="%231E90FF"/><path d="M370 330 C380 325, 395 325, 400 330 C405 335, 405 345, 400 350 C395 355, 380 355, 370 350 C365 345, 365 335, 370 330 Z" fill="%231E90FF"/></svg>');
+}
+
+.theme-gardening {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="350" width="500" height="150" fill="%23654321"/><circle cx="100" cy="400" r="30" stroke="%23228B22" stroke-width="5" fill="%23228B22"/><path d="M100 370 L100 300" stroke="%23228B22" stroke-width="3" fill="none"/><circle cx="200" cy="400" r="30" stroke="%23FF69B4" stroke-width="5" fill="%23FF69B4"/><path d="M200 370 L200 320" stroke="%23228B22" stroke-width="3" fill="none"/><circle cx="300" cy="400" r="30" stroke="%23FFD700" stroke-width="5" fill="%23FFD700"/><path d="M300 370 L300 310" stroke="%23228B22" stroke-width="3" fill="none"/><circle cx="400" cy="400" r="30" stroke="%23FF4500" stroke-width="5" fill="%23FF4500"/><path d="M400 370 L400 330" stroke="%23228B22" stroke-width="3" fill="none"/><rect x="240" y="330" width="20" height="100" fill="%23654321"/><path d="M230 330 L250 300 L270 330" stroke="%23228B22" stroke-width="10" fill="%23228B22"/></svg>');
+}
+
+/* Pet Themes */
+.theme-dogs {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><circle cx="150" cy="200" r="40" fill="%23A0522D"/><circle cx="125" cy="180" r="10" fill="%23000000"/><circle cx="175" cy="180" r="10" fill="%23000000"/><path d="M120 160 L140 175" stroke="%23000000" stroke-width="3" fill="none"/><path d="M180 160 L160 175" stroke="%23000000" stroke-width="3" fill="none"/><circle cx="150" cy="200" r="10" fill="%23000000"/><path d="M130 220 Q150 235 170 220" stroke="%23000000" stroke-width="3" fill="none"/><circle cx="100" cy="150" r="15" fill="%23A0522D"/><circle cx="200" cy="150" r="15" fill="%23A0522D"/><circle cx="350" cy="300" r="40" fill="%23DEB887"/><circle cx="325" cy="280" r="10" fill="%23000000"/><circle cx="375" cy="280" r="10" fill="%23000000"/><path d="M320 260 L340 275" stroke="%23000000" stroke-width="3" fill="none"/><path d="M380 260 L360 275" stroke="%23000000" stroke-width="3" fill="none"/><circle cx="350" cy="300" r="10" fill="%23000000"/><path d="M330 320 Q350 335 370 320" stroke="%23000000" stroke-width="3" fill="none"/><circle cx="300" cy="250" r="15" fill="%23DEB887"/><circle cx="400" cy="250" r="15" fill="%23DEB887"/></svg>');
+}
+
+.theme-cats {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><circle cx="150" cy="200" r="40" fill="%23808080"/><path d="M120 170 L140 180" stroke="%23000000" stroke-width="2" fill="none"/><path d="M180 170 L160 180" stroke="%23000000" stroke-width="2" fill="none"/><path d="M135 190 L165 190" stroke="%23000000" stroke-width="1" fill="none"/><path d="M130 210 Q150 225 170 210" stroke="%23000000" stroke-width="2" fill="none"/><path d="M145 200 L155 200" stroke="%23000000" stroke-width="2" fill="none"/><path d="M150 200 L150 210" stroke="%23000000" stroke-width="2" fill="none"/><path d="M110 160 L90 130" stroke="%23808080" stroke-width="10" fill="none"/><path d="M190 160 L210 130" stroke="%23808080" stroke-width="10" fill="none"/><circle cx="350" cy="300" r="40" fill="%23D2B48C"/><path d="M320 270 L340 280" stroke="%23000000" stroke-width="2" fill="none"/><path d="M380 270 L360 280" stroke="%23000000" stroke-width="2" fill="none"/><path d="M335 290 L365 290" stroke="%23000000" stroke-width="1" fill="none"/><path d="M330 310 Q350 325 370 310" stroke="%23000000" stroke-width="2" fill="none"/><path d="M345 300 L355 300" stroke="%23000000" stroke-width="2" fill="none"/><path d="M350 300 L350 310" stroke="%23000000" stroke-width="2" fill="none"/><path d="M310 260 L290 230" stroke="%23D2B48C" stroke-width="10" fill="none"/><path d="M390 260 L410 230" stroke="%23D2B48C" stroke-width="10" fill="none"/></svg>');
+}
+
+.theme-fish {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="0" width="500" height="500" fill="%23AFEEEE"/><path d="M100 150 C130 120, 170 120, 200 150 C230 180, 170 200, 200 230 C170 260, 130 260, 100 230 C70 200, 130 180, 100 150 Z" fill="%23FF7F50"/><circle cx="140" cy="150" r="5" fill="%23000000"/><path d="M100 150 L80 130" stroke="%23FF7F50" stroke-width="8" fill="none"/><path d="M100 230 L80 250" stroke="%23FF7F50" stroke-width="8" fill="none"/><path d="M300 300 C330 270, 370 270, 400 300 C430 330, 370 350, 400 380 C370 410, 330 410, 300 380 C270 350, 330 330, 300 300 Z" fill="%234169E1"/><circle cx="340" cy="300" r="5" fill="%23000000"/><path d="M300 300 L280 280" stroke="%234169E1" stroke-width="8" fill="none"/><path d="M300 380 L280 400" stroke="%234169E1" stroke-width="8" fill="none"/><circle cx="200" cy="200" r="5" fill="%23FFFFFF"/><circle cx="250" cy="150" r="5" fill="%23FFFFFF"/><circle cx="300" cy="250" r="5" fill="%23FFFFFF"/><circle cx="150" cy="300" r="5" fill="%23FFFFFF"/><circle cx="350" cy="200" r="5" fill="%23FFFFFF"/></svg>');
+}
+
+.theme-birds {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="0" width="500" height="500" fill="%2387CEEB"/><path d="M100 100 C120 80, 140 80, 150 90 L170 70 C190 50, 210 50, 220 60 L200 80 C220 90, 220 110, 200 120 C180 130, 160 130, 150 120 L130 140 C110 160, 90 160, 80 150 L100 130 C80 120, 80 100, 100 100 Z" fill="%23FF6347"/><circle cx="130" cy="90" r="5" fill="%23000000"/><path d="M170 100 L180 90 L190 100" fill="%23FFA500"/><path d="M300 200 C320 180, 340 180, 350 190 L370 170 C390 150, 410 150, 420 160 L400 180 C420 190, 420 210, 400 220 C380 230, 360 230, 350 220 L330 240 C310 260, 290 260, 280 250 L300 230 C280 220, 280 200, 300 200 Z" fill="%2387CEFA"/><circle cx="330" cy="190" r="5" fill="%23000000"/><path d="M370 200 L380 190 L390 200" fill="%23FFA500"/><path d="M150 350 C170 330, 190 330, 200 340 L220 320 C240 300, 260 300, 270 310 L250 330 C270 340, 270 360, 250 370 C230 380, 210 380, 200 370 L180 390 C160 410, 140 410, 130 400 L150 380 C130 370, 130 350, 150 350 Z" fill="%239400D3"/><circle cx="180" cy="340" r="5" fill="%23000000"/><path d="M220 350 L230 340 L240 350" fill="%23FFA500"/></svg>');
+}
+
+/* Celebration Themes */
+.theme-birthday {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><circle cx="100" cy="100" r="20" fill="%23FF69B4"/><path d="M100 120 L100 200" stroke="%23000000" stroke-width="2" fill="none"/><circle cx="200" cy="150" r="20" fill="%2300BFFF"/><path d="M200 170 L200 250" stroke="%23000000" stroke-width="2" fill="none"/><circle cx="300" cy="100" r="20" fill="%23FF6347"/><path d="M300 120 L300 200" stroke="%23000000" stroke-width="2" fill="none"/><circle cx="400" cy="150" r="20" fill="%2332CD32"/><path d="M400 170 L400 250" stroke="%23000000" stroke-width="2" fill="none"/><path d="M150 300 L150 400 L350 400 L350 300 C340 280, 330 290, 320 300 C310 310, 300 280, 290 300 C280 320, 270 290, 260 300 C250 310, 240 280, 230 300 C220 320, 210 290, 200 300 C190 310, 180 280, 170 300 C160 320, 150 290, 150 300 Z" fill="%23FFD700"/><rect x="230" y="350" width="40" height="50" fill="%23FF69B4"/><path d="M250 350 L250 300" stroke="%23000000" stroke-width="2" fill="none"/><circle cx="250" cy="300" r="5" fill="%23FF0000"/></svg>');
+}
+
+.theme-party {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><path d="M100 100 L120 60" stroke="%23FF4500" stroke-width="3" fill="none"/><circle cx="120" cy="60" r="10" fill="%23FF4500"/><path d="M200 150 L220 110" stroke="%2300BFFF" stroke-width="3" fill="none"/><circle cx="220" cy="110" r="10" fill="%2300BFFF"/><path d="M300 100 L320 60" stroke="%23FF69B4" stroke-width="3" fill="none"/><circle cx="320" cy="60" r="10" fill="%23FF69B4"/><path d="M400 150 L420 110" stroke="%2332CD32" stroke-width="3" fill="none"/><circle cx="420" cy="110" r="10" fill="%2332CD32"/><path d="M150 200 L170 160" stroke="%23FFD700" stroke-width="3" fill="none"/><circle cx="170" cy="160" r="10" fill="%23FFD700"/><path d="M250 200 L270 160" stroke="%239400D3" stroke-width="3" fill="none"/><circle cx="270" cy="160" r="10" fill="%239400D3"/><path d="M350 200 L370 160" stroke="%23FF6347" stroke-width="3" fill="none"/><circle cx="370" cy="160" r="10" fill="%23FF6347"/><rect x="150" y="300" width="200" height="100" rx="10" ry="10" fill="%23FFD700"/><text x="250" y="360" font-size="40" text-anchor="middle" fill="%23000000">PARTY</text></svg>');
+}
+
+.theme-confetti {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="100" y="100" width="10" height="10" transform="rotate(45, 100, 100)" fill="%23FF69B4"/><rect x="150" y="150" width="10" height="10" transform="rotate(30, 150, 150)" fill="%2300BFFF"/><rect x="200" y="100" width="10" height="10" transform="rotate(60, 200, 100)" fill="%23FF6347"/><rect x="250" y="150" width="10" height="10" transform="rotate(15, 250, 150)" fill="%2332CD32"/><rect x="300" y="100" width="10" height="10" transform="rotate(75, 300, 100)" fill="%23FFD700"/><rect x="350" y="150" width="10" height="10" transform="rotate(45, 350, 150)" fill="%239400D3"/><rect x="400" y="100" width="10" height="10" transform="rotate(90, 400, 100)" fill="%23FF4500"/><rect x="120" y="200" width="10" height="10" transform="rotate(20, 120, 200)" fill="%23FF69B4"/><rect x="170" y="250" width="10" height="10" transform="rotate(50, 170, 250)" fill="%2300BFFF"/><rect x="220" y="200" width="10" height="10" transform="rotate(70, 220, 200)" fill="%23FF6347"/><rect x="270" y="250" width="10" height="10" transform="rotate(40, 270, 250)" fill="%2332CD32"/><rect x="320" y="200" width="10" height="10" transform="rotate(25, 320, 200)" fill="%23FFD700"/><rect x="370" y="250" width="10" height="10" transform="rotate(55, 370, 250)" fill="%239400D3"/><rect x="420" y="200" width="10" height="10" transform="rotate(10, 420, 200)" fill="%23FF4500"/><rect x="100" y="300" width="10" height="10" transform="rotate(80, 100, 300)" fill="%23FF69B4"/><rect x="150" y="350" width="10" height="10" transform="rotate(35, 150, 350)" fill="%2300BFFF"/><rect x="200" y="300" width="10" height="10" transform="rotate(65, 200, 300)" fill="%23FF6347"/><rect x="250" y="350" width="10" height="10" transform="rotate(5, 250, 350)" fill="%2332CD32"/><rect x="300" y="300" width="10" height="10" transform="rotate(85, 300, 300)" fill="%23FFD700"/><rect x="350" y="350" width="10" height="10" transform="rotate(30, 350, 350)" fill="%239400D3"/><rect x="400" y="300" width="10" height="10" transform="rotate(50, 400, 300)" fill="%23FF4500"/></svg>');
+}
+
+.theme-fireworks {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><path d="M100 100 L100 110 M95 105 L105 105" stroke="%23FF69B4" stroke-width="2"/><path d="M100 100 L110 110 M110 100 L100 110" stroke="%23FF69B4" stroke-width="2"/><path d="M100 100 L105 90 M95 90 L105 90" stroke="%23FF69B4" stroke-width="2"/><path d="M200 150 L200 160 M195 155 L205 155" stroke="%2300BFFF" stroke-width="2"/><path d="M200 150 L210 160 M210 150 L200 160" stroke="%2300BFFF" stroke-width="2"/><path d="M200 150 L205 140 M195 140 L205 140" stroke="%2300BFFF" stroke-width="2"/><path d="M300 100 L300 110 M295 105 L305 105" stroke="%23FF6347" stroke-width="2"/><path d="M300 100 L310 110 M310 100 L300 110" stroke="%23FF6347" stroke-width="2"/><path d="M300 100 L305 90 M295 90 L305 90" stroke="%23FF6347" stroke-width="2"/><path d="M400 150 L400 160 M395 155 L405 155" stroke="%2332CD32" stroke-width="2"/><path d="M400 150 L410 160 M410 150 L400 160" stroke="%2332CD32" stroke-width="2"/><path d="M400 150 L405 140 M395 140 L405 140" stroke="%2332CD32" stroke-width="2"/><path d="M150 200 L150 210 M145 205 L155 205" stroke="%23FFD700" stroke-width="2"/><path d="M150 200 L160 210 M160 200 L150 210" stroke="%23FFD700" stroke-width="2"/><path d="M150 200 L155 190 M145 190 L155 190" stroke="%23FFD700" stroke-width="2"/><path d="M250 350 L250 360 M245 355 L255 355" stroke="%239400D3" stroke-width="4"/><path d="M250 350 L260 360 M260 350 L250 360" stroke="%239400D3" stroke-width="4"/><path d="M250 350 L255 340 M245 340 L255 340" stroke="%239400D3" stroke-width="4"/><path d="M250 350 L240 360 M240 350 L250 360" stroke="%239400D3" stroke-width="4"/><path d="M250 350 L245 340 M235 340 L245 340" stroke="%239400D3" stroke-width="4"/><path d="M250 350 L250 335 M245 335 L255 335" stroke="%239400D3" stroke-width="4"/></svg>');
+}
+
+/* Additional fun theme */
+.theme-space {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect x="0" y="0" width="500" height="500" fill="%23000033"/><circle cx="100" cy="100" r="2" fill="%23FFFFFF"/><circle cx="150" cy="150" r="1" fill="%23FFFFFF"/><circle cx="200" cy="100" r="2" fill="%23FFFFFF"/><circle cx="250" cy="150" r="1" fill="%23FFFFFF"/><circle cx="300" cy="100" r="2" fill="%23FFFFFF"/><circle cx="350" cy="150" r="1" fill="%23FFFFFF"/><circle cx="400" cy="100" r="2" fill="%23FFFFFF"/><circle cx="125" cy="200" r="1" fill="%23FFFFFF"/><circle cx="175" cy="250" r="2" fill="%23FFFFFF"/><circle cx="225" cy="200" r="1" fill="%23FFFFFF"/><circle cx="275" cy="250" r="2" fill="%23FFFFFF"/><circle cx="325" cy="200" r="1" fill="%23FFFFFF"/><circle cx="375" cy="250" r="2" fill="%23FFFFFF"/><circle cx="425" cy="200" r="1" fill="%23FFFFFF"/><circle cx="100" cy="300" r="2" fill="%23FFFFFF"/><circle cx="150" cy="350" r="1" fill="%23FFFFFF"/><circle cx="200" cy="300" r="2" fill="%23FFFFFF"/><circle cx="250" cy="350" r="1" fill="%23FFFFFF"/><circle cx="300" cy="300" r="2" fill="%23FFFFFF"/><circle cx="350" cy="350" r="1" fill="%23FFFFFF"/><circle cx="400" cy="300" r="2" fill="%23FFFFFF"/><circle cx="200" cy="200" r="30" fill="%23FFD700"/><circle cx="370" cy="280" r="20" fill="%23ADD8E6"/><path d="M320 170 C350 150, 380 170, 380 200 C380 230, 350 250, 320 230 C290 210, 290 190, 320 170 Z" fill="%23C0C0C0"/></svg>');
+}
