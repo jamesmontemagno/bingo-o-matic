@@ -51,23 +51,48 @@
         <div class="game-content">
             @if (isSelecting && useWheel)
             {
-                <div class="wheel-overlay">
-                    <div class="wheel-container">
-                    <div class="wheel" style="transform: rotate(@(wheelRotation)deg)">
+                <div class="wheel-overlay @(isWheelDramatic ? "dramatic" : "")">
+                    <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "") @(isWheelDramatic ? "dramatic-finale" : "")">
+                    <div class="wheel @(isWheelDramatic ? "dramatic-glow" : "")" style="transform: rotate(@(wheelRotation)deg)">
                         @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
                         {
                             var segmentAngle = 360.0 / availableItems.Count;
                             var startAngle = segmentAngle * index;
                             var endAngle = segmentAngle * (index + 1);
+                            
+                            // Add small overlap to eliminate gaps between segments
+                            // Use larger overlap for fewer segments to prevent gaps
+                            var overlapAngle = availableItems.Count <= 5 ? 2.0 : 0.5; // Larger overlap for fewer segments
+                            var adjustedStartAngle = startAngle - overlapAngle;
+                            var adjustedEndAngle = endAngle + overlapAngle;
+                            
                             var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
-                            var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((startAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((startAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((endAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((endAngle - 90) * Math.PI / 180)}%)";
+                            var (translateX, translateY) = GetDynamicTextPosition();
+                            var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((adjustedStartAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedStartAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((adjustedEndAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedEndAngle - 90) * Math.PI / 180)}%)";
                             <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
                             </div>
-                            <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(140px) translateY(-50%)">@item</span>
+                            <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(@(translateX)px) translateY(@(translateY)%); font-size: @GetDynamicFontSize();">@item</span>
 
                         }
                     </div>
-                        <div class="wheel-pointer"></div>
+                        <div class="wheel-pointer @(isWheelDramatic ? "dramatic-pointer" : "")"></div>
+                        
+                        @* Dramatic effects *@
+                        @if (showWheelSparkles)
+                        {
+                            <div class="wheel-sparkles">
+                                @for (int i = 0; i < 12; i++)
+                                {
+                                    <div class="sparkle" style="--delay: @(i * 0.1)s; --angle: @(i * 30)deg;"></div>
+                                }
+                            </div>
+                        }
+                        
+                        @if (isWheelDramatic)
+                        {
+                            <div class="dramatic-flash"></div>
+                            <div class="victory-burst"></div>
+                        }
                     </div>
                 </div>
             }
@@ -178,12 +203,139 @@
         "#2ECC71", // Green
         "#F39C12", // Orange
         "#9B59B6", // Purple
-        "#1ABC9C"  // Teal
+        "#1ABC9C", // Teal
+        "#E67E22", // Carrot Orange
+        "#8E44AD", // Wisteria Purple
+        "#16A085", // Dark Turquoise
+        "#C0392B"  // Dark Red
     };
     
     private string GetWheelSegmentColor(int index)
     {
-        return wheelColors[index % wheelColors.Length];
+        // For better visual separation, ensure adjacent segments have different colors
+        // Also ensure first and last segments never match when there are enough segments
+        var totalSegments = availableItems.Count;
+        
+        // If we have fewer segments than colors, space them out
+        if (totalSegments <= wheelColors.Length)
+        {
+            // Calculate spacing to distribute colors evenly
+            var spacing = Math.Max(1, wheelColors.Length / totalSegments);
+            var colorIndex = (index * spacing) % wheelColors.Length;
+            
+            // Special handling to ensure first and last segments don't match when possible
+            if (totalSegments > 2 && index == totalSegments - 1) // Last segment
+            {
+                var firstSegmentColorIndex = 0; // First segment always uses index 0 with spacing
+                if (colorIndex == firstSegmentColorIndex)
+                {
+                    // Move to next available color that's different from first segment
+                    colorIndex = (colorIndex + spacing) % wheelColors.Length;
+                }
+            }
+            
+            return wheelColors[colorIndex];
+        }
+        else
+        {
+            // More segments than colors - use alternating pattern to avoid adjacency
+            // This creates a pattern like: 0,2,4,1,3,5,0,2,4... which maximizes separation
+            var colorIndex = (index * 2) % wheelColors.Length;
+            if (index >= wheelColors.Length / 2)
+            {
+                colorIndex = ((index - wheelColors.Length / 2) * 2 + 1) % wheelColors.Length;
+            }
+            
+            // Additional protection for first/last segment matching
+            if (index == totalSegments - 1) // Last segment
+            {
+                var firstSegmentColorIndex = 0; // First segment uses index 0
+                if (colorIndex == firstSegmentColorIndex)
+                {
+                    // Find an alternative color that's different from first segment and previous segment
+                    var previousSegmentIndex = totalSegments - 2;
+                    var previousColorIndex = (previousSegmentIndex * 2) % wheelColors.Length;
+                    if (previousSegmentIndex >= wheelColors.Length / 2)
+                    {
+                        previousColorIndex = ((previousSegmentIndex - wheelColors.Length / 2) * 2 + 1) % wheelColors.Length;
+                    }
+                    
+                    // Try to find a color that's different from both first and previous segments
+                    for (int offset = 1; offset < wheelColors.Length; offset++)
+                    {
+                        var alternativeIndex = (colorIndex + offset) % wheelColors.Length;
+                        if (alternativeIndex != firstSegmentColorIndex && alternativeIndex != previousColorIndex)
+                        {
+                            colorIndex = alternativeIndex;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            return wheelColors[colorIndex];
+        }
+    }
+
+    private string GetDynamicFontSize()
+    {
+        // Calculate font size based on number of items
+        // More items = smaller font, fewer items = larger font
+        var itemCount = availableItems.Count;
+        
+        if (itemCount <= 3) return "1.8rem";      // Large font for 3 or fewer items
+        if (itemCount <= 10) return "2rem";      // Medium-large font for 4-6 items
+        if (itemCount <= 20) return "1.8rem";     // Medium font for 7-10 items
+        if (itemCount <= 30) return "1.5rem";       // Small-medium font for 11-15 items
+        if (itemCount <= 40) return "1.2rem";     // Small font for 16-20 items
+        return "0.8rem";                          // Very small font for 21+ items
+    }
+
+    private (double translateX, double translateY) GetDynamicTextPosition()
+    {
+        // Position text right at the border/edge of the wheel
+        var itemCount = availableItems.Count;
+        
+        // Calculate position to place text right at the wheel border
+        // The wheel radius is approximately 250px (half of min 500px wheel size)
+        // We want text positioned right at the edge
+        var baseRadius = 240; // Close to wheel edge for border positioning
+        
+        // For border alignment, we want text consistently at the edge
+        // regardless of segment count, but adjust slightly for readability
+        double textDistanceRatio;
+        if (itemCount <= 3)
+        {
+            textDistanceRatio = 0.85; // Slightly inward for large segments to avoid cutoff
+        }
+        else if (itemCount <= 8)
+        {
+            textDistanceRatio = 0.90; // Close to edge for medium segments
+        }
+        else
+        {
+            textDistanceRatio = 0.95; // Right at edge for small segments
+        }
+        
+        var translateX = baseRadius * textDistanceRatio;
+        
+        // Y translation - keep text centered vertically in each segment
+        // Minimal Y offset since we want text aligned on the right border
+        double translateY;
+        if (itemCount <= 5)
+        {
+            translateY = -10; // Minimal offset for large segments
+        }
+        else if (itemCount <= 15) 
+        {
+            translateY = -8; // Very small offset for medium segments
+        }
+        else
+        {
+            translateY = -5; // Almost no offset for small segments
+        }
+        
+        return (translateX, translateY);
     }
 
     // Confirmation dialog state
@@ -195,6 +347,9 @@
     // Wheel state
     private bool useWheel = false;
     private double wheelRotation = 0;
+    private bool isWheelSlowingDown = false;
+    private bool isWheelDramatic = false;
+    private bool showWheelSparkles = false;
     private const string WheelPreferenceKey = "bingo_wheel_preference";
 
     protected override async Task OnInitializedAsync()
@@ -422,6 +577,9 @@
                 
                 // Start the wheel spinning animation
                 wheelRotation = 0;
+                isWheelSlowingDown = false;
+                isWheelDramatic = false;
+                showWheelSparkles = false;
                 StateHasChanged();
                 
                 // Trigger the animation by setting the final rotation
@@ -429,13 +587,37 @@
                 wheelRotation = targetRotation;
                 StateHasChanged();
                 
-                // Wait for the animation to complete plus one second
-                await Task.Delay(5000);
+                // Main spin (3.0 seconds)
+                await Task.Delay(3000);
                 
-                // Update the game state
+                // Subtle slowing down phase (0.3 seconds)
+                isWheelSlowingDown = true;
+                StateHasChanged();
+                await Task.Delay(300);
+                
+                // Elegant finale with sparkles (0.4 seconds)
+                isWheelDramatic = true;
+                showWheelSparkles = true;
+                StateHasChanged();
+                await Task.Delay(400);
+                
+                // Update game state
                 availableItems.RemoveAt(randomIndex);
                 calledItems.Add(currentItem);
                 displayItem = currentItem;
+                
+                // Keep the final state visible (3 seconds)
+                await Task.Delay(3000);
+                
+                // Reset effects
+                isWheelDramatic = false;
+                showWheelSparkles = false;
+                isWheelSlowingDown = false;
+                StateHasChanged();
+                
+                // Reset wheel position
+                wheelRotation = 0;
+                StateHasChanged();
             }
             else
             {
