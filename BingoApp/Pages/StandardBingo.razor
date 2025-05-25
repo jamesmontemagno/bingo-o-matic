@@ -136,7 +136,7 @@
     private Random random = new Random();
     private int initialSpeed = 50; // initial speed for the animation
     private int finalSpeed = 500; // final speed before selection
-    private int animationDuration = 4500; // total animation duration in milliseconds
+    private int animationDuration = 6000; // total animation duration in milliseconds
 
     protected override async Task OnInitializedAsync()
     {
@@ -193,7 +193,7 @@
             ShuffleNumbers();
             // During animation, show random numbers except for the last frame
             var progress = (DateTime.Now - startTime).TotalMilliseconds / animationDuration;
-            if (progress >= 0.97) // In the last 3% of animation, show the selected number
+            if (progress >= 0.96) // In the last 3% of animation, show the selected number
             {
                 displayNumber = currentNumber.Value;
             }
