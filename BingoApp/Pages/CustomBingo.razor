@@ -8,7 +8,7 @@
 
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
-@inject IBrowserStorageService StorageService
+@inject ILocalBrowserStorageService LocalStorageService
 
 <div class="bingo-container">
     <div class="bingo-header">
@@ -450,7 +450,7 @@
     {
         try
         {
-            var savedPreference = await StorageService.GetItemAsync<bool?>(WheelPreferenceKey);
+            var savedPreference = await LocalStorageService.GetItemAsync<bool?>(WheelPreferenceKey);
             useWheel = savedPreference ?? false;
         }
         catch
@@ -464,7 +464,7 @@
     {
         try
         {
-            await StorageService.SetItemAsync(WheelPreferenceKey, useWheel);
+            await LocalStorageService.SetItemAsync(WheelPreferenceKey, useWheel);
         }
         catch
         {
