@@ -8,8 +8,10 @@ public class BingoSetService : IAsyncDisposable
 {
     private readonly List<BingoSet> _sets;
     private readonly IBrowserStorageService _storageService;
-    private const string StorageKey = "bingo_sets";
+    private const string StoreName = "BingoSets";
     private bool _isInitialized = false;
+    private bool _IsInitializing = false;
+    private SemaphoreSlim _initializationLock = new(1, 1);
     
     public event Action? OnSetsChanged;
 
@@ -17,7 +19,6 @@ public class BingoSetService : IAsyncDisposable
     {
         _sets = new List<BingoSet>();
         _storageService = storageService;
-        // We'll load data asynchronously in LoadSetsAsync
     }
 
     public async ValueTask DisposeAsync()
@@ -28,29 +29,49 @@ public class BingoSetService : IAsyncDisposable
 
     private async Task InitializeAsync()
     {
-        if (_isInitialized)
+
+        if (_IsInitializing)
             return;
+
+        _IsInitializing = true;
+
+        await _initializationLock.WaitAsync();
+        try
+        {
+
+            if (_isInitialized)
+                return;
+
+            await _storageService.InitializeAsync(StoreName);
+            var storedSets = await _storageService.GetAllItemsAsync<BingoSet>();
             
-        var storedSets = await _storageService.GetItemAsync<List<BingoSet>>(StorageKey);
-        
-        if (storedSets != null && storedSets.Any())
-        {
-            _sets.Clear();
-            _sets.AddRange(storedSets);
+            if (storedSets.Any())
+            {
+                _sets.Clear();
+                _sets.AddRange(storedSets);
+            }
+            else
+            {
+                // If no stored data, add mock data
+                _sets.AddRange(MockBingoData.GetMockSets());
+                await SaveSetsAsync();
+            }
+            
+            _isInitialized = true;
         }
-        else
+        finally
         {
-            // If no stored data, add mock data
-            _sets.AddRange(MockBingoData.GetMockSets());
-            await SaveSetsAsync();
+            _IsInitializing = false;
+            _initializationLock.Release();
         }
-        
-        _isInitialized = true;
     }
     
     private async Task SaveSetsAsync()
     {
-        await _storageService.SetItemAsync(StorageKey, _sets);
+        await InitializeAsync();
+        // Convert sets to dictionary with ID as key
+        var setsDictionary = _sets.ToDictionary(s => s.Id.ToString(), s => s);
+        await _storageService.SetItemsAsync(setsDictionary);
         OnSetsChanged?.Invoke();
     }
 
@@ -115,6 +136,7 @@ public class BingoSetService : IAsyncDisposable
         // Remove duplicates and empty items
         set = set with
         {
+            Id = set.Id == Guid.Empty ? Guid.NewGuid() : set.Id,
             Items = set.Items.Where(i => !string.IsNullOrWhiteSpace(i))
                            .Distinct(StringComparer.OrdinalIgnoreCase)
                            .ToArray()
@@ -149,6 +171,7 @@ public class BingoSetService : IAsyncDisposable
         // Remove duplicates and empty items
         set = set with
         {
+            Id = set.Id == Guid.Empty ? Guid.NewGuid() : set.Id,
             Items = set.Items.Where(i => !string.IsNullOrWhiteSpace(i))
                            .Distinct(StringComparer.OrdinalIgnoreCase)
                            .ToArray()

@@ -8,7 +8,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddSingleton<IBrowserStorageService, IndexedDbService>();
+builder.Services.AddTransient<IBrowserStorageService, IndexedDbService>();
 builder.Services.AddSingleton<ILocalBrowserStorageService, LocalStorageService>();
 builder.Services.AddSingleton<BingoSetService>();
 builder.Services.AddSingleton<NavbarService>();

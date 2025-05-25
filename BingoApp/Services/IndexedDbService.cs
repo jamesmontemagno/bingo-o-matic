@@ -8,39 +8,74 @@ public class IndexedDbService : IBrowserStorageService, IAsyncDisposable
     private readonly IJSRuntime _jsRuntime;
     private IJSObjectReference? _module;
     private const string DatabaseName = "BingoData";
-    private const string StoreName = "BingoStore";
-    private const int DatabaseVersion = 1;
+    private const int InitialDatabaseVersion = 1;
     private bool _initialized = false;
+    private SemaphoreSlim _initializationLock = new(1, 1);
+    private string? _storeName;
 
     public IndexedDbService(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
     }
 
-    private async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync(string storeName)
     {
-        if (_initialized && _module is not null)
-            return;
+        if (string.IsNullOrEmpty(storeName))
+            throw new ArgumentException("Store name cannot be empty", nameof(storeName));
 
-        // Load the IndexedDB helper JavaScript module
-        _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./js/indexedDbInterop.js");
+        await _initializationLock.WaitAsync();
+        try
+        {
+            _storeName = storeName;
+            await EnsureInitializedAsync();
+        }
+        catch (Exception)
+        {
+            _initialized = false;
+            _module = null;
+            throw;
+        }
+        finally
+        {
+            _initializationLock.Release();
+        }
+    }
 
-        // Initialize the database
-        await _module.InvokeVoidAsync("initDb", DatabaseName, StoreName, DatabaseVersion);
+    private async ValueTask EnsureInitializedAsync()
+    {
+        if (!_initialized || _module is null || string.IsNullOrEmpty(_storeName))
+        {
+            if (string.IsNullOrEmpty(_storeName))
+                throw new InvalidOperationException("StoreName must be set before calling any operations. Call InitializeAsync first.");
 
-        _initialized = true;
+            try
+            {
+                // Load the IndexedDB helper JavaScript module
+                _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./js/indexedDbInterop.js");
+
+                // Initialize the database with initial version
+                await _module.InvokeVoidAsync("initDb", DatabaseName, _storeName, InitialDatabaseVersion);
+
+                _initialized = true;
+            }
+            catch (JSException ex)
+            {
+                Console.Error.WriteLine($"IndexedDB initialization error: {ex.Message}");
+                throw;
+            }
+        }
     }
 
     public async ValueTask<T?> GetItemAsync<T>(string key)
     {
-        await InitializeAsync();
+        await EnsureInitializedAsync();
 
-        if (_module is null)
+        if (_module is null || string.IsNullOrEmpty(_storeName))
             return default;
 
         var json = await _module.InvokeAsync<string?>(
-            "getItem", DatabaseName, StoreName, key);
+            "getItem", DatabaseName, _storeName, key);
 
         if (string.IsNullOrEmpty(json))
             return default;
@@ -56,11 +91,42 @@ public class IndexedDbService : IBrowserStorageService, IAsyncDisposable
         }
     }
 
+    public async ValueTask<IEnumerable<T>> GetAllItemsAsync<T>()
+    {
+        await EnsureInitializedAsync();
+
+        if (_module is null || string.IsNullOrEmpty(_storeName))
+            return Array.Empty<T>();
+
+        var json = await _module.InvokeAsync<string?>(
+            "getAllItems", DatabaseName, _storeName);
+
+        if (string.IsNullOrEmpty(json))
+            return Array.Empty<T>();
+
+        try
+        {
+            var items = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            if (items == null)
+                return Array.Empty<T>();
+
+            return items.Values
+                .Select(v => JsonSerializer.Deserialize<T>(v))
+                .Where(item => item != null)
+                .Cast<T>();
+        }
+        catch
+        {
+            // If deserialization fails, return empty array
+            return Array.Empty<T>();
+        }
+    }
+
     public async ValueTask SetItemAsync<T>(string key, T item)
     {
-        await InitializeAsync();
+        await EnsureInitializedAsync();
 
-        if (_module is null)
+        if (_module is null || string.IsNullOrEmpty(_storeName))
             return;
 
         if (item == null)
@@ -71,29 +137,44 @@ public class IndexedDbService : IBrowserStorageService, IAsyncDisposable
 
         var json = JsonSerializer.Serialize(item);
         await _module.InvokeVoidAsync(
-            "setItem", DatabaseName, StoreName, key, json);
+            "setItem", DatabaseName, _storeName, key, json);
+    }
+
+    public async ValueTask SetItemsAsync<T>(IDictionary<string, T> items)
+    {
+        await EnsureInitializedAsync();
+
+        if (_module is null || string.IsNullOrEmpty(_storeName))
+            return;
+
+        var serializedItems = items.ToDictionary(
+            kvp => kvp.Key,
+            kvp => JsonSerializer.Serialize(kvp.Value));
+
+        await _module.InvokeVoidAsync(
+            "setItems", DatabaseName, _storeName, serializedItems);
     }
 
     public async ValueTask RemoveItemAsync(string key)
     {
-        await InitializeAsync();
+        await EnsureInitializedAsync();
 
-        if (_module is null)
+        if (_module is null || string.IsNullOrEmpty(_storeName))
             return;
 
         await _module.InvokeVoidAsync(
-            "removeItem", DatabaseName, StoreName, key);
+            "removeItem", DatabaseName, _storeName, key);
     }
 
     public async ValueTask ClearAsync()
     {
-        await InitializeAsync();
+        await EnsureInitializedAsync();
 
-        if (_module is null)
+        if (_module is null || string.IsNullOrEmpty(_storeName))
             return;
 
         await _module.InvokeVoidAsync(
-            "clearStore", DatabaseName, StoreName);
+            "clearStore", DatabaseName, _storeName);
     }
 
     public async ValueTask DisposeAsync()
