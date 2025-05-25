@@ -575,8 +575,9 @@
     z-index: 100;
     pointer-events: none;
     backface-visibility: hidden;
-    text-align: center; /* Center text content within the span */
-    max-width: 120px; 
+    text-align: right; /* Align text to the right to hug the outside edge */
+    width: 180px; /* Fixed width to extend further out */
+    padding-right: 5px; /* Add some padding from the edge */
     overflow: visible;
 }
 
