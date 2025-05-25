@@ -27,8 +27,33 @@ async function generatePDF(cards, dotNetHelper) {
             'theme-color-purple': { bg: [242, 230, 255], border: [204, 153, 255] },
             'theme-color-orange': { bg: [255, 242, 230], border: [255, 204, 153] },
             'theme-color-pink': { bg: [255, 230, 242], border: [255, 153, 204] },
+            'theme-confetti': { bg: [255, 255, 255], border: [255, 215, 0] }, // Gold border for confetti theme
             'none': { bg: [255, 255, 255], border: [0, 0, 0] }
         };
+        
+        // Function to fetch and cache Unsplash images
+        async function getUnsplashImage(theme) {
+            const searchTerm = unsplashThemes[theme];
+            if (!searchTerm) return null;
+            
+            try {
+                // Use Unsplash Source API for simplicity (no API key required)
+                // This returns a random image based on search terms
+                const imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(searchTerm)}`;
+                
+                // Create a promise to load the image
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous'; // Enable CORS
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error('Failed to load image'));
+                    img.src = imageUrl;
+                });
+            } catch (error) {
+                console.warn(`Failed to load Unsplash image for theme ${theme}:`, error);
+                return null;
+            }
+        }
         
         // Process each card with progress updates
         for (let cardIndex = 0; cardIndex < cards.length; cardIndex++) {
@@ -44,48 +69,27 @@ async function generatePDF(cards, dotNetHelper) {
                 pdf.addPage();
             }
             
-            // Apply theme background if applicable
+            // Apply theme background and border
             const theme = card.theme || 'none';
-            const isColorTheme = theme.startsWith('theme-color-');
+            const themeConfig = themeColors[theme] || themeColors['none'];
             
-            if (isColorTheme && themeColors[theme]) {
-                // Fill the whole page with a light version of the theme color
-                const bgColor = themeColors[theme].bg;
-                pdf.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-                pdf.rect(0, 0, pageWidth, pageHeight, 'F');
-            }
+            // Fill the background with theme color
+            pdf.setFillColor(themeConfig.bg[0], themeConfig.bg[1], themeConfig.bg[2]);
+            pdf.rect(0, 0, pageWidth, pageHeight, 'F');
             
-            // Add a decorative border based on the theme for the whole card area
+            // Add a decorative border
             if (theme !== 'none') {
-                // Draw a themed border around the bingo area
-                let borderColor = [100, 100, 100]; // Default gray
-                
-                if (isColorTheme && themeColors[theme]) {
-                    borderColor = themeColors[theme].border;
-                } else {
-                    // Different border colors based on theme category
-                    if (theme.includes('hiking') || theme.includes('beach') || theme.includes('camping') || 
-                        theme.includes('fishing') || theme.includes('gardening')) {
-                        borderColor = [34, 139, 34]; // ForestGreen
-                    } else if (theme.includes('dogs') || theme.includes('cats') || 
-                               theme.includes('fish') || theme.includes('birds')) {
-                        borderColor = [70, 130, 180]; // SteelBlue
-                    } else if (theme.includes('birthday') || theme.includes('party') || 
-                              theme.includes('confetti') || theme.includes('fireworks')) {
-                        borderColor = [255, 215, 0]; // Gold
-                    } else if (theme.includes('space')) {
-                        borderColor = [75, 0, 130]; // Indigo
-                    }
-                }
+                const borderColor = themeConfig.border;
+                pdf.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
                 
                 // Draw outer themed border
                 pdf.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
                 pdf.setLineWidth(1.5);
-                pdf.rect(margin - 5, titleY - 5, gridSize + 10, gridSize + 45, 'D');
+                pdf.rect(margin - 5, titleY - 15, gridSize + 10, gridSize + 55, 'D');
                 
                 // Add some decorations based on the theme
                 if (theme.includes('birthday') || theme.includes('party') || theme.includes('confetti')) {
-                    // Draw confetti or decorative elements
+                    // Draw confetti with transparency
                     const decorColors = [
                         [255, 105, 180], // Hot pink
                         [0, 191, 255],   // Deep sky blue
@@ -93,22 +97,27 @@ async function generatePDF(cards, dotNetHelper) {
                         [50, 205, 50]    // Lime green
                     ];
                     
+                    // Set transparency for confetti
+                    pdf.setGState(new pdf.GState({opacity: 0.3}));
+                    
                     for (let i = 0; i < 20; i++) {
                         const colorIndex = i % decorColors.length;
+                        const color = decorColors[colorIndex];
                         const x = Math.random() * (pageWidth - 10) + 5;
                         const y = Math.random() * (pageHeight - 10) + 5;
                         const size = Math.random() * 5 + 2;
                         
-                        pdf.setFillColor(decorColors[colorIndex][0], decorColors[colorIndex][1], decorColors[colorIndex][2]);
+                        pdf.setFillColor(color[0], color[1], color[2]);
                         
                         if (Math.random() > 0.5) {
-                            // Star/confetti
                             pdf.circle(x, y, size, 'F');
                         } else {
-                            // Rectangle/confetti
                             pdf.rect(x, y, size, size, 'F');
                         }
                     }
+                    
+                    // Reset opacity for other elements
+                    pdf.setGState(new pdf.GState({opacity: 1.0}));
                 }
             }
             
@@ -221,7 +230,10 @@ async function generatePDF(cards, dotNetHelper) {
         }
         
         // Save the PDF
-        pdf.save('bingo-cards.pdf');
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const cleanTitle = cards[0].title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        pdf.save(`${cleanTitle}-bingo-cards-${dateStr}.pdf`);
         
         return { success: true };
     } catch (error) {

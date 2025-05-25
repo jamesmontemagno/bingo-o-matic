@@ -49,6 +49,25 @@
     border: 2px solid #ff99cc;
 }
 
+/* Confetti Theme */
+.theme-confetti .bingo-card-container {
+    background-color: white;
+    border: 2px solid #ffd700;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-confetti .bingo-card-container::before {
+    content: '🎊';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    opacity: 0.1;
+    z-index: -1;
+}
+
 /* Outdoor Themes */
 .theme-hiking {
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><path d="M0 350 L100 200 L200 300 L300 100 L400 250 L500 150 L500 500 L0 500 Z" fill="%23228B22"/><circle cx="450" cy="100" r="30" fill="%23FDB813"/><path d="M50 350 L150 200 L250 300 L350 100 L450 250 L500 150 L500 500 L0 500 Z" fill="%23006400"/><path d="M150 500 L200 450 L250 500" stroke="%23654321" stroke-width="10" fill="none"/><path d="M250 500 L275 400 L300 500" stroke="%23654321" stroke-width="10" fill="none"/><path d="M100 500 L125 450 L150 500" stroke="%23654321" stroke-width="10" fill="none"/></svg>');

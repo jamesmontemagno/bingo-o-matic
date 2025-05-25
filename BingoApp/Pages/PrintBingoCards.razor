@@ -50,7 +50,7 @@ else if (!generatedCards.Any())
                     <div class="row theme-selector">
                         <div class="col-12">
                             <div class="mb-2">
-                                <strong>Color Themes</strong>
+                                <strong>Choose a Theme</strong>
                             </div>
                             <div class="d-flex flex-wrap mb-3">
                                 <div class="theme-option @(selectedTheme == "none" ? "selected" : "")" 
@@ -83,126 +83,10 @@ else if (!generatedCards.Any())
                                     <div class="theme-preview"></div>
                                     <div class="theme-name">Pink</div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <div class="mb-2">
-                                <strong>Outdoor Themes</strong>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3">
-                                <div class="theme-option @(selectedTheme == "theme-hiking" ? "selected" : "")" 
-                                     @onclick="SelectThemeHiking">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-hiking"></div>
-                                    </div>
-                                    <div class="theme-name">Hiking</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-beach" ? "selected" : "")" 
-                                     @onclick="SelectThemeBeach">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-beach"></div>
-                                    </div>
-                                    <div class="theme-name">Beach</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-camping" ? "selected" : "")" 
-                                     @onclick="SelectThemeCamping">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-camping"></div>
-                                    </div>
-                                    <div class="theme-name">Camping</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-fishing" ? "selected" : "")" 
-                                     @onclick="SelectThemeFishing">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-fishing"></div>
-                                    </div>
-                                    <div class="theme-name">Fishing</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-gardening" ? "selected" : "")" 
-                                     @onclick="SelectThemeGardening">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-gardening"></div>
-                                    </div>
-                                    <div class="theme-name">Gardening</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <div class="mb-2">
-                                <strong>Pet Themes</strong>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3">
-                                <div class="theme-option @(selectedTheme == "theme-dogs" ? "selected" : "")" 
-                                     @onclick="SelectThemeDogs">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-dogs"></div>
-                                    </div>
-                                    <div class="theme-name">Dogs</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-cats" ? "selected" : "")" 
-                                     @onclick="SelectThemeCats">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-cats"></div>
-                                    </div>
-                                    <div class="theme-name">Cats</div>
-                                </div>                                <div class="theme-option @(selectedTheme == "theme-fish" ? "selected" : "")"
-                                     @onclick="SelectThemeFish">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-fish"></div>
-                                    </div>
-                                    <div class="theme-name">Fish</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-birds" ? "selected" : "")" 
-                                     @onclick="SelectThemeBirds">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-birds"></div>
-                                    </div>
-                                    <div class="theme-name">Birds</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <div class="mb-2">
-                                <strong>Celebration Themes</strong>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3">
-                                <div class="theme-option @(selectedTheme == "theme-birthday" ? "selected" : "")" 
-                                     @onclick="SelectThemeBirthday">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-birthday"></div>
-                                    </div>
-                                    <div class="theme-name">Birthday</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-party" ? "selected" : "")" 
-                                     @onclick="SelectThemeParty">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-party"></div>
-                                    </div>
-                                    <div class="theme-name">Party</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-confetti" ? "selected" : "")" 
+                                <div class="theme-option theme-confetti @(selectedTheme == "theme-confetti" ? "selected" : "")" 
                                      @onclick="SelectThemeConfetti">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-confetti"></div>
-                                    </div>
+                                    <div class="theme-preview">🎊</div>
                                     <div class="theme-name">Confetti</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-fireworks" ? "selected" : "")" 
-                                     @onclick="SelectThemeFireworks">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-fireworks"></div>
-                                    </div>
-                                    <div class="theme-name">Fireworks</div>
-                                </div>
-                                <div class="theme-option @(selectedTheme == "theme-space" ? "selected" : "")" 
-                                     @onclick="SelectThemeSpace">
-                                    <div class="theme-preview">
-                                        <div class="bingo-theme theme-space"></div>
-                                    </div>
-                                    <div class="theme-name">Space</div>
                                 </div>
                             </div>
                         </div>
@@ -304,20 +188,7 @@ else
         { "theme-color-purple", "Purple" },
         { "theme-color-orange", "Orange" },
         { "theme-color-pink", "Pink" },
-        { "theme-hiking", "Hiking" },
-        { "theme-beach", "Beach" },
-        { "theme-camping", "Camping" },
-        { "theme-fishing", "Fishing" },
-        { "theme-gardening", "Gardening" },
-        { "theme-dogs", "Dogs" },
-        { "theme-cats", "Cats" },
-        { "theme-fish", "Fish" },
-        { "theme-birds", "Birds" },
-        { "theme-birthday", "Birthday" },
-        { "theme-party", "Party" },
-        { "theme-confetti", "Confetti" },
-        { "theme-fireworks", "Fireworks" },
-        { "theme-space", "Space" }
+        { "theme-confetti", "Confetti" }
     };
 
     protected override async Task OnInitializedAsync()
@@ -356,20 +227,7 @@ else
     private void SelectThemePurple() => SelectTheme("theme-color-purple");
     private void SelectThemeOrange() => SelectTheme("theme-color-orange");
     private void SelectThemePink() => SelectTheme("theme-color-pink");
-    private void SelectThemeHiking() => SelectTheme("theme-hiking");
-    private void SelectThemeBeach() => SelectTheme("theme-beach");
-    private void SelectThemeCamping() => SelectTheme("theme-camping");
-    private void SelectThemeFishing() => SelectTheme("theme-fishing");
-    private void SelectThemeGardening() => SelectTheme("theme-gardening");
-    private void SelectThemeDogs() => SelectTheme("theme-dogs");
-    private void SelectThemeCats() => SelectTheme("theme-cats");
-    private void SelectThemeFish() => SelectTheme("theme-fish");
-    private void SelectThemeBirds() => SelectTheme("theme-birds");
-    private void SelectThemeBirthday() => SelectTheme("theme-birthday");
-    private void SelectThemeParty() => SelectTheme("theme-party");
     private void SelectThemeConfetti() => SelectTheme("theme-confetti");
-    private void SelectThemeFireworks() => SelectTheme("theme-fireworks");
-    private void SelectThemeSpace() => SelectTheme("theme-space");
     
     private string GetThemeClass()
     {
