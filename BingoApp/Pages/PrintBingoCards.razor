@@ -1,0 +1,223 @@
+@page "/print-bingo-cards/{SetId:guid}"
+@using BingoApp.Models
+@using BingoApp.Services
+@using System.ComponentModel.DataAnnotations
+@inject BingoSetService BingoService
+@inject BingoCardService CardService
+@inject IJSRuntime JS
+@implements IDisposable
+
+<PageTitle>Print Bingo Cards - Bingo-o-matic</PageTitle>
+
+@if (isLoading)
+{
+    <div class="text-center mt-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (set == null)
+{
+    <div class="alert alert-danger" role="alert">
+        Set not found
+    </div>
+}
+else if (!generatedCards.Any())
+{
+    <div class="container mt-4">
+        <h1>Print Bingo Cards</h1>
+        <h4>@set.Name</h4>
+
+        <EditForm Model="formModel" OnValidSubmit="GenerateCards" class="card mt-4">
+            <DataAnnotationsValidator />
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Custom Title</label>
+                    <InputText class="form-control" @bind-Value="formModel.Title" />
+                    <ValidationMessage For="@(() => formModel.Title)" />
+                    <div class="form-text">Leave blank to use the set name</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Number of Cards</label>
+                    <InputNumber class="form-control" @bind-Value="formModel.NumberOfCards" />
+                    <ValidationMessage For="@(() => formModel.NumberOfCards)" />
+                    <div class="form-text">Enter a number between 1 and 100</div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger">
+                        @errorMessage
+                    </div>
+                }
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        Generate Cards
+                    </button>
+                    <a href="/custom-bingo/manage" class="btn btn-secondary ms-2">Back</a>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="text-center">
+            <h4>@customTitle</h4>
+            @if (isGeneratingPdf)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Generating PDF...</h5>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: @($"{progress}%")">
+                                @progress%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <button class="btn btn-primary" @onclick="@(() => generatedCards.Clear())">
+                        Generate New Cards
+                    </button>
+                    <button class="btn btn-success ms-2" @onclick="GeneratePdf">
+                        Download PDF
+                    </button>
+                    <a href="/custom-bingo/manage" class="btn btn-secondary ms-2">Back</a>
+                </div>
+            }
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Ready to Download</h5>
+                        <p class="card-text">@generatedCards.Count cards have been generated.</p>
+                        <p class="card-text"><small class="text-muted">Click "Download PDF" to save your bingo cards.</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid SetId { get; set; }
+
+    private BingoSet? set;
+    private bool isLoading = true;
+    private bool isGeneratingPdf = false;
+    private string errorMessage = "";
+    private int progress = 0;
+    private string customTitle = "";
+    private List<string[][]> generatedCards = new();
+    private PrintBingoCardsModel formModel = new();
+    private DotNetObjectReference<PrintBingoCards>? objRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            set = await BingoService.GetByIdAsync(SetId);
+            if (set != null)
+            {
+                customTitle = set.Name;
+                formModel.Title = set.Name;
+                formModel.NumberOfCards = 1;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error loading bingo set: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GenerateCards()
+    {
+        if (set == null) return;
+        
+        errorMessage = "";
+        customTitle = string.IsNullOrWhiteSpace(formModel.Title) ? set.Name : formModel.Title;
+
+        try
+        {
+            generatedCards = CardService.GenerateCards(set, formModel.NumberOfCards).ToList();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error generating cards: " + ex.Message;
+        }
+    }
+
+    private async Task GeneratePdf()
+    {
+        if (!generatedCards.Any()) return;
+
+        try
+        {
+            isGeneratingPdf = true;
+            progress = 0;
+            objRef = DotNetObjectReference.Create(this);
+
+            var cards = generatedCards.Select((grid, index) => new
+            {
+                title = customTitle,
+                grid = grid
+            }).ToList();
+
+            var result = await JS.InvokeAsync<GeneratePdfResult>("generatePDF", cards, objRef);
+
+            if (!result.Success)
+            {
+                errorMessage = "Error generating PDF: " + result.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error generating PDF: " + ex.Message;
+        }
+        finally
+        {
+            isGeneratingPdf = false;
+            progress = 0;
+        }
+    }
+
+    [JSInvokable]
+    public void UpdateProgress(int percentage)
+    {
+        progress = percentage;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+
+    private class PrintBingoCardsModel
+    {
+        public string Title { get; set; } = "";
+
+        [Range(1, 100, ErrorMessage = "Please enter a number between 1 and 100")]
+        public int NumberOfCards { get; set; } = 1;
+    }
+
+    private class GeneratePdfResult
+    {
+        public bool Success { get; set; }
+        public string? Error { get; set; }
+    }
+}

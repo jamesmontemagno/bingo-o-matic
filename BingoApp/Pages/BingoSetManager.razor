@@ -2,6 +2,7 @@
 @using BingoApp.Models
 @using BingoApp.Services
 @inject BingoSetService BingoService
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <h1>Manage Bingo Sets</h1>
@@ -40,6 +41,9 @@
                                     </button>
                                     <button class="btn btn-outline-secondary btn-sm me-2" @onclick="() => EditSet(set)">
                                         Edit
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm me-2" @onclick="() => NavigateToPrint(set)">
+                                        Print
                                     </button>
                                     <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteSetPrompt(set)">
                                         Delete
@@ -276,5 +280,10 @@
         {
             errorMessage = ex.Message;
         }
+    }
+
+    private void NavigateToPrint(BingoSet set)
+    {
+        NavigationManager.NavigateTo($"/print-bingo-cards/{set.Id}");
     }
 }

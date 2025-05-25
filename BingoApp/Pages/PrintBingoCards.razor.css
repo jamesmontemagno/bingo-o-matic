@@ -1,0 +1,82 @@
+.print-container {
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem;
+}
+
+@media print {
+    .print-container {
+        padding: 0;
+    }
+
+    .bingo-card {
+        page-break-inside: avoid;
+        margin-bottom: 0 !important;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @page {
+        margin: 0.5cm;
+        size: portrait;
+    }
+}
+
+.bingo-card {
+    border: 2px solid #000;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: white;
+    width: 100%;
+    margin: 0 auto;
+    height: calc(100vh - 80px); /* Account for the sticky header */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-bottom: 2px solid #000;
+    flex: 0 0 auto;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.card-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 0.25rem;
+}
+
+.bingo-grid {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    flex: 1;
+    table-layout: fixed;
+}
+
+.bingo-grid td {
+    border: 2px solid #000;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    height: 20%;
+    width: 20%;
+    vertical-align: middle;
+    padding: 0.5rem;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+.bingo-grid .free-space {
+    background-color: #f8f9fa;
+    font-size: 2.5em;
+    text-transform: uppercase;
+}

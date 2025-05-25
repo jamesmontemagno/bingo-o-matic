@@ -11,5 +11,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddSingleton<IBrowserStorageService, LocalStorageService>();
 builder.Services.AddSingleton<BingoSetService>();
 builder.Services.AddSingleton<NavbarService>();
+builder.Services.AddScoped<BingoCardService>();
 
 await builder.Build().RunAsync();
