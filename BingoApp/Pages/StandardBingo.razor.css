@@ -261,7 +261,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    height: 4rem;
+    min-height: 4rem;
     border-radius: 8px;
     padding: 0.5rem;
     background: rgba(var(--bs-primary-rgb), 0.05);
@@ -278,6 +278,18 @@
     font-weight: bold;
     width: 4rem;
     text-align: center;
+}
+
+/* Add the numbers class to fix horizontal layout */
+.numbers {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+    max-height: 4rem;
+    align-content: flex-start;
+    overflow-y: auto;
 }
 
 .number-mini {
