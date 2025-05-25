@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace BingoApp.Services;
 
-public class LocalStorageService : IBrowserStorageService
+public class LocalStorageService : ILocalBrowserStorageService
 {
     private readonly IJSRuntime _jsRuntime;
     private const string StorageType = "localStorage";

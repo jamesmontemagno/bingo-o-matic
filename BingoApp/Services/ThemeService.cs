@@ -5,13 +5,13 @@ namespace BingoApp.Services
 {
     public class ThemeService
     {
-        private readonly IBrowserStorageService _storageService;
+        private readonly ILocalBrowserStorageService _storageService;
         private readonly IJSRuntime _jsRuntime;
         private const string ThemeKey = "theme-preference";
 
         public event Action<bool>? ThemeChanged;
 
-        public ThemeService(IBrowserStorageService storageService, IJSRuntime jsRuntime)
+        public ThemeService(ILocalBrowserStorageService storageService, IJSRuntime jsRuntime)
         {
             _storageService = storageService;
             _jsRuntime = jsRuntime;

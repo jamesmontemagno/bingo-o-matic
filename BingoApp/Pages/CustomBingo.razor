@@ -12,17 +12,6 @@
 
 <div class="bingo-container">
     <div class="bingo-header">
-        <div class="bingo-title">
-            <h1>Custom Bingo</h1>
-            @if (selectedSet != null)
-            {
-                <p class="lead">Playing: @selectedSet.Name</p>
-            }
-            else
-            {
-                <p class="lead">Select a bingo set to play</p>
-            }
-        </div>
         <div class="bingo-controls">
             <div class="form-group me-2">
                 <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
