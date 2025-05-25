@@ -12,7 +12,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Available Bingo Sets</h5>
                 <button class="btn btn-primary" @onclick="() => ShowSetEditor()">
-                    <span class="emoji-icon">➕</span> Add New Set
+                    Add New Set
                 </button>
             </div>
             @if (isLoading)
@@ -36,13 +36,13 @@
                                 </div>
                                 <div>
                                     <button class="btn btn-outline-primary btn-sm me-2" @onclick="() => ViewSet(set)">
-                                        <span class="emoji-icon">👁️</span> View
+                                        View
                                     </button>
                                     <button class="btn btn-outline-secondary btn-sm me-2" @onclick="() => EditSet(set)">
-                                        <span class="emoji-icon">✏️</span> Edit
+                                        Edit
                                     </button>
                                     <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteSetPrompt(set)">
-                                        <span class="emoji-icon">🗑️</span> Delete
+                                        Delete
                                     </button>
                                 </div>
                             </div>
