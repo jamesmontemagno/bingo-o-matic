@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Components
 @using System.Web
 @using Microsoft.AspNetCore.Components.Web
+@using BingoApp.Models
+@using BingoApp.Services
 @implements IDisposable
 
 @inject BingoSetService BingoService
@@ -279,60 +281,135 @@
 
     private string GetDynamicFontSize()
     {
-        // Calculate font size based on number of items
-        // More items = smaller font, fewer items = larger font
+        // Calculate font size based on number of items and length of longest item
         var itemCount = availableItems.Count;
+        var maxLength = availableItems.Count > 0 ? availableItems.Max(s => s.Length) : 0;
         
-        if (itemCount <= 3) return "1.8rem";      // Large font for 3 or fewer items
-        if (itemCount <= 10) return "2rem";      // Medium-large font for 4-6 items
-        if (itemCount <= 20) return "1.8rem";     // Medium font for 7-10 items
-        if (itemCount <= 30) return "1.5rem";       // Small-medium font for 11-15 items
-        if (itemCount <= 40) return "1.2rem";     // Small font for 16-20 items
-        return "0.8rem";                          // Very small font for 21+ items
+        // If more than 50 items, keep original smaller sizes
+        if (itemCount > 50)
+        {
+            if (maxLength > 15)
+            {
+                if (itemCount <= 3) return "1.0rem";
+                if (itemCount <= 8) return "0.9rem";
+                if (itemCount <= 15) return "0.8rem";
+                return "0.7rem";
+            }
+            else if (maxLength > 10)
+            {
+                if (itemCount <= 3) return "1.2rem";
+                if (itemCount <= 8) return "1.0rem";
+                if (itemCount <= 15) return "0.9rem";
+                if (itemCount <= 25) return "0.8rem";
+                return "0.7rem";
+            }
+            else
+            {
+                if (itemCount <= 3) return "1.4rem";
+                if (itemCount <= 8) return "1.2rem";
+                if (itemCount <= 15) return "1.0rem";
+                if (itemCount <= 25) return "0.9rem";
+                if (itemCount <= 35) return "0.8rem";
+                return "0.7rem";
+            }
+        }
+        
+        // Increased sizes by 1.5x for <= 50 items
+        if (maxLength > 15)
+        {
+            // Very conservative sizes for very long text
+            if (itemCount <= 3) return "1.5rem";
+            if (itemCount <= 8) return "1.35rem";
+            if (itemCount <= 15) return "1.2rem";
+            return "1.05rem";
+        }
+        else if (maxLength > 10)
+        {
+            // Conservative sizes for long text
+            if (itemCount <= 3) return "1.8rem";
+            if (itemCount <= 8) return "1.5rem";
+            if (itemCount <= 15) return "1.35rem";
+            if (itemCount <= 25) return "1.2rem";
+            return "1.05rem";
+        }
+        else
+        {
+            // Normal sizing for shorter text
+            if (itemCount <= 3) return "2.1rem";
+            if (itemCount <= 8) return "1.8rem";
+            if (itemCount <= 15) return "1.5rem";
+            if (itemCount <= 25) return "1.35rem";
+            if (itemCount <= 35) return "1.2rem";
+            return "1.05rem";
+        }
     }
 
     private (double translateX, double translateY) GetDynamicTextPosition()
     {
-        // Position text right at the border/edge of the wheel
+        // Position text with more conservative inward placement
         var itemCount = availableItems.Count;
         
-        // Calculate position to place text right at the wheel border
+        // Calculate position with more conservative inward placement
         // The wheel radius is approximately 250px (half of min 500px wheel size)
-        // We want text positioned right at the edge
-        var baseRadius = 240; // Close to wheel edge for border positioning
+        var baseRadius = 200; // Further reduced to keep text well inside wheel
         
-        // For border alignment, we want text consistently at the edge
-        // regardless of segment count, but adjust slightly for readability
+        // Adjust text distance from center based on number of items and text length
+        var maxLength = availableItems.Count > 0 ? availableItems.Max(s => s.Length) : 0;
         double textDistanceRatio;
-        if (itemCount <= 3)
+        
+        // More conservative placement for longer text
+        if (maxLength > 15)
         {
-            textDistanceRatio = 0.85; // Slightly inward for large segments to avoid cutoff
+            textDistanceRatio = 0.60; // Very conservative for very long text
         }
-        else if (itemCount <= 8)
+        else if (maxLength > 10)
         {
-            textDistanceRatio = 0.90; // Close to edge for medium segments
+            textDistanceRatio = 0.65; // Conservative for long text
         }
         else
         {
-            textDistanceRatio = 0.95; // Right at edge for small segments
+            // For normal length text, still be more conservative than before
+            if (itemCount <= 3)
+            {
+                textDistanceRatio = 0.70; // Much more inward for large segments
+            }
+            else if (itemCount <= 8)
+            {
+                textDistanceRatio = 0.75; // More inward for medium segments
+            }
+            else if (itemCount <= 15)
+            {
+                textDistanceRatio = 0.80; // Slightly more inward for smaller segments
+            }
+            else
+            {
+                textDistanceRatio = 0.85; // Still keep some safe distance from edge
+            }
         }
         
         var translateX = baseRadius * textDistanceRatio;
         
-        // Y translation - keep text centered vertically in each segment
-        // Minimal Y offset since we want text aligned on the right border
+        // Y translation - keep text centered with more offset for longer text
         double translateY;
-        if (itemCount <= 5)
+        if (maxLength > 15)
         {
-            translateY = -10; // Minimal offset for large segments
+            translateY = -20; // Larger offset for very long text
         }
-        else if (itemCount <= 15) 
+        else if (maxLength > 10)
         {
-            translateY = -8; // Very small offset for medium segments
+            translateY = -18; // Large offset for long text
+        }
+        else if (itemCount <= 5)
+        {
+            translateY = -15; // Normal offset for few items
+        }
+        else if (itemCount <= 15)
+        {
+            translateY = -12; // Slightly smaller offset
         }
         else
         {
-            translateY = -5; // Almost no offset for small segments
+            translateY = -10; // Minimal offset for many items
         }
         
         return (translateX, translateY);
