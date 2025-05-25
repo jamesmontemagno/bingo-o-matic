@@ -40,6 +40,27 @@
     gap: 1rem;
 }
 
+/* Mobile responsiveness adjustments */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-section .tagline {
+        font-size: 1.2rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
 .hero-buttons .btn {
     transform-origin: center;
     transition: all 0.3s ease;
@@ -78,6 +99,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Mobile responsiveness for feature cards */
+@media (max-width: 768px) {
+    .feature-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .features-section {
+        padding: 2rem 0;
+    }
+    
+    .features-section h2 {
+        margin-bottom: 2rem;
+        font-size: 2rem;
+    }
 }
 
 .feature-card:hover {

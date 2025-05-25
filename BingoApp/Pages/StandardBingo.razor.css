@@ -11,6 +11,14 @@
     margin-top: 2rem;
 }
 
+/* Mobile responsiveness - stack game content vertically */
+@media (max-width: 768px) {
+    .game-content {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
 .current-ball {
     flex: 0 0 200px;
     min-height: 200px;
@@ -28,6 +36,26 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* Mobile responsiveness - stack header content vertically */
+@media (max-width: 768px) {
+    .bingo-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .bingo-title {
+        margin-bottom: 1rem;
+    }
+    
+    .bingo-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
 }
 
 :global(.immersive) .bingo-header {
