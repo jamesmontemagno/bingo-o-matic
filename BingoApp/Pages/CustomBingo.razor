@@ -12,17 +12,6 @@
 
 <div class="bingo-container">
     <div class="bingo-header">
-        <div class="bingo-title">
-            <h1>Custom Bingo</h1>
-            @if (selectedSet != null)
-            {
-                <p class="lead">Playing: @selectedSet.Name</p>
-            }
-            else
-            {
-                <p class="lead">Select a bingo set to play</p>
-            }
-        </div>
         <div class="bingo-controls">
             <div class="form-group me-2">
                 <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
@@ -649,8 +638,18 @@
                 // Calculate the final rotation to make the selected item land at the pointer
                 double segmentAngle = 360.0 / availableItems.Count;
                 double itemAngle = segmentAngle * randomIndex;
-                // Add extra rotations for effect (5-7 full rotations) plus the specific angle
-                double targetRotation = (random.Next(5, 8) * 360) + (360 - itemAngle);
+                
+                // Since the coordinate system in the wheel rendering has 0 degrees at the right side
+                // (notice the -90 in the clipPath calculation) and the pointer is also at the right,
+                // we need to align the center of the item's segment with the 0-degree mark
+                
+                // Center of the item's segment
+                double itemCenterAngle = itemAngle + (segmentAngle / 2);
+                // Fixed number of rotations (5-8) for visual effect plus the alignment angle
+                double targetRotation = (random.Next(5, 8) * 360) + (360 - itemCenterAngle);
+                
+                // Fix the rotation to ensure it's within proper range
+                targetRotation = targetRotation % 360 == 0 ? targetRotation + 1 : targetRotation;
                 
                 // Start the wheel spinning animation
                 wheelRotation = 0;
