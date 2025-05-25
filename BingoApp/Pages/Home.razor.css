@@ -199,6 +199,52 @@ footer i {
     margin-right: 0.5rem;
 }
 
+/* Special feature card for No Ads feature */
+.special-feature {
+    background: linear-gradient(135deg, var(--bs-primary-rgb-soft) 0%, var(--bs-secondary-rgb-soft) 100%);
+    border: 2px solid var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .special-feature {
+    background: linear-gradient(135deg, rgba(var(--bs-primary-rgb), 0.2) 0%, rgba(var(--bs-secondary-rgb), 0.2) 100%);
+}
+
+.special-feature .emoji-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.special-feature h3 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Add emoji icons styling */
+.emoji-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .emoji-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
 /* Animation for gradient text */
 @keyframes gradient {
     0% {
@@ -224,4 +270,35 @@ footer i {
     50% {
         transform: translateY(-10px);
     }
+}
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.special-feature h3 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Add emoji icons styling */
+.emoji-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .emoji-icon {
+    transform: scale(1.2) rotate(5deg);
 }

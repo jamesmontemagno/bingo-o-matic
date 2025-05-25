@@ -4,11 +4,13 @@ A modern, interactive bingo game web application built with [Blazor WebAssembly]
 
 ## Features
 
-- Standard Bingo: Play traditional bingo with B-I-N-G-O columns
-- Custom Bingo: Create and play with your own custom bingo sets
-- Immersive Mode: Toggle fullscreen mode for better visibility during play
-- Mobile-friendly design
-- Smooth animations and visual feedback
+- **Standard Bingo:** Classic bingo gameplay, easy to start and play with B-I-N-G-O columns
+- **Custom Bingo:** Create unique bingo games with custom card content and play with your own sets
+- **Create & Organize Sets:** Group bingo cards into sets for events, classrooms, or themes
+- **Create & Print Custom Bingo Cards:** Generate printable cards tailored to your specific needs
+- **Custom Theming & Fun Animations:** Personalize with color themes and enjoy playful, engaging animations
+- **Offline Mode with PWA:** Play anywhere, even offline, thanks to Progressive Web App support
+- **No Ads & Completely Free:** 100% free experience—no ads, no tracking
 
 ## Technology Used
 
