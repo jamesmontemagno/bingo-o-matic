@@ -32,7 +32,7 @@ public class BingoCardService
 
             do
             {
-                newCard = GenerateCard(set.Items);
+                newCard = GenerateCard(set.Items.Distinct(StringComparer.OrdinalIgnoreCase).ToArray());
                 isUnique = !IsCardDuplicate(newCard);
                 attempts++;
 

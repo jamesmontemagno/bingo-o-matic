@@ -429,7 +429,7 @@
 
         if (selectedSet?.Items?.Length > 0)
         {
-            availableItems = new List<string>(selectedSet.Items);
+            availableItems = new List<string>(selectedSet.Items.Distinct(StringComparer.OrdinalIgnoreCase).ToArray());
             calledItems.Clear();
             currentItem = null;
             displayItem = null;
@@ -507,10 +507,10 @@
             ShuffleList(availableItems);
             
             StateHasChanged();
-            await Task.Delay(1000);
             
             if (selectionMode == SelectionMode.Wheel)
             {
+                await Task.Delay(1000);
                 // Select the final item first
                 int randomIndex = random.Next(0, availableItems.Count);
                 currentItem = availableItems[randomIndex];
@@ -577,6 +577,7 @@
             }
             else if (selectionMode == SelectionMode.Grid)
             {
+                await Task.Delay(1000);
                 if (gridSelector != null)
                 {
                     await gridSelector.StartSelectionAsync();
@@ -596,30 +597,29 @@
                 var token = animationCts.Token;
 
                 // Fast cycling at the beginning
-                var fastRotations = 15;
+                // Randomize the number of rotations for each phase
+                var fastRotations = random.Next(12, 20);
                 for (int i = 0; i < fastRotations && !token.IsCancellationRequested; i++)
                 {
                     displayItem = availableItems[random.Next(availableItems.Count)];
                     StateHasChanged();
-                    await Task.Delay(50, token);
+                    await Task.Delay(60, token);
                 }
-                
-                // Medium speed cycling
-                var mediumRotations = 10;
+
+                var mediumRotations = random.Next(8, 14);
                 for (int i = 0; i < mediumRotations && !token.IsCancellationRequested; i++)
                 {
                     displayItem = availableItems[random.Next(availableItems.Count)];
                     StateHasChanged();
-                    await Task.Delay(100, token);
+                    await Task.Delay(160, token);
                 }
-                
-                // Slow down dramatically for final selections
-                var slowRotations = 7;
+
+                var slowRotations = random.Next(5, 10);
                 for (int i = 0; i < slowRotations && !token.IsCancellationRequested; i++)
                 {
                     displayItem = availableItems[random.Next(availableItems.Count)];
                     StateHasChanged();
-                    await Task.Delay(200, token);
+                    await Task.Delay(250, token);
                 }
 
                 if (!token.IsCancellationRequested)
