@@ -8,9 +8,6 @@
             <button class="btn btn-primary me-2" @onclick="DrawNextNumber" disabled="@isShowingAnimation">
                 <i class="bi bi-shuffle"></i> Draw Number
             </button>
-            <button class="btn btn-outline-primary me-2" @onclick="async () => await ResetGame(true)">
-                <i class="bi bi-arrow-repeat"></i> Reset
-            </button>
         </div>
     </div>
 
@@ -114,6 +111,12 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="text-center mt-3">
+        <button class="btn btn-outline-primary" @onclick="async () => await ResetGame(true)" disabled="@isShowingAnimation">
+            <i class="bi bi-arrow-repeat"></i> Reset Game
+        </button>
     </div>
 </div>
 

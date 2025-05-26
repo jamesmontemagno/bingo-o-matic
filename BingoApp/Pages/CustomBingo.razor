@@ -24,32 +24,31 @@
                     </select>
                 </div>
                 <a href="/custom-bingo/manage" class="btn btn-outline-secondary manage-btn" title="Manage Bingo Sets" aria-label="Manage Bingo Sets">
-                    <i class="bi bi-gear"></i>
+                    ⚙️ Manage
                 </a>
             </div>
-            <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
-                Draw Item
-            </button>
-            <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null || isSelecting)">
-                Reset
-            </button>
-            <div class="mode-toggle @(isSelecting ? "disabled" : "")" role="group" aria-label="Selection mode">
-                <button type="button" 
-                        class="mode-toggle-btn @(!useWheel ? "active" : "")" 
-                        @onclick="() => SetMode(false)"
-                        disabled="@isSelecting"
-                        aria-pressed="@(!useWheel)">
-                    <i class="bi bi-list-ul"></i>
-                    <span>Cards</span>
+            <div class="draw-toggle-row d-flex align-items-center gap-2 mt-2">
+                <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
+                    Draw Item
                 </button>
-                <button type="button" 
-                        class="mode-toggle-btn @(useWheel ? "active" : "")" 
-                        @onclick="() => SetMode(true)"
-                        disabled="@isSelecting"
-                        aria-pressed="@useWheel">
-                    <i class="bi bi-palette"></i>
-                    <span>Wheel</span>
-                </button>
+                <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
+                    <button type="button" 
+                            class="mode-toggle-btn @(!useWheel ? "active" : "")" 
+                            @onclick="() => SetMode(false)"
+                            disabled="@isSelecting"
+                            aria-pressed="@(!useWheel)">
+                        <i class="bi bi-list-ul"></i>
+                        <span>Cards</span>
+                    </button>
+                    <button type="button" 
+                            class="mode-toggle-btn @(useWheel ? "active" : "")" 
+                            @onclick="() => SetMode(true)"
+                            disabled="@isSelecting"
+                            aria-pressed="@useWheel">
+                        <i class="bi bi-palette"></i>
+                        <span>Wheel</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -122,7 +121,7 @@
                                 bool isLatestItem = calledItems.IndexOf(item) == calledItems.Count - 1;
                                 <div class="item-cell called @(isLatestItem ? "latest" : "previous")" style="@(isLatestItem ? $"background-color: {currentThemeColor}" : $"border-color: {currentThemeColor}")">
                                     <span>@item</span>
-                            </div>
+                                </div>
                             }
                         }
                         else
@@ -130,6 +129,11 @@
                             <p>No items selected yet. Click "Draw Item" to begin.</p>
                         }
                     </div>
+                </div>
+                <div class="reset-btn-row mt-3 d-flex justify-content-center">
+                    <button class="btn btn-outline-primary" @onclick="ConfirmNewGame" disabled="@(selectedSet == null || isSelecting)">
+                        Reset Game
+                    </button>
                 </div>
             }
         </div>
