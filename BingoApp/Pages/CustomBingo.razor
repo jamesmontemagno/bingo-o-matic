@@ -11,6 +11,7 @@
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
 @inject ILocalBrowserStorageService LocalStorageService
+@inject IJSRuntime JSRuntime
 
 <div class="bingo-container">
     <div class="bingo-header">
@@ -33,32 +34,35 @@
                 <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
                     <i class="bi bi-shuffle"></i> Draw Item
                 </button>
-                <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
-                    <button type="button" 
-                            class="mode-toggle-btn @(selectionMode == SelectionMode.Cards ? "active" : "")" 
-                            @onclick="() => SetMode(SelectionMode.Cards)"
-                            disabled="@isSelecting"
-                            aria-pressed="@(selectionMode == SelectionMode.Cards)">
-                        <i class="bi bi-list-ul"></i>
-                        <span>Cards</span>
-                    </button>
-                    <button type="button" 
-                            class="mode-toggle-btn @(selectionMode == SelectionMode.Wheel ? "active" : "")" 
-                            @onclick="() => SetMode(SelectionMode.Wheel)"
-                            disabled="@isSelecting"
-                            aria-pressed="@(selectionMode == SelectionMode.Wheel)">
-                        <i class="bi bi-palette"></i>
-                        <span>Wheel</span>
-                    </button>
-                    <button type="button" 
-                            class="mode-toggle-btn @(selectionMode == SelectionMode.Grid ? "active" : "")" 
-                            @onclick="() => SetMode(SelectionMode.Grid)"
-                            disabled="@isSelecting"
-                            aria-pressed="@(selectionMode == SelectionMode.Grid)">
-                        <i class="bi bi-grid-3x3-gap"></i>
-                        <span>Grid</span>
-                    </button>
-                </div>
+                @if (!isMobileDevice)
+                {
+                    <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
+                        <button type="button" 
+                                class="mode-toggle-btn @(selectionMode == SelectionMode.Cards ? "active" : "")" 
+                                @onclick="() => SetMode(SelectionMode.Cards)"
+                                disabled="@isSelecting"
+                                aria-pressed="@(selectionMode == SelectionMode.Cards)">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Cards</span>
+                        </button>
+                        <button type="button" 
+                                class="mode-toggle-btn @(selectionMode == SelectionMode.Wheel ? "active" : "")" 
+                                @onclick="() => SetMode(SelectionMode.Wheel)"
+                                disabled="@isSelecting"
+                                aria-pressed="@(selectionMode == SelectionMode.Wheel)">
+                            <i class="bi bi-palette"></i>
+                            <span>Wheel</span>
+                        </button>
+                        <button type="button" 
+                                class="mode-toggle-btn @(selectionMode == SelectionMode.Grid ? "active" : "")" 
+                                @onclick="() => SetMode(SelectionMode.Grid)"
+                                disabled="@isSelecting"
+                                aria-pressed="@(selectionMode == SelectionMode.Grid)">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>Grid</span>
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -289,13 +293,27 @@
     private bool showWheelSparkles = false;
     private const string WheelPreferenceKey = "bingo_wheel_preference";
 
+    private bool isMobileDevice;
+
     protected override async Task OnInitializedAsync()
     {
+        // Detect if device is mobile
+        isMobileDevice = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
+        
+        // Force cards mode on mobile
+        if (isMobileDevice)
+        {
+            selectionMode = SelectionMode.Cards;
+        }
+        
         // Subscribe to changes
         BingoService.OnSetsChanged += OnBingoSetsChanged;
         
         // Load preferences
-        await LoadModePreferenceAsync();
+        if (!isMobileDevice)
+        {
+            await LoadModePreferenceAsync();
+        }
         
         // Load wheel preference
         await LoadWheelPreferenceAsync();
@@ -685,7 +703,7 @@
 
     private async Task SetMode(SelectionMode mode)
     {
-        if (selectionMode != mode)
+        if (selectionMode != mode && !isMobileDevice)
         {
             selectionMode = mode;
             await SaveModePreferenceAsync();

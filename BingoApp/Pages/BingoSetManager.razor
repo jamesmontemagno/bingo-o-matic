@@ -36,14 +36,17 @@
                                     <small class="text-muted">@set.Items.Length items</small>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => EditSet(set)">
-                                        Edit
+                                    <button class="btn btn-outline-secondary btn-sm" title="Edit" @onclick="() => EditSet(set)">
+                                        <i class="bi bi-pencil"></i>
+                                        <span class="visually-hidden">Edit</span>
                                     </button>
-                                    <button class="btn btn-outline-success btn-sm" @onclick="() => NavigateToPrint(set)">
-                                        Print
+                                    <button class="btn btn-outline-success btn-sm" title="Print" @onclick="() => NavigateToPrint(set)">
+                                        <i class="bi bi-printer"></i>
+                                        <span class="visually-hidden">Print</span>
                                     </button>
-                                    <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteSetPrompt(set)">
-                                        Delete
+                                    <button class="btn btn-outline-danger btn-sm" title="Delete" @onclick="() => DeleteSetPrompt(set)">
+                                        <i class="bi bi-trash"></i>
+                                        <span class="visually-hidden">Delete</span>
                                     </button>
                                 </div>
                             </div>
