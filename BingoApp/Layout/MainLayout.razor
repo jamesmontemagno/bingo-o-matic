@@ -1,6 +1,10 @@
 ﻿@using BingoApp.Layout
+@using BingoApp.Components
+@using BingoApp.Services
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
+@inject ThemeService ThemeService
+@implements IAsyncDisposable
 
 <div class="page">
     <header class="app-header">
@@ -35,6 +39,7 @@
             </div>
         </div>
     </footer>
+    <PWAUpdater Theme="@(ThemeService.IsDarkMode ? "dark" : "light")" />
 </div>
 
 @code {
@@ -43,5 +48,18 @@
     protected override async Task OnInitializedAsync()
     {
         isMobile = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
+        await ThemeService.InitializeThemeAsync();
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(bool isDark)
+    {
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+        await ValueTask.CompletedTask;
     }
 }
