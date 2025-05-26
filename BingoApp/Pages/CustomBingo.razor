@@ -17,13 +17,13 @@
     <div class="bingo-header">
         <div class="bingo-controls">
 
-            <div class="draw-toggle-row d-flex flex-column align-items-center gap-3 mt-2">
-                <button class="btn btn-primary btn-lg w-100" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
+            <div class="draw-toggle-row d-flex flex-column flex-md-row align-items-center gap-3 mt-2">
+                <button class="btn btn-primary btn-lg flex-shrink-0" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
                     <i class="bi bi-shuffle"></i> Draw Item
                 </button>
                 @if (!isMobileDevice)
                 {
-                    <div class="mode-toggle w-100 @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
+                    <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
                         <button type="button" 
                                 class="mode-toggle-btn @(selectionMode == SelectionMode.Cards ? "active" : "")" 
                                 @onclick="() => SetMode(SelectionMode.Cards)"
@@ -51,9 +51,9 @@
                     </div>
                 }
 
-                @if (selectedSet == null || calledItems.Count == 0)
+                @if ((selectedSet == null || calledItems.Count == 0) && !isSelecting)
                 {
-                    <div class="selector-row">
+                    <div class="selector-row flex-grow-1">
                         <div class="form-group">
                             <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged"  disabled="@(isSelecting)">
                                 <option value="">Select a set...</option>

@@ -29,6 +29,10 @@
     align-items: center;
 }
 
+.bingo-controls .draw-toggle-row {
+    width: 100%;
+}
+
 .selector-row {
     display: flex;
     align-items: center;
@@ -76,6 +80,48 @@
 
     .manage-btn {
         margin-left: 0.5rem;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+    .draw-toggle-row {
+        flex-direction: row !important;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .mode-toggle {
+        max-width: fit-content;
+        margin: 0;
+    }
+
+    .selector-row {
+        max-width: 400px;
+    }
+
+    button.btn-lg {
+        min-width: 200px;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+    .draw-toggle-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .mode-toggle {
+        width: 100%;
+    }
+
+    .selector-row {
+        width: 100%;
+    }
+
+    button.btn-lg {
+        width: 100%;
     }
 }
 
