@@ -15,7 +15,7 @@
         <div class="bingo-controls">
             <div class="selector-row">
                 <div class="form-group">
-                    <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
+                    <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged"  disabled="@(isSelecting)">
                         <option value="">Select a set...</option>
                         @foreach (var set in bingoSets)
                         {

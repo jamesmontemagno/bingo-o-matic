@@ -53,7 +53,7 @@ public class BingoSetService : IAsyncDisposable
             else
             {
                 // If no stored data, add mock data
-                _sets.AddRange(MockBingoData.GetMockSets());
+                _sets.AddRange(MockBingoData.GetMockSets().Take(5));
                 await SaveSetsAsync();
             }
             
