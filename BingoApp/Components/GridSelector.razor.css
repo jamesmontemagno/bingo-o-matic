@@ -1,0 +1,109 @@
+.grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bs-modal-backdrop-bg);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    padding: 2rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    width: 100%;
+    perspective: 1000px;
+}
+
+.grid-item {
+    background: var(--bs-body-bg);
+    border: 2px solid var(--bs-border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    color: var(--bs-body-color);
+    font-size: 1.2rem;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: scale(1) rotateY(0);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.grid-item.highlighted {
+    border-color: var(--theme-color);
+    background: color-mix(in srgb, var(--theme-color) 10%, var(--bs-body-bg));
+    transform: scale(1.2) rotateY(10deg);
+    z-index: 1;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-color) 30%, transparent);
+    color: var(--bs-emphasis-color);
+}
+
+.grid-container.finalizing .grid-item {
+    opacity: 0.3;
+    transform: scale(0.95) rotateY(0);
+    transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+    filter: grayscale(0.8);
+}
+
+.grid-container.finalizing .grid-item.selected {
+    opacity: 1;
+    filter: none;
+    border-color: var(--theme-color);
+    background: color-mix(in srgb, var(--theme-color) 15%, var(--bs-body-bg));
+    transform: scale(1.3) rotateY(0);
+    animation: victoryPulse 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    box-shadow: 
+        0 0 30px var(--theme-color),
+        0 0 60px color-mix(in srgb, var(--theme-color) 30%, transparent);
+}
+
+.grid-container.animating .grid-item {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.grid-item span {
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes victoryPulse {
+    0% { 
+        transform: scale(1.3) rotateY(0);
+        box-shadow: 
+            0 0 30px var(--theme-color, #fff),
+            0 0 60px color-mix(in srgb, var(--theme-color, #fff) 50%, transparent);
+    }
+    50% { 
+        transform: scale(1.4) rotateY(5deg);
+        box-shadow: 
+            0 0 50px var(--theme-color, #fff),
+            0 0 100px color-mix(in srgb, var(--theme-color, #fff) 50%, transparent);
+    }
+    100% { 
+        transform: scale(1.3) rotateY(0);
+        box-shadow: 
+            0 0 30px var(--theme-color, #fff),
+            0 0 60px color-mix(in srgb, var(--theme-color, #fff) 50%, transparent);
+    }
+}

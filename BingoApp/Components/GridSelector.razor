@@ -1,0 +1,112 @@
+@if (IsSelecting)
+{
+    <div class="grid-overlay">
+        <div class="grid-container @(IsAnimating ? "animating" : "") @(IsFinalizing ? "finalizing" : "")"style="--theme-color: @ThemeColor">
+            @foreach (var item in Items)
+            {
+                <div class="grid-item @(item == SelectedItem ? "selected" : "") @(HighlightedItem == item ? "highlighted" : "")">
+                    <span>@item</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsSelecting { get; set; }
+
+    [Parameter]
+    public string ThemeColor { get; set; } = "var(--primary-color)";
+
+    [Parameter]
+    public List<string> Items { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<string> OnItemSelected { get; set; }
+
+    private bool IsAnimating;
+    private bool IsFinalizing;
+    private string? SelectedItem;
+    private string? HighlightedItem;
+    private Random random = new();
+    private CancellationTokenSource? animationCts;
+
+    public async Task StartSelectionAsync()
+    {
+        try
+        {
+            IsAnimating = true;
+            IsFinalizing = false;
+            SelectedItem = null;
+            
+            // Cancel any existing animation
+            animationCts?.Cancel();
+            animationCts = new CancellationTokenSource();
+            var token = animationCts.Token;
+
+            // Randomize the number of iterations for each phase
+            int fastPhaseCount = random.Next(12, 20);    // e.g. 12-19
+            int mediumPhaseCount = random.Next(6, 11);   // e.g. 6-10
+            int finalPhaseCount = random.Next(3, 7);     // e.g. 3-6
+
+            // Fast highlighting phase - more dramatic scaling and rotation
+            for (int i = 0; i < fastPhaseCount && !token.IsCancellationRequested; i++)
+            {
+                HighlightedItem = Items[random.Next(Items.Count)];
+                StateHasChanged();
+                await Task.Delay(30, token); // Faster initial phase
+            }
+
+            // Medium speed phase - increasing delays for dramatic effect
+            for (int i = 0; i < mediumPhaseCount && !token.IsCancellationRequested; i++)
+            {
+                HighlightedItem = Items[random.Next(Items.Count)];
+                StateHasChanged();
+                await Task.Delay(100 + (i * 40), token); // Progressive slowdown
+            }
+
+            // Final dramatic phase - longer pauses
+            for (int i = 0; i < finalPhaseCount && !token.IsCancellationRequested; i++)
+            {
+                HighlightedItem = Items[random.Next(Items.Count)];
+                StateHasChanged();
+                await Task.Delay(300 + (i * 100), token); // Much more dramatic pauses
+            }
+
+            if (!token.IsCancellationRequested)
+            {
+                // Select final item
+                SelectedItem = Items[random.Next(Items.Count)];
+                HighlightedItem = SelectedItem;
+                IsFinalizing = true;
+                StateHasChanged();
+
+                // Hold the selection for a moment
+                await Task.Delay(3500, token);
+
+                // Notify parent of selection
+                if (OnItemSelected.HasDelegate)
+                {
+                    await OnItemSelected.InvokeAsync(SelectedItem);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Animation was cancelled
+        }
+        finally
+        {
+            IsAnimating = false;
+            animationCts?.Dispose();
+            animationCts = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        animationCts?.Cancel();
+        animationCts?.Dispose();
+    }
+}
