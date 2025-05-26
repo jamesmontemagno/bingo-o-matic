@@ -399,3 +399,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+BingoApp/wwwroot/.DS_Store
+BingoApp/wwwroot/images/.DS_Store
