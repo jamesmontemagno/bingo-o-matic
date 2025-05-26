@@ -1,0 +1,205 @@
+@using Microsoft.JSInterop
+@using System.Diagnostics
+
+@if (IsSelecting)
+{
+    <div class="grid-overlay">
+        <div class="grid-container @(IsAnimating ? "animating" : "") @(IsFinalizing ? "finalizing" : "")" 
+             style="--theme-color: @ThemeColor; --grid-columns: @columns; --grid-rows: @rows; --item-size: @(itemSize)px; --item-width: @(itemWidth)px; --item-height: @(itemHeight)px">
+            @foreach (var item in Items)
+            {
+                <div class="grid-item @(item == SelectedItem ? "selected" : "") @(HighlightedItem == item ? "highlighted" : "")">
+                    <span>@item</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsSelecting { get; set; }
+
+    [Parameter]
+    public string ThemeColor { get; set; } = "var(--primary-color)";
+
+    [Parameter]
+    public List<string> Items { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<string> OnItemSelected { get; set; }
+
+    private bool IsAnimating;
+    private bool IsFinalizing;
+    private string? SelectedItem;
+    private string? HighlightedItem;
+    private Random random = new();
+    private CancellationTokenSource? animationCts;
+    
+    // Grid layout properties
+    private int columns = 4;
+    private int rows = 3;
+    private int itemSize = 120;
+    private int itemWidth = 120;
+    private int itemHeight = 120;
+    
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+    
+    private class GridLayoutResult
+    {
+        public int columns { get; set; }
+        public int rows { get; set; }
+        public int itemSize { get; set; }
+        public int itemWidth { get; set; }
+        public int itemHeight { get; set; }
+    }
+
+    private DotNetObjectReference<GridSelector>? dotNetRef;
+
+    protected override Task OnInitializedAsync()
+    {
+        // Create a reference to this component instance for JS interop
+        dotNetRef = DotNetObjectReference.Create(this);
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsSelecting && Items.Count > 0)
+        {
+            await CalculateGridLayoutAsync();
+        }
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && IsSelecting)
+        {
+            // Register for window resize events
+            await JSRuntime.InvokeVoidAsync("GridHelper.setupResizeListener", dotNetRef);
+        }
+    }
+    
+    [JSInvokable]
+    public async Task HandleWindowResize()
+    {
+        if (IsSelecting && Items.Count > 0)
+        {
+            await CalculateGridLayoutAsync();
+            StateHasChanged();
+        }
+    }
+    
+    private async Task CalculateGridLayoutAsync()
+    {
+        try
+        {
+            // Call JavaScript to calculate optimal grid based on viewport
+            // Use minimum item size of 80px for better visibility and touch targets
+            var result = await JSRuntime.InvokeAsync<GridLayoutResult>("GridHelper.calculateGrid", Items.Count, 80);
+            
+            // Update grid layout properties
+            columns = result.columns;
+            rows = result.rows;
+            itemSize = result.itemSize;
+            itemWidth = result.itemWidth > 0 ? result.itemWidth : result.itemSize;
+            itemHeight = result.itemHeight > 0 ? result.itemHeight : result.itemSize;
+        }
+        catch (Exception)
+        {
+            // Fallback to default calculation if JS interop fails
+            var sqrt = Math.Sqrt(Items.Count);
+            columns = Math.Max(2, (int)Math.Ceiling(sqrt * 0.7)); // Use fewer columns for larger items
+            rows = (int)Math.Ceiling((double)Items.Count / columns);
+            itemSize = 100; // Larger default item size
+            itemWidth = 120;
+            itemHeight = 100;
+        }
+    }
+
+    public async Task StartSelectionAsync()
+    {
+        try
+        {
+            // Recalculate grid layout first
+            await CalculateGridLayoutAsync();
+            
+            IsAnimating = true;
+            IsFinalizing = false;
+            SelectedItem = null;
+            
+            // Cancel any existing animation
+            animationCts?.Cancel();
+            animationCts = new CancellationTokenSource();
+            var token = animationCts.Token;
+
+            // Randomize the number of iterations for each phase
+            int fastPhaseCount = random.Next(12, 20);    // e.g. 12-19
+            int mediumPhaseCount = random.Next(6, 11);   // e.g. 6-10
+            int finalPhaseCount = random.Next(3, 7);     // e.g. 3-6
+
+            // Fast highlighting phase - more dramatic scaling and rotation
+            for (int i = 0; i < fastPhaseCount && !token.IsCancellationRequested; i++)
+            {
+                HighlightedItem = Items[random.Next(Items.Count)];
+                StateHasChanged();
+                await Task.Delay(100, token); // Faster initial phase
+            }
+
+            // Medium speed phase - increasing delays for dramatic effect
+            for (int i = 0; i < mediumPhaseCount && !token.IsCancellationRequested; i++)
+            {
+                HighlightedItem = Items[random.Next(Items.Count)];
+                StateHasChanged();
+                await Task.Delay(200 + (i * 40), token); // Progressive slowdown
+            }
+
+            // Final dramatic phase - longer pauses
+            for (int i = 0; i < finalPhaseCount && !token.IsCancellationRequested; i++)
+            {
+                HighlightedItem = Items[random.Next(Items.Count)];
+                StateHasChanged();
+                await Task.Delay(300 + (i * 100), token); // Much more dramatic pauses
+            }
+
+            if (!token.IsCancellationRequested)
+            {
+                // Select final item
+                SelectedItem = Items[random.Next(Items.Count)];
+                HighlightedItem = SelectedItem;
+                IsFinalizing = true;
+                StateHasChanged();
+
+                // Hold the selection for a moment
+                await Task.Delay(3500, token);
+
+                // Notify parent of selection
+                if (OnItemSelected.HasDelegate)
+                {
+                    await OnItemSelected.InvokeAsync(SelectedItem);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Animation was cancelled
+        }
+        finally
+        {
+            IsAnimating = false;
+            animationCts?.Dispose();
+            animationCts = null;
+        }
+    }
+        
+    public void Dispose()
+    {
+        animationCts?.Cancel();
+        animationCts?.Dispose();
+        
+        // Dispose of the .NET reference to prevent memory leaks
+        dotNetRef?.Dispose();
+        dotNetRef = null;
+    }
+}

@@ -22,9 +22,9 @@ public static class MockBingoData
                 "Maltese", "Newfoundland", "West Highland White Terrier", "Bichon Frise", "Rhodesian Ridgeback",
                 "Chesapeake Bay Retriever", "Collie", "St. Bernard", "Bull Terrier", "Scottish Terrier",
                 "Bloodhound", "Akita", "Alaskan Malamute", "Chow Chow", "Old English Sheepdog",
-                "Irish Setter", "Afghan Hound", "Basenji", "Samoyed", "Newfoundland",
+                "Irish Setter", "Afghan Hound", "Basenji", "Samoyed",
                 "Great Pyrenees", "Weimaraner", "Irish Wolfhound", "Airedale Terrier", "Bullmastiff",
-                "Dalmatian", "Portuguese Water Dog", "Papillon", "Giant Schnauzer", "Australian Cattle Dog",
+                "Dalmatian", "Papillon", "Giant Schnauzer", "Australian Cattle Dog",
                 "Soft Coated Wheaten Terrier", "Cairn Terrier", "Chinese Shar-Pei", "Norwegian Elkhound", "Whippet",
                 "Italian Greyhound", "Border Terrier", "Wirehaired Pointing Griffon", "Keeshond", "Belgian Tervuren",
                 "Cardigan Welsh Corgi", "Greater Swiss Mountain Dog", "Chinese Crested", "Staffordshire Bull Terrier"
@@ -71,7 +71,7 @@ public static class MockBingoData
                 "Wood Duck", "Sandhill Crane", "Wild Turkey", "Ruffed Grouse", "Common Loon",
                 "Great Egret", "Snowy Owl", "Red-shouldered Hawk", "Ring-billed Gull", "Black-crowned Night Heron",
                 "Eastern Towhee", "Indigo Bunting", "Northern Harrier", "Sharp-shinned Hawk", "American Woodcock",
-                "Yellow Warbler", "Scarlet Tanager", "Wood Thrush", "Northern Cardinal", "Purple Martin",
+                "Yellow Warbler", "Scarlet Tanager", "Wood Thrush", "Purple Martin",
                 "Tree Swallow", "Gray Catbird", "Brown Thrasher", "Common Yellowthroat", "Eastern Meadowlark",
                 "Peregrine Falcon", "Common Raven", "Red Crossbill", "Yellow-bellied Sapsucker", "Pine Grosbeak"
             }
@@ -114,11 +114,9 @@ public static class MockBingoData
                 "Mount Shasta", "Mount Bachelor", "Broken Top", "Mount Jefferson", "Mount Washington",
                 "Pikes Peak", "Mount Mitchell", "Grand Teton", "Mount Olympus", "Mount Thielsen",
                 "Black Butte", "Mount McLoughlin", "Mount Scott", "Diamond Peak", "Mount Bailey",
-                "South Sister", "Middle Sister", "North Sister", "Mount Yoran", "Mount Thielsen",
-                "Mount Hood Meadows", "Timberline Lodge", "Mount Jefferson", "Mount Washington", "Three Fingered Jack",
-                "Mount Bachelor", "Broken Top", "South Sister", "Middle Sister", "North Sister",
-                "Black Butte", "Mount McLoughlin", "Mount Scott", "Diamond Peak", "Mount Bailey",
-                "Mount Shasta", "Lassen Peak", "Mount Whitney", "Mount Elbert", "Mount Massive",
+                "South Sister", "Middle Sister", "North Sister", "Mount Yoran",
+                "Mount Hood Meadows", "Timberline Lodge", "Three Fingered Jack",
+                "Lassen Peak", "Mount Elbert", "Mount Massive",
                 "Mount Harvard", "Mount Princeton", "Mount Yale", "Mount Oxford", "Mount Columbia"
             }
         },
@@ -133,14 +131,14 @@ public static class MockBingoData
                 "Olympic Mountains", "Coast Range", "Cascade Range", "Columbia River Gorge", "Hoh Rainforest",
                 "Oregon Coast", "Washington Coast", "Olympic National Park", "Crater Lake", "Smith Rock",
                 "Deschutes River", "Snake River", "John Day River", "Willamette River", "Hood River",
-                "Columbia River Gorge", "Mount Adams", "Mount Jefferson", "Three Sisters", "Broken Top",
+                "Mount Adams", "Mount Jefferson", "Three Sisters", "Broken Top",
                 "Mount Bachelor", "Newberry Volcano", "Steens Mountain", "Wallowa Mountains", "Blue Mountains",
-                "Painted Hills", "Alvord Desert", "Fort Rock", "Cascade Lakes", "Puget Sound",
+                "Painted Hills", "Alvord Desert", "Fort Rock", "Cascade Lakes",
                 "Elliott Bay", "Lake Washington", "Lake Chelan", "Ross Lake", "Lake Oswego",
-                "Klamath Lake", "Crater Lake", "Lake Billy Chinook", "Detroit Lake", "Clear Lake",
+                "Klamath Lake", "Lake Billy Chinook", "Detroit Lake", "Clear Lake",
                 "Olympic Rain Shadow", "Columbia Basin", "Palouse Hills", "Methow Valley", "Skagit Valley",
-                "Willamette Valley", "Rogue Valley", "Umpqua Valley", "Hood River Valley", "Yakima Valley",
-                "Olympic Coast", "Oregon Coast", "Long Beach Peninsula", "Tillamook Head", "Cape Disappointment",
+                "Rogue Valley", "Umpqua Valley", "Hood River Valley", "Yakima Valley",
+                "Olympic Coast", "Long Beach Peninsula", "Tillamook Head", "Cape Disappointment",
                 "Cape Lookout", "Cape Kiwanda", "Haystack Rock", "Three Arch Rocks", "Thor's Well"
             }
         },
@@ -187,8 +185,8 @@ public static class MockBingoData
                 "Red Fox", "Arctic Fox", "Snowshoe Hare", "Jack Rabbit", "Cotton-tail Rabbit",
                 "Ground Squirrel", "Chipmunk", "Prairie Dog", "Marmot", "Flying Squirrel",
                 "Red Squirrel", "Gray Squirrel", "Pika", "Muskrat", "Vole",
-                "Mountain Lion", "Jaguar", "Ocelot", "Armadillo", "Javelina",
-                "Bighorn Sheep", "Dall Sheep", "Mountain Goat", "Pronghorn", "Moose"
+                "Jaguar", "Ocelot", "Armadillo", "Javelina",
+                "Dall Sheep"
             }
         },
         new BingoSet
@@ -209,8 +207,7 @@ public static class MockBingoData
                 "Dexter", "The Big Bang Theory", "Modern Family", "How I Met Your Mother", "Parks and Recreation",
                 "Stranger Things", "The Crown", "This Is Us", "The Mandalorian", "The Walking Dead",
                 "Westworld", "Black Mirror", "The Good Place", "Schitt's Creek", "The Handmaid's Tale",
-                "Frasier", "Will & Grace", "Everybody Loves Raymond", "The Practice", "NYPD Blue",
-                "ER", "The West Wing", "Six Feet Under", "The Shield", "Deadwood"
+                "Frasier", "Will & Grace", "Everybody Loves Raymond", "The Practice", "Six Feet Under", "The Shield", "Deadwood"
             }
         },
         new BingoSet
@@ -246,7 +243,7 @@ public static class MockBingoData
                 "Mount Elbert", "Mount Massive", "Mount Harvard", "Longs Peak", "Mount Antero",
                 "Mount Lincoln", "Mount Wilson", "Mount Princeton", "Mount Yale", "Mount Bross",
                 "Mount Democrat", "Mount Sherman", "Mount Shavano", "Mount Belford", "Mount Oxford",
-                "Mount Columbia", "Mount Harvard", "Mount Blanca", "Mount Lindsey", "Mount Ouray"
+                "Mount Columbia", "Mount Blanca", "Mount Lindsey", "Mount Ouray"
             }
         },
     };

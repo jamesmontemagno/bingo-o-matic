@@ -5,6 +5,7 @@
 @using BingoApp.Models
 @using BingoApp.Services
 @using BingoApp.Helpers
+@using BingoApp.Components
 @implements IDisposable
 
 @inject BingoSetService BingoService
@@ -34,20 +35,28 @@
                 </button>
                 <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
                     <button type="button" 
-                            class="mode-toggle-btn @(!useWheel ? "active" : "")" 
-                            @onclick="() => SetMode(false)"
+                            class="mode-toggle-btn @(selectionMode == SelectionMode.Cards ? "active" : "")" 
+                            @onclick="() => SetMode(SelectionMode.Cards)"
                             disabled="@isSelecting"
-                            aria-pressed="@(!useWheel)">
+                            aria-pressed="@(selectionMode == SelectionMode.Cards)">
                         <i class="bi bi-list-ul"></i>
                         <span>Cards</span>
                     </button>
                     <button type="button" 
-                            class="mode-toggle-btn @(useWheel ? "active" : "")" 
-                            @onclick="() => SetMode(true)"
+                            class="mode-toggle-btn @(selectionMode == SelectionMode.Wheel ? "active" : "")" 
+                            @onclick="() => SetMode(SelectionMode.Wheel)"
                             disabled="@isSelecting"
-                            aria-pressed="@useWheel">
+                            aria-pressed="@(selectionMode == SelectionMode.Wheel)">
                         <i class="bi bi-palette"></i>
                         <span>Wheel</span>
+                    </button>
+                    <button type="button" 
+                            class="mode-toggle-btn @(selectionMode == SelectionMode.Grid ? "active" : "")" 
+                            @onclick="() => SetMode(SelectionMode.Grid)"
+                            disabled="@isSelecting"
+                            aria-pressed="@(selectionMode == SelectionMode.Grid)">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        <span>Grid</span>
                     </button>
                 </div>
             </div>
@@ -57,52 +66,72 @@
     @if (selectedSet != null)
     {
         <div class="game-content">
-            @if (isSelecting && useWheel)
+            @if (isSelecting)
             {
-                <div class="wheel-overlay @(isWheelDramatic ? "dramatic" : "")">
-                    <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "") @(isWheelDramatic ? "dramatic-finale" : "")">
-                    <div class="wheel @(isWheelDramatic ? "dramatic-glow" : "")" style="transform: rotate(@(wheelRotation)deg)">
-                        @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
-                        {
-                            var segmentAngle = 360.0 / availableItems.Count;
-                            var startAngle = segmentAngle * index;
-                            var endAngle = segmentAngle * (index + 1);
-                            
-                            // Add small overlap to eliminate gaps between segments
-                            // Use larger overlap for fewer segments to prevent gaps
-                            var overlapAngle = availableItems.Count <= 5 ? 2.0 : 0.5; // Larger overlap for fewer segments
-                            var adjustedStartAngle = startAngle - overlapAngle;
-                            var adjustedEndAngle = endAngle + overlapAngle;
-                            
-                            var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
-                            var (translateX, translateY) = GetDynamicTextPosition();
-                            var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((adjustedStartAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedStartAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((adjustedEndAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedEndAngle - 90) * Math.PI / 180)}%)";
-                            <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
-                            </div>
-                            <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(@(translateX)px) translateY(@(translateY)%); font-size: @GetDynamicFontSize();">@item</span>
+                @if (selectionMode == SelectionMode.Wheel)
+                {
+                    <div class="wheel-overlay @(isWheelDramatic ? "dramatic" : "")">
+                        <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "") @(isWheelDramatic ? "dramatic-finale" : "")">
+                        <div class="wheel @(isWheelDramatic ? "dramatic-glow" : "")" style="transform: rotate(@(wheelRotation)deg)">
+                            @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
+                            {
+                                var segmentAngle = 360.0 / availableItems.Count;
+                                var startAngle = segmentAngle * index;
+                                var endAngle = segmentAngle * (index + 1);
+                                
+                                // Add small overlap to eliminate gaps between segments
+                                // Use larger overlap for fewer segments to prevent gaps
+                                var overlapAngle = availableItems.Count <= 5 ? 2.0 : 0.5; // Larger overlap for fewer segments
+                                var adjustedStartAngle = startAngle - overlapAngle;
+                                var adjustedEndAngle = endAngle + overlapAngle;
+                                
+                                var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
+                                var (translateX, translateY) = GetDynamicTextPosition();
+                                var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((adjustedStartAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedStartAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((adjustedEndAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedEndAngle - 90) * Math.PI / 180)}%)";
+                                <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
+                                </div>
+                                <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(@(translateX)px) translateY(@(translateY)%); font-size: @GetDynamicFontSize();">@item</span>
 
-                        }
+                            }
+                        </div>
+                            <div class="wheel-pointer @(isWheelDramatic ? "dramatic-pointer" : "")"></div>
+                            
+                            @* Dramatic effects *@
+                            @if (showWheelSparkles)
+                            {
+                                <div class="wheel-sparkles">
+                                    @for (int i = 0; i < 12; i++)
+                                    {
+                                        <div class="sparkle" style="--delay: @(i * 0.1)s; --angle: @(i * 30)deg;"></div>
+                                    }
+                                </div>
+                            }
+                            
+                            @if (isWheelDramatic)
+                            {
+                                <div class="dramatic-flash"></div>
+                                <div class="victory-burst"></div>
+                            }
+                        </div>
                     </div>
-                        <div class="wheel-pointer @(isWheelDramatic ? "dramatic-pointer" : "")"></div>
-                        
-                        @* Dramatic effects *@
-                        @if (showWheelSparkles)
-                        {
-                            <div class="wheel-sparkles">
-                                @for (int i = 0; i < 12; i++)
-                                {
-                                    <div class="sparkle" style="--delay: @(i * 0.1)s; --angle: @(i * 30)deg;"></div>
-                                }
-                            </div>
-                        }
-                        
-                        @if (isWheelDramatic)
-                        {
-                            <div class="dramatic-flash"></div>
-                            <div class="victory-burst"></div>
-                        }
+                }
+                else if (selectionMode == SelectionMode.Grid)
+                {
+                    <GridSelector 
+                        IsSelecting="true"
+                        Items="@availableItems"
+                        ThemeColor="@currentThemeColor"
+                        @ref="gridSelector"
+                        OnItemSelected="OnGridItemSelected" />
+                }
+                else
+                {
+                    <div class="current-item selecting @(isAnimating ? "animate" : "")" aria-live="polite">
+                        <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
+                            <span class="item">@(displayItem ?? "Ready to draw...")</span>
+                        </div>
                     </div>
-                </div>
+                }
             }
             else
             {
@@ -165,6 +194,16 @@
 }
 
 @code {
+    private enum SelectionMode
+    {
+        Cards,
+        Wheel,
+        Grid
+    }
+
+    private SelectionMode selectionMode = SelectionMode.Cards;
+    private GridSelector? gridSelector;
+
     private string selectedSetName = "";
     private string pendingSetName = "";
     private List<BingoSet> bingoSets = new();
@@ -224,6 +263,18 @@
         return WheelHelpers.GetDynamicTextPosition(availableItems);
     }
 
+    /// <summary>
+    /// Shuffles a list in place using the Fisher-Yates algorithm
+    /// </summary>
+    private void ShuffleList<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = random.Next(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+    }
+
     // Confirmation dialog state
     private bool showConfirmDialog = false;
     private string confirmTitle = "";
@@ -242,6 +293,9 @@
     {
         // Subscribe to changes
         BingoService.OnSetsChanged += OnBingoSetsChanged;
+        
+        // Load preferences
+        await LoadModePreferenceAsync();
         
         // Load wheel preference
         await LoadWheelPreferenceAsync();
@@ -375,7 +429,7 @@
 
         if (selectedSet?.Items?.Length > 0)
         {
-            availableItems = new List<string>(selectedSet.Items);
+            availableItems = new List<string>(selectedSet.Items.Distinct(StringComparer.OrdinalIgnoreCase).ToArray());
             calledItems.Clear();
             currentItem = null;
             displayItem = null;
@@ -449,8 +503,14 @@
             isSelecting = true;
             isSelected = false;
             
-            if (useWheel)
+            // Shuffle the available items before selection
+            ShuffleList(availableItems);
+            
+            StateHasChanged();
+            
+            if (selectionMode == SelectionMode.Wheel)
             {
+                await Task.Delay(1000);
                 // Select the final item first
                 int randomIndex = random.Next(0, availableItems.Count);
                 currentItem = availableItems[randomIndex];
@@ -515,6 +575,14 @@
                 wheelRotation = 0;
                 StateHasChanged();
             }
+            else if (selectionMode == SelectionMode.Grid)
+            {
+                await Task.Delay(1000);
+                if (gridSelector != null)
+                {
+                    await gridSelector.StartSelectionAsync();
+                }
+            }
             else
             {
                 // Original card-based selection animation
@@ -529,30 +597,29 @@
                 var token = animationCts.Token;
 
                 // Fast cycling at the beginning
-                var fastRotations = 15;
+                // Randomize the number of rotations for each phase
+                var fastRotations = random.Next(12, 20);
                 for (int i = 0; i < fastRotations && !token.IsCancellationRequested; i++)
                 {
                     displayItem = availableItems[random.Next(availableItems.Count)];
                     StateHasChanged();
-                    await Task.Delay(50, token);
+                    await Task.Delay(60, token);
                 }
-                
-                // Medium speed cycling
-                var mediumRotations = 10;
+
+                var mediumRotations = random.Next(8, 14);
                 for (int i = 0; i < mediumRotations && !token.IsCancellationRequested; i++)
                 {
                     displayItem = availableItems[random.Next(availableItems.Count)];
                     StateHasChanged();
-                    await Task.Delay(100, token);
+                    await Task.Delay(160, token);
                 }
-                
-                // Slow down dramatically for final selections
-                var slowRotations = 7;
+
+                var slowRotations = random.Next(5, 10);
                 for (int i = 0; i < slowRotations && !token.IsCancellationRequested; i++)
                 {
                     displayItem = availableItems[random.Next(availableItems.Count)];
                     StateHasChanged();
-                    await Task.Delay(200, token);
+                    await Task.Delay(250, token);
                 }
 
                 if (!token.IsCancellationRequested)
@@ -602,12 +669,57 @@
         StateHasChanged();
     }
 
-    private async Task SetMode(bool useWheelMode)
+    private async Task OnGridItemSelected(string item)
     {
-        if (useWheel != useWheelMode)
+        if (availableItems.Contains(item))
         {
-            useWheel = useWheelMode;
-            await OnWheelPreferenceChanged();
+            currentItem = item;
+            displayItem = item;
+            availableItems.Remove(item);
+            calledItems.Add(item);
+            isSelecting = false;
+            isSelected = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SetMode(SelectionMode mode)
+    {
+        if (selectionMode != mode)
+        {
+            selectionMode = mode;
+            await SaveModePreferenceAsync();
+        }
+    }
+
+    private const string ModePreferenceKey = "bingo_selection_mode";
+    
+    private async Task LoadModePreferenceAsync()
+    {
+        try
+        {
+            var savedMode = await LocalStorageService.GetItemAsync<string>(ModePreferenceKey);
+            if (!string.IsNullOrEmpty(savedMode) && Enum.TryParse<SelectionMode>(savedMode, out var mode))
+            {
+                selectionMode = mode;
+            }
+        }
+        catch
+        {
+            // If loading fails, keep default
+            selectionMode = SelectionMode.Cards;
+        }
+    }
+    
+    private async Task SaveModePreferenceAsync()
+    {
+        try
+        {
+            await LocalStorageService.SetItemAsync(ModePreferenceKey, selectionMode.ToString());
+        }
+        catch
+        {
+            // Silently fail if saving doesn't work
         }
     }
 
