@@ -74,14 +74,14 @@
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
     <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/navbar.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>    
     <script src="js/print-cards.js"></script>
     <script type="module" src="js/pwaUpdater.js"></script>
-    <script>
+    <script type="module">
+        import { NavbarHelpers } from './js/navbar.js';
         document.addEventListener('DOMContentLoaded', function() {
-            window.navbarHelpers.setupNavbarAutoClose();
-            window.navbarHelpers.setupResizeHandler();
+            NavbarHelpers.setupNavbarAutoClose();
+            NavbarHelpers.setupResizeHandler();
         });
     </script>
 </body>

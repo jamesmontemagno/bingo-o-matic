@@ -6,7 +6,7 @@
 @using BingoApp.Services
 @using BingoApp.Helpers
 @using BingoApp.Components
-@implements IDisposable
+@implements IAsyncDisposable
 
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
@@ -298,14 +298,16 @@
     private bool isWheelSlowingDown = false;
     private bool isWheelDramatic = false;
     private bool showWheelSparkles = false;
-    private const string WheelPreferenceKey = "bingo_wheel_preference";
-
-    private bool isMobileDevice;
+    private const string WheelPreferenceKey = "bingo_wheel_preference";    private bool isMobileDevice;
+    private IJSObjectReference? module;
 
     protected override async Task OnInitializedAsync()
     {
+        // Import device detector module
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/deviceDetector.js");
+        
         // Detect if device is mobile
-        isMobileDevice = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
+        isMobileDevice = await module.InvokeAsync<bool>("DeviceDetector.isMobileDevice");
         
         // Force cards mode on mobile
         if (isMobileDevice)
@@ -679,7 +681,7 @@
         }
     }
 
-    private void ToggleItem(string item)
+    private async Task ToggleItem(string item)
     {
         if (calledItems.Contains(item))
         {
@@ -692,6 +694,7 @@
             availableItems.Remove(item);
         }
         StateHasChanged();
+        await Task.CompletedTask;
     }
 
     private async Task OnGridItemSelected(string item)
@@ -748,12 +751,17 @@
         }
     }
 
-    public void Dispose()
+    async ValueTask IAsyncDisposable.DisposeAsync()
     {
         // Clean up any resources when the component is disposed
         BingoService.OnSetsChanged -= OnBingoSetsChanged;
         animationCts?.Cancel();
         animationCts?.Dispose();
         animationCts = null;
+
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
     }
 }

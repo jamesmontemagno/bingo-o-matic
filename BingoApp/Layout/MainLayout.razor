@@ -44,10 +44,12 @@
 
 @code {
     private bool isMobile;
+    private IJSObjectReference? module;
 
     protected override async Task OnInitializedAsync()
     {
-        isMobile = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/deviceDetector.js");
+        isMobile = await module.InvokeAsync<bool>("DeviceDetector.isMobileDevice");
         await ThemeService.InitializeThemeAsync();
         ThemeService.ThemeChanged += OnThemeChanged;
     }
@@ -60,6 +62,9 @@
     public async ValueTask DisposeAsync()
     {
         ThemeService.ThemeChanged -= OnThemeChanged;
-        await ValueTask.CompletedTask;
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
     }
 }

@@ -1,15 +1,6 @@
-/**
- * Check if the device is mobile
- */
-window.isMobileDevice = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(navigator.userAgent) 
-        || (window.innerWidth <= 768);
-};
+import { DeviceDetector } from './deviceDetector.js';
 
-/**
- * Helper functions for Navbar Bootstrap integration
- */
-window.navbarHelpers = {
+export const NavbarHelpers = {
     // Toggle the navbar programmatically
     toggleNavbar: function() {
         const navbarContent = document.querySelector('#navbarContent');

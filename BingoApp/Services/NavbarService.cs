@@ -21,7 +21,7 @@ namespace BingoApp.Services
         {
             try 
             {
-                await _jsRuntime.InvokeVoidAsync("navbarHelpers.closeNavbar");
+                await _jsRuntime.InvokeVoidAsync("NavbarHelpers.closeNavbar");
             }
             catch
             {
@@ -36,7 +36,7 @@ namespace BingoApp.Services
         {
             try
             {
-                await _jsRuntime.InvokeVoidAsync("navbarHelpers.toggleNavbar");
+                await _jsRuntime.InvokeVoidAsync("NavbarHelpers.toggleNavbar");
             }
             catch
             {
