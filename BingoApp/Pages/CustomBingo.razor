@@ -28,11 +28,23 @@
             <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null)">
                 Reset
             </button>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="useWheel" @bind="useWheel" @bind:after="OnWheelPreferenceChanged">
-                <label class="form-check-label" for="useWheel">
-                    Use Wheel
-                </label>
+            <div class="mode-toggle @(isSelecting ? "disabled" : "")" role="group" aria-label="Selection mode">
+                <button type="button" 
+                        class="mode-toggle-btn @(!useWheel ? "active" : "")" 
+                        @onclick="() => SetMode(false)"
+                        disabled="@isSelecting"
+                        aria-pressed="@(!useWheel)">
+                    <i class="bi bi-list-ul"></i>
+                    <span>Cards</span>
+                </button>
+                <button type="button" 
+                        class="mode-toggle-btn @(useWheel ? "active" : "")" 
+                        @onclick="() => SetMode(true)"
+                        disabled="@isSelecting"
+                        aria-pressed="@useWheel">
+                    <i class="bi bi-palette"></i>
+                    <span>Wheel</span>
+                </button>
             </div>
         </div>
     </div>
@@ -780,6 +792,15 @@
             availableItems.Remove(item);
         }
         StateHasChanged();
+    }
+
+    private async Task SetMode(bool useWheelMode)
+    {
+        if (useWheel != useWheelMode)
+        {
+            useWheel = useWheelMode;
+            await OnWheelPreferenceChanged();
+        }
     }
 
     public void Dispose()

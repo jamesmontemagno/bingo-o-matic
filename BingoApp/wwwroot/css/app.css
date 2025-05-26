@@ -304,6 +304,113 @@ html, body {
     color: #1a1d20;
 }
 
+/* Disabled Button Styles */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    pointer-events: none;
+    position: relative;
+}
+
+/* Primary disabled */
+.btn-primary:disabled,
+.btn-primary.disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Secondary disabled */
+.btn-secondary:disabled,
+.btn-secondary.disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Outline primary disabled */
+.btn-outline-primary:disabled,
+.btn-outline-primary.disabled {
+    background-color: transparent;
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+/* Outline secondary disabled */
+.btn-outline-secondary:disabled,
+.btn-outline-secondary.disabled {
+    background-color: transparent;
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+/* Danger disabled */
+.btn-danger:disabled,
+.btn-danger.disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Success disabled */
+.btn-success:disabled,
+.btn-success.disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Dark theme disabled buttons */
+[data-bs-theme="dark"] .btn:disabled,
+[data-bs-theme="dark"] .btn.disabled {
+    opacity: 0.5;
+}
+
+[data-bs-theme="dark"] .btn-primary:disabled,
+[data-bs-theme="dark"] .btn-primary.disabled {
+    background-color: #495057;
+    border-color: #495057;
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .btn-secondary:disabled,
+[data-bs-theme="dark"] .btn-secondary.disabled {
+    background-color: #495057;
+    border-color: #495057;
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary:disabled,
+[data-bs-theme="dark"] .btn-outline-primary.disabled {
+    background-color: transparent;
+    border-color: #495057;
+    color: #495057;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:disabled,
+[data-bs-theme="dark"] .btn-outline-secondary.disabled {
+    background-color: transparent;
+    border-color: #495057;
+    color: #495057;
+}
+
+[data-bs-theme="dark"] .btn-danger:disabled,
+[data-bs-theme="dark"] .btn-danger.disabled {
+    background-color: #495057;
+    border-color: #495057;
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .btn-success:disabled,
+[data-bs-theme="dark"] .btn-success.disabled {
+    background-color: #495057;
+    border-color: #495057;
+    color: #adb5bd;
+}
+
 /* Link styling */
 a, .btn-link {
     color: var(--primary-color);

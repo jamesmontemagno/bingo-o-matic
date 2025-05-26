@@ -936,3 +936,106 @@
         rgba(0, 0, 0, 0.95) 100%);
     animation: dramatic-overlay 2s ease-in-out;
 }
+
+/* Segmented control for mode toggle */
+.mode-toggle {
+    display: inline-flex;
+    background-color: var(--bs-gray-200);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 0;
+    border: 1px solid var(--bs-gray-300);
+    transition: all 0.3s ease;
+}
+
+[data-bs-theme="dark"] .mode-toggle {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.mode-toggle.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.mode-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--bs-gray-600);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-bs-theme="dark"] .mode-toggle-btn {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mode-toggle-btn:hover:not(.active):not(:disabled) {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+}
+
+.mode-toggle-btn.active {
+    background-color: var(--bs-primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="dark"] .mode-toggle-btn.active {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mode-toggle-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.mode-toggle-btn i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.mode-toggle-btn:hover i {
+    transform: scale(1.1);
+}
+
+.mode-toggle-btn.active i {
+    transform: scale(1.05);
+}
+
+/* Theme-specific icon colors */
+.mode-toggle-btn:not(.active) i.bi-list-ul {
+    color: #3498db;
+}
+
+.mode-toggle-btn:not(.active) i.bi-palette {
+    color: #e74c3c;
+}
+
+[data-bs-theme="dark"] .mode-toggle-btn:not(.active) i.bi-list-ul {
+    color: #74b9ff;
+}
+
+[data-bs-theme="dark"] .mode-toggle-btn:not(.active) i.bi-palette {
+    color: #ff6b6b;
+}
+
+/* Animation when switching modes */
+@keyframes mode-switch {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.mode-toggle-btn.active {
+    animation: mode-switch 0.3s ease-in-out;
+}
