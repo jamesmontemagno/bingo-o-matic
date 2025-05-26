@@ -212,6 +212,42 @@ public static class MockBingoData
                 "Frasier", "Will & Grace", "Everybody Loves Raymond", "The Practice", "NYPD Blue",
                 "ER", "The West Wing", "Six Feet Under", "The Shield", "Deadwood"
             }
-        }
+        },
+        new BingoSet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Colorado Landmarks",
+            Items = new[]
+            {
+                "Garden of the Gods", "Red Rocks Amphitheatre", "Pikes Peak", "Royal Gorge Bridge", "Mesa Verde National Park",
+                "Great Sand Dunes National Park", "Maroon Bells", "Flatirons", "Chapel on the Rock", "Coors Field",
+                "Union Station", "Denver Art Museum", "Colorado State Capitol", "Stanley Hotel", "Durango & Silverton Railroad",
+                "Manitou Incline", "Mount Evans Scenic Byway", "Cheyenne Mountain Zoo", "Glenwood Hot Springs", "Telluride Historic District",
+                "Leadville Mining District", "Bent's Old Fort", "Buffalo Bill Museum & Grave", "Crested Butte", "Pearl Street Mall",
+                "Strawberry Park Hot Springs", "Royal Gorge Route Railroad", "San Juan Skyway", "Bishop Castle", "Hanging Lake",
+                "Rocky Mountain National Park", "Denver Botanic Gardens", "Colorado Railroad Museum", "Chautauqua Park", "Elitch Gardens",
+                "Molly Brown House Museum", "Mount Elbert", "Mount Sneffels", "Independence Pass", "Paint Mines Interpretive Park",
+                "St. Mary's Glacier", "Seven Falls", "Loveland Pass", "Guanella Pass", "Cave of the Winds",
+                "Echo Lake Park", "Crystal Mill", "Devil's Head Lookout", "Dinosaur National Monument", "Four Corners Monument"
+            }
+        },
+        new BingoSet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Colorado Geography",
+            Items = new[]
+            {
+                "Rocky Mountains", "Front Range", "San Juan Mountains", "Sawatch Range", "Sangre de Cristo Mountains",
+                "Great Plains", "Colorado Plateau", "Arkansas River", "South Platte River", "Colorado River",
+                "Gunnison River", "Yampa River", "San Luis Valley", "San Juan Basin", "Pawnee National Grassland",
+                "Uncompahgre Plateau", "Grand Mesa", "Flat Tops", "Wet Mountain Valley", "Cache la Poudre River",
+                "Blue River", "Roaring Fork Valley", "North Park", "Middle Park", "South Park",
+                "Denver Basin", "Laramie Foothills", "Book Cliffs", "Dolores River", "Rabbit Ears Range",
+                "Mount Elbert", "Mount Massive", "Mount Harvard", "Longs Peak", "Mount Antero",
+                "Mount Lincoln", "Mount Wilson", "Mount Princeton", "Mount Yale", "Mount Bross",
+                "Mount Democrat", "Mount Sherman", "Mount Shavano", "Mount Belford", "Mount Oxford",
+                "Mount Columbia", "Mount Harvard", "Mount Blanca", "Mount Lindsey", "Mount Ouray"
+            }
+        },
     };
 }

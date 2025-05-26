@@ -29,16 +29,53 @@
     align-items: center;
 }
 
+.selector-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.selector-row .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.manage-btn {
+    flex-shrink: 0;
+    padding: 0.375rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 38px;
+}
+
+.manage-btn i {
+    font-size: 1.1rem;
+}
+
 /* Improve mobile responsiveness for bingo controls */
 @media (max-width: 768px) {
     .bingo-controls {
         width: 100%;
         justify-content: center;
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .form-group {
+    .selector-row {
         width: 100%;
         margin-bottom: 0.5rem;
+    }
+
+    .selector-row .form-group {
+        min-width: 0;
+    }
+
+    .manage-btn {
+        margin-left: 0.5rem;
     }
 }
 

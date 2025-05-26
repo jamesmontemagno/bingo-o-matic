@@ -13,19 +13,24 @@
 <div class="bingo-container">
     <div class="bingo-header">
         <div class="bingo-controls">
-            <div class="form-group me-2">
-                <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
-                    <option value="">Select a set...</option>
-                    @foreach (var set in bingoSets)
-                    {
-                        <option value="@set.Name">@set.Name</option>
-                    }
-                </select>
+            <div class="selector-row">
+                <div class="form-group">
+                    <select class="form-select" id="bingoSet" @bind="pendingSetName" @bind:after="OnBingoSetSelectionChanged">
+                        <option value="">Select a set...</option>
+                        @foreach (var set in bingoSets)
+                        {
+                            <option value="@set.Name">@set.Name</option>
+                        }
+                    </select>
+                </div>
+                <a href="/custom-bingo/manage" class="btn btn-outline-secondary manage-btn" title="Manage Bingo Sets" aria-label="Manage Bingo Sets">
+                    <i class="bi bi-gear"></i>
+                </a>
             </div>
             <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
                 Draw Item
             </button>
-            <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null)">
+            <button class="btn btn-outline-primary me-2" @onclick="ConfirmNewGame" disabled="@(selectedSet == null || isSelecting)">
                 Reset
             </button>
             <div class="mode-toggle @(isSelecting ? "disabled" : "")" role="group" aria-label="Selection mode">
