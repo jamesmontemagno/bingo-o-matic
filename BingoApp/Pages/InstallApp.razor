@@ -1,0 +1,492 @@
+@page "/install-app"
+@using System.Text.RegularExpressions
+@inject IJSRuntime JSRuntime
+
+<div class="install-container">
+    <h1>Install Bingo-o-matic</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">What is a Progressive Web App?</h2>
+        </div>
+        <div class="card-body">
+            <p>
+                Bingo-o-matic is a <strong>Progressive Web App (PWA)</strong> that works on any device with a modern web browser. 
+                Unlike traditional apps, PWAs can be installed directly from your web browser without needing to visit an app store.
+            </p>
+            <p>
+                <strong>Benefits of installing Bingo-o-matic as a PWA:</strong>
+            </p>
+            <ul>
+                <li><i class="bi bi-lightning-charge"></i> <strong>Fast access</strong> - Launch directly from your home screen or start menu</li>
+                <li><i class="bi bi-wifi-off"></i> <strong>Works offline</strong> - Play bingo even without an internet connection</li>
+                <li><i class="bi bi-arrow-clockwise"></i> <strong>Always updated</strong> - Get the latest features automatically</li>
+                <li><i class="bi bi-window"></i> <strong>Distraction-free</strong> - Runs in its own window without browser controls</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Installation Instructions</h2>
+        </div>
+        <div class="card-body">
+            <p>Select your device type to see installation instructions:</p>
+            
+            <div class="os-selector mode-toggle" role="group" aria-label="Select operating system">
+                <button type="button" 
+                        class="mode-toggle-btn @(CurrentOS == "windows" ? "active" : "")"
+                        @onclick='() => SelectOS("windows")'
+                        aria-pressed="@(CurrentOS == "windows")">
+                    <i class="bi bi-windows"></i>
+                    <span>Windows</span>
+                </button>
+                <button type="button" 
+                        class="mode-toggle-btn @(CurrentOS == "macos" ? "active" : "")"
+                        @onclick='() => SelectOS("macos")'
+                        aria-pressed="@(CurrentOS == "macos")">
+                    <i class="bi bi-apple"></i>
+                    <span>macOS</span>
+                </button>
+                <button type="button" 
+                        class="mode-toggle-btn @(CurrentOS == "android" ? "active" : "")"
+                        @onclick='() => SelectOS("android")'
+                        aria-pressed="@(CurrentOS == "android")">
+                    <i class="bi bi-android2"></i>
+                    <span>Android</span>
+                </button>
+                <button type="button" 
+                        class="mode-toggle-btn @(CurrentOS == "ios" ? "active" : "")"
+                        @onclick='() => SelectOS("ios")'
+                        aria-pressed="@(CurrentOS == "ios")">
+                    <i class="bi bi-phone"></i>
+                    <span>iOS</span>
+                </button>
+                <button type="button" 
+                        class="mode-toggle-btn @(CurrentOS == "linux" ? "active" : "")"
+                        @onclick='() => SelectOS("linux")'
+                        aria-pressed="@(CurrentOS == "linux")">
+                    <i class="bi bi-ubuntu"></i>
+                    <span>Linux</span>
+                </button>
+            </div>
+            
+            <div class="os-instructions mt-4">
+                @if (CurrentOS == "windows")
+                {
+                    <div class="os-section" id="windows-instructions">
+                        <h3>Installing on Windows</h3>
+                        <p>Follow these steps to install Bingo-o-matic on Windows:</p>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Open Microsoft Edge or Google Chrome</h4>
+                                <p>Bingo-o-matic can be installed from most modern browsers, but Edge and Chrome provide the best experience on Windows.</p>
+                                <div class="step-image">
+                                    <img src="images/install/windows-browser.png" alt="Windows browser icons" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Navigate to bingo-o-matic.com</h4>
+                                <p>Go to <a href="https://bingo-o-matic.com" target="_blank">https://bingo-o-matic.com</a> in your browser.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Look for the install icon</h4>
+                                <p>In the address bar, you'll see an install icon. In Edge, it looks like a "+" sign. In Chrome, it's a computer monitor with a down arrow.</p>
+                                <div class="step-image">
+                                    <img src="images/install/windows-install-icon.png" alt="Windows browser install icon" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Click "Install" or "Install Bingo-o-matic"</h4>
+                                <p>Click the install button and confirm the installation when prompted.</p>
+                                <div class="step-image">
+                                    <img src="images/install/windows-install-prompt.png" alt="Windows install prompt" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Launch from Start Menu or Desktop</h4>
+                                <p>Once installed, you can launch Bingo-o-matic from your Start menu, desktop, or taskbar.</p>
+                                <div class="step-image">
+                                    <img src="images/install/windows-start-menu.png" alt="Windows Start menu with Bingo-o-matic" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (CurrentOS == "macos")
+                {
+                    <div class="os-section" id="macos-instructions">
+                        <h3>Installing on macOS</h3>
+                        <p>Follow these steps to install Bingo-o-matic on macOS:</p>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Open Safari or Google Chrome</h4>
+                                <p>Safari provides the best installation experience on macOS, but Chrome also works well.</p>
+                                <div class="step-image">
+                                    <img src="images/install/macos-browsers.png" alt="macOS browser icons" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Navigate to bingo-o-matic.com</h4>
+                                <p>Go to <a href="https://bingo-o-matic.com" target="_blank">https://bingo-o-matic.com</a> in your browser.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Using Safari: Add to Dock</h4>
+                                <p>In Safari, click on "File" in the menu bar, then select "Add to Dock..." from the dropdown menu.</p>
+                                <div class="step-image">
+                                    <img src="images/install/macos-safari-add-to-dock.png" alt="Safari Add to Dock menu" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Using Chrome: Install from Menu</h4>
+                                <p>In Chrome, click the three dots menu in the top right, then select "Install Bingo-o-matic..."</p>
+                                <div class="step-image">
+                                    <img src="images/install/macos-chrome-install.png" alt="Chrome install menu on macOS" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Launch from Dock or Applications</h4>
+                                <p>Once installed, you can launch Bingo-o-matic from your Dock or Applications folder.</p>
+                                <div class="step-image">
+                                    <img src="images/install/macos-dock.png" alt="macOS Dock with Bingo-o-matic" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (CurrentOS == "android")
+                {
+                    <div class="os-section" id="android-instructions">
+                        <h3>Installing on Android</h3>
+                        <p>Follow these steps to install Bingo-o-matic on your Android device:</p>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Open Chrome or Samsung Internet</h4>
+                                <p>Both Google Chrome and Samsung Internet browsers support PWA installation on Android.</p>
+                                <div class="step-image">
+                                    <img src="images/install/android-browsers.png" alt="Android browser icons" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Navigate to bingo-o-matic.com</h4>
+                                <p>Go to <a href="https://bingo-o-matic.com" target="_blank">https://bingo-o-matic.com</a> in your browser.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Open browser menu</h4>
+                                <p>Tap the three-dot menu button in the top right corner of your browser.</p>
+                                <div class="step-image">
+                                    <img src="images/install/android-menu.png" alt="Android browser menu button" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Tap "Install app" or "Add to Home screen"</h4>
+                                <p>Select the option to install the app or add it to your home screen.</p>
+                                <div class="step-image">
+                                    <img src="images/install/android-install-prompt.png" alt="Android install prompt" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Confirm installation</h4>
+                                <p>Tap "Install" or "Add" on the confirmation dialog.</p>
+                                <div class="step-image">
+                                    <img src="images/install/android-confirm.png" alt="Android installation confirmation" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <h4>Launch from Home screen</h4>
+                                <p>Bingo-o-matic is now installed on your device. Find and tap its icon on your home screen to launch it.</p>
+                                <div class="step-image">
+                                    <img src="images/install/android-homescreen.png" alt="Android home screen with Bingo-o-matic" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (CurrentOS == "ios")
+                {
+                    <div class="os-section" id="ios-instructions">
+                        <h3>Installing on iPhone or iPad</h3>
+                        <p>Follow these steps to install Bingo-o-matic on your iOS device:</p>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Open Safari</h4>
+                                <p>Safari is required to install PWAs on iOS devices. Other browsers like Chrome or Firefox won't work for this purpose.</p>
+                                <div class="step-image">
+                                    <img src="images/install/ios-safari.png" alt="iOS Safari icon" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Navigate to bingo-o-matic.com</h4>
+                                <p>Go to <a href="https://bingo-o-matic.com" target="_blank">https://bingo-o-matic.com</a> in Safari.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Tap the Share button</h4>
+                                <p>Tap the Share button at the bottom of the screen (the square with an arrow pointing up).</p>
+                                <div class="step-image">
+                                    <img src="images/install/ios-share.png" alt="iOS Share button" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Find "Add to Home Screen"</h4>
+                                <p>Scroll down in the share menu and tap "Add to Home Screen". You might need to scroll to find this option.</p>
+                                <div class="step-image">
+                                    <img src="images/install/ios-add-to-home.png" alt="iOS Add to Home Screen option" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Edit name (optional) and tap "Add"</h4>
+                                <p>You can edit the name of the app if you wish. When ready, tap "Add" in the top right corner.</p>
+                                <div class="step-image">
+                                    <img src="images/install/ios-confirm.png" alt="iOS Add confirmation" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <h4>Launch from Home screen</h4>
+                                <p>Bingo-o-matic is now installed and will appear on your home screen. Tap the icon to open it.</p>
+                                <div class="step-image">
+                                    <img src="images/install/ios-homescreen.png" alt="iOS home screen with Bingo-o-matic" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (CurrentOS == "linux")
+                {
+                    <div class="os-section" id="linux-instructions">
+                        <h3>Installing on Linux</h3>
+                        <p>Follow these steps to install Bingo-o-matic on your Linux system:</p>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Open Google Chrome or Chromium</h4>
+                                <p>Chrome/Chromium provides the best PWA installation experience on Linux.</p>
+                                <div class="step-image">
+                                    <img src="images/install/linux-chrome.png" alt="Chrome on Linux" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Navigate to bingo-o-matic.com</h4>
+                                <p>Go to <a href="https://bingo-o-matic.com" target="_blank">https://bingo-o-matic.com</a> in your browser.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Look for the install icon in the address bar</h4>
+                                <p>You'll see an install icon (typically a computer monitor with a down arrow) in the address bar.</p>
+                                <div class="step-image">
+                                    <img src="images/install/linux-install-icon.png" alt="Linux install icon in browser" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Click "Install" or "Install Bingo-o-matic"</h4>
+                                <p>Click the install button and confirm the installation.</p>
+                                <div class="step-image">
+                                    <img src="images/install/linux-install-prompt.png" alt="Linux install prompt" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Launch from Applications menu</h4>
+                                <p>Once installed, you can find and launch Bingo-o-matic from your desktop environment's applications menu.</p>
+                                <div class="step-image">
+                                    <img src="images/install/linux-applications.png" alt="Linux applications menu with Bingo-o-matic" class="img-fluid rounded shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="troubleshooting mt-4">
+                <h3>Troubleshooting</h3>
+                <div class="accordion" id="installTroubleshooting">
+                    <div class="accordion-item">
+                        <h4 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                I don't see an install option
+                            </button>
+                        </h4>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#installTroubleshooting">
+                            <div class="accordion-body">
+                                <p>If you don't see an install option:</p>
+                                <ul>
+                                    <li>Make sure you're using a supported browser (Chrome, Edge, Safari)</li>
+                                    <li>Try refreshing the page</li>
+                                    <li>You may have already installed the app - check your home screen or app menu</li>
+                                    <li>Some browsers require you to visit the site multiple times before showing the install prompt</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h4 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                The app doesn't work offline
+                            </button>
+                        </h4>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#installTroubleshooting">
+                            <div class="accordion-body">
+                                <p>To ensure the app works offline:</p>
+                                <ul>
+                                    <li>Make sure you've opened the app at least once while connected to the internet</li>
+                                    <li>Try closing and reopening the app</li>
+                                    <li>In rare cases, you may need to reinstall the app</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h4 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                How to uninstall the app
+                            </button>
+                        </h4>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#installTroubleshooting">
+                            <div class="accordion-body">
+                                <p>To uninstall Bingo-o-matic:</p>
+                                <ul>
+                                    <li><strong>Windows:</strong> Right-click the app icon and select "Uninstall"</li>
+                                    <li><strong>macOS:</strong> Drag the app icon from Applications to Trash</li>
+                                    <li><strong>Android:</strong> Long press the app icon and select "Uninstall"</li>
+                                    <li><strong>iOS:</strong> Long press the app icon, select "Remove App", then "Delete App"</li>
+                                    <li><strong>Linux:</strong> Right-click the app icon in your application menu and select "Remove" or "Uninstall"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string CurrentOS { get; set; } = "windows";
+    private string DetectedOS { get; set; } = "windows";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Try to detect user's OS
+        try
+        {
+            var userAgent = await JSRuntime.InvokeAsync<string>("eval", "navigator.userAgent");
+            
+            if (Regex.IsMatch(userAgent, "Windows", RegexOptions.IgnoreCase))
+                DetectedOS = "windows";
+            else if (Regex.IsMatch(userAgent, "Macintosh|Mac OS", RegexOptions.IgnoreCase))
+                DetectedOS = "macos";
+            else if (Regex.IsMatch(userAgent, "Android", RegexOptions.IgnoreCase))
+                DetectedOS = "android";
+            else if (Regex.IsMatch(userAgent, "iPhone|iPad|iPod", RegexOptions.IgnoreCase))
+                DetectedOS = "ios";
+            else if (Regex.IsMatch(userAgent, "Linux", RegexOptions.IgnoreCase))
+                DetectedOS = "linux";
+            
+            CurrentOS = DetectedOS;
+        }
+        catch
+        {
+            // If detection fails, default to Windows
+            CurrentOS = "windows";
+        }
+    }
+
+    private void SelectOS(string os)
+    {
+        CurrentOS = os;
+    }
+}

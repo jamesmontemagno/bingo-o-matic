@@ -1,0 +1,27 @@
+This directory will contain screenshots for the installation instructions for different operating systems.
+
+The following images are needed:
+- windows-browser.png
+- windows-install-icon.png
+- windows-install-prompt.png
+- windows-start-menu.png
+- macos-browsers.png
+- macos-safari-add-to-dock.png
+- macos-chrome-install.png
+- macos-dock.png
+- android-browsers.png
+- android-menu.png
+- android-install-prompt.png
+- android-confirm.png
+- android-homescreen.png
+- ios-safari.png
+- ios-share.png
+- ios-add-to-home.png
+- ios-confirm.png
+- ios-homescreen.png
+- linux-chrome.png
+- linux-install-icon.png
+- linux-install-prompt.png
+- linux-applications.png
+
+The actual screenshots should be created and added to this directory.
