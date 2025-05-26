@@ -1,0 +1,72 @@
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@if (updateAvailable)
+{
+    <div class="pwa-updater @(isVisible ? "visible" : "hidden")" data-bs-theme="@Theme">
+        <div class="pwa-updater-content">
+            <span class="pwa-updater-message">
+                <i class="bi bi-arrow-clockwise"></i> App update available
+            </span>
+            <button class="pwa-updater-button" @onclick="UpdateApplication" title="Update application">
+                Update now
+            </button>
+            <button class="pwa-updater-dismiss" @onclick="DismissUpdate" title="Dismiss">
+                <span>×</span>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Theme { get; set; } = "light";
+
+    private bool updateAvailable = false;
+    private bool isVisible = true;
+    private DotNetObjectReference<PWAUpdater>? objRef;
+    private IJSObjectReference? module;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pwaUpdater.js");
+        
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("initialize", objRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnUpdateAvailable()
+    {
+        updateAvailable = true;
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task UpdateApplication()
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("updateApplication");
+        }
+    }
+
+    private void DismissUpdate()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+        
+        objRef?.Dispose();
+    }
+}
