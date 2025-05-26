@@ -62,13 +62,6 @@
                     <i class="bi bi-phone"></i>
                     <span>iOS</span>
                 </button>
-                <button type="button" 
-                        class="mode-toggle-btn @(CurrentOS == "linux" ? "active" : "")"
-                        @onclick='() => SelectOS("linux")'
-                        aria-pressed="@(CurrentOS == "linux")">
-                    <i class="bi bi-ubuntu"></i>
-                    <span>Linux</span>
-                </button>
             </div>
             
             <div class="os-instructions mt-4">
@@ -83,9 +76,6 @@
                             <div class="step-content">
                                 <h4>Open Microsoft Edge or Google Chrome</h4>
                                 <p>Bingo-o-matic can be installed from most modern browsers, but Edge and Chrome provide the best experience on Windows.</p>
-                                <div class="step-image">
-                                    <img src="images/install/windows-browser.png" alt="Windows browser icons" class="img-fluid rounded shadow-sm">
-                                </div>
                             </div>
                         </div>
                         
@@ -140,11 +130,8 @@
                         <div class="instruction-step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                                <h4>Open Safari or Google Chrome</h4>
-                                <p>Safari provides the best installation experience on macOS, but Chrome also works well.</p>
-                                <div class="step-image">
-                                    <img src="images/install/macos-browsers.png" alt="macOS browser icons" class="img-fluid rounded shadow-sm">
-                                </div>
+                                <h4>Open Safari</h4>
+                                <p>Safari provides the best installation experience on macOS, but Edge or Chrome also works well.</p>
                             </div>
                         </div>
                         
@@ -170,10 +157,10 @@
                         <div class="instruction-step">
                             <div class="step-number">4</div>
                             <div class="step-content">
-                                <h4>Using Chrome: Install from Menu</h4>
-                                <p>In Chrome, click the three dots menu in the top right, then select "Install Bingo-o-matic..."</p>
+                                <h4>Using Chrome/Edge: Install from Menu</h4>
+                                <p>In the address bar, you'll see an install icon. In Edge, it looks like a "+" sign. In Chrome, it's a computer monitor with a down arrow.</p>
                                 <div class="step-image">
-                                    <img src="images/install/macos-chrome-install.png" alt="Chrome install menu on macOS" class="img-fluid rounded shadow-sm">
+                                    <img src="images/install/windows-install-icon.png" alt="Browser install icon" class="img-fluid rounded shadow-sm">
                                 </div>
                             </div>
                         </div>
@@ -181,8 +168,8 @@
                         <div class="instruction-step">
                             <div class="step-number">5</div>
                             <div class="step-content">
-                                <h4>Launch from Dock or Applications</h4>
-                                <p>Once installed, you can launch Bingo-o-matic from your Dock or Applications folder.</p>
+                                <h4>Launch from Dock or Launchpad</h4>
+                                <p>Once installed, you can launch Bingo-o-matic from your Dock or Launchpad.</p>
                                 <div class="step-image">
                                     <img src="images/install/macos-dock.png" alt="macOS Dock with Bingo-o-matic" class="img-fluid rounded shadow-sm">
                                 </div>
@@ -199,11 +186,8 @@
                         <div class="instruction-step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                                <h4>Open Chrome or Samsung Internet</h4>
-                                <p>Both Google Chrome and Samsung Internet browsers support PWA installation on Android.</p>
-                                <div class="step-image">
-                                    <img src="images/install/android-browsers.png" alt="Android browser icons" class="img-fluid rounded shadow-sm">
-                                </div>
+                                <h4>Open Chrome</h4>
+                                <p>Google Chrome, Microsoft Edge, and Samsung Internet browsers support PWA installation on Android.</p>
                             </div>
                         </div>
                         
@@ -270,10 +254,7 @@
                             <div class="step-number">1</div>
                             <div class="step-content">
                                 <h4>Open Safari</h4>
-                                <p>Safari is required to install PWAs on iOS devices. Other browsers like Chrome or Firefox won't work for this purpose.</p>
-                                <div class="step-image">
-                                    <img src="images/install/ios-safari.png" alt="iOS Safari icon" class="img-fluid rounded shadow-sm">
-                                </div>
+                                <p>Safari is required to install PWAs on iOS devices. Edge will also work for installing PWAs.</p>
                             </div>
                         </div>
                         
@@ -325,65 +306,6 @@
                                 <p>Bingo-o-matic is now installed and will appear on your home screen. Tap the icon to open it.</p>
                                 <div class="step-image">
                                     <img src="images/install/ios-homescreen.png" alt="iOS home screen with Bingo-o-matic" class="img-fluid rounded shadow-sm">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else if (CurrentOS == "linux")
-                {
-                    <div class="os-section" id="linux-instructions">
-                        <h3>Installing on Linux</h3>
-                        <p>Follow these steps to install Bingo-o-matic on your Linux system:</p>
-                        
-                        <div class="instruction-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>Open Google Chrome or Chromium</h4>
-                                <p>Chrome/Chromium provides the best PWA installation experience on Linux.</p>
-                                <div class="step-image">
-                                    <img src="images/install/linux-chrome.png" alt="Chrome on Linux" class="img-fluid rounded shadow-sm">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="instruction-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>Navigate to bingo-o-matic.com</h4>
-                                <p>Go to <a href="https://bingo-o-matic.com" target="_blank">https://bingo-o-matic.com</a> in your browser.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="instruction-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>Look for the install icon in the address bar</h4>
-                                <p>You'll see an install icon (typically a computer monitor with a down arrow) in the address bar.</p>
-                                <div class="step-image">
-                                    <img src="images/install/linux-install-icon.png" alt="Linux install icon in browser" class="img-fluid rounded shadow-sm">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="instruction-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>Click "Install" or "Install Bingo-o-matic"</h4>
-                                <p>Click the install button and confirm the installation.</p>
-                                <div class="step-image">
-                                    <img src="images/install/linux-install-prompt.png" alt="Linux install prompt" class="img-fluid rounded shadow-sm">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="instruction-step">
-                            <div class="step-number">5</div>
-                            <div class="step-content">
-                                <h4>Launch from Applications menu</h4>
-                                <p>Once installed, you can find and launch Bingo-o-matic from your desktop environment's applications menu.</p>
-                                <div class="step-image">
-                                    <img src="images/install/linux-applications.png" alt="Linux applications menu with Bingo-o-matic" class="img-fluid rounded shadow-sm">
                                 </div>
                             </div>
                         </div>
