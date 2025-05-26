@@ -263,6 +263,18 @@
         return WheelHelpers.GetDynamicTextPosition(availableItems);
     }
 
+    /// <summary>
+    /// Shuffles a list in place using the Fisher-Yates algorithm
+    /// </summary>
+    private void ShuffleList<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = random.Next(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+    }
+
     // Confirmation dialog state
     private bool showConfirmDialog = false;
     private string confirmTitle = "";
@@ -490,6 +502,10 @@
         {
             isSelecting = true;
             isSelected = false;
+            
+            // Shuffle the available items before selection
+            ShuffleList(availableItems);
+            
             StateHasChanged();
             await Task.Delay(1000);
             
