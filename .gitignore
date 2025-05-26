@@ -401,3 +401,4 @@ FodyWeavers.xsd
 *.sln.iml
 BingoApp/wwwroot/.DS_Store
 BingoApp/wwwroot/images/.DS_Store
+planning/prompt-ideas.md
