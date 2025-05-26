@@ -24,12 +24,12 @@
                     </select>
                 </div>
                 <a href="/custom-bingo/manage" class="btn btn-outline-secondary manage-btn" title="Manage Bingo Sets" aria-label="Manage Bingo Sets">
-                    ⚙️ Manage
+                    <i class="bi bi-gear"></i> Manage
                 </a>
             </div>
             <div class="draw-toggle-row d-flex align-items-center gap-2 mt-2">
                 <button class="btn btn-primary me-2" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
-                    Draw Item
+                    <i class="bi bi-shuffle"></i> Draw Item
                 </button>
                 <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
                     <button type="button" 
@@ -132,7 +132,7 @@
                 </div>
                 <div class="reset-btn-row mt-3 d-flex justify-content-center">
                     <button class="btn btn-outline-primary" @onclick="ConfirmNewGame" disabled="@(selectedSet == null || isSelecting)">
-                        Reset Game
+                        <i class="bi bi-arrow-repeat"></i> Reset Game
                     </button>
                 </div>
             }
