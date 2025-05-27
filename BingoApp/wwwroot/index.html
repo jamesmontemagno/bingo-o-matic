@@ -60,17 +60,17 @@
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-progress-overlay" role="status" aria-live="polite">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <div class="loading-progress-text">Loading Bingo-o-matic...</div>
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
+    <div id="blazor-error-ui" style="display:none;">
+        <span class="error-icon bi bi-exclamation-triangle-fill" aria-hidden="true"></span>
+        <span class="error-message">An unhandled error has occurred.</span>
         <a href="." class="reload">Reload</a>
-        <span class="dismiss">🗙</span>
+        <button class="dismiss" aria-label="Dismiss">🗙</button>
     </div>    
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
@@ -83,6 +83,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             NavbarHelpers.setupNavbarAutoClose();
             NavbarHelpers.setupResizeHandler();
+        });
+        // Hide loading overlay when Blazor is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            Blazor.start().then(() => {
+                document.querySelector('.loading-progress-overlay')?.remove();
+            });
+        });
+        // Error UI dismiss
+        document.querySelector('#blazor-error-ui .dismiss')?.addEventListener('click', function() {
+            document.getElementById('blazor-error-ui').style.display = 'none';
         });
     </script>
 </body>
