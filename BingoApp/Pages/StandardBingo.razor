@@ -12,8 +12,17 @@
     </div>
 
     <div class="game-content">
-        <div class="current-ball">
-            @if (currentNumber != null)
+        <div class="current-ball" @onclick="HandleBallClick">
+            @if (!gameStarted)
+            {
+                <div class="current-number">
+                    <div class="number-display tap-to-start">
+                        <span class="letter">TAP TO</span>
+                        <span class="number">START</span>
+                    </div>
+                </div>
+            }
+            else if (currentNumber != null)
             {
                 <div class="current-number">
                     @if (isShowingAnimation)
@@ -130,6 +139,7 @@
     private bool showGlow;
     private int displayNumber;
     private double animationProgress;
+    private bool gameStarted = false;
     private HashSet<int> calledNumbers = new();
     private List<int> availableNumbers = new();
     private Random random = new Random();
@@ -175,6 +185,8 @@
         if (availableNumbers.Count == 0 || isShowingAnimation)
             return;
 
+
+        gameStarted = true;
         showGlow = false;
         isShowingAnimation = true;
         
@@ -244,6 +256,7 @@
         isShowingAnimation = false;
         showGlow = false;
         animationProgress = 0;
+        gameStarted = false;
     }
 
     private async Task ToggleNumber(int number)
@@ -295,5 +308,18 @@
         return calledNumbers
             .Where(n => n >= range.Item1 && n <= range.Item2)
             .OrderBy(n => n);
+    }
+
+    private async Task HandleBallClick()
+    {
+        if (!gameStarted)
+        {
+            gameStarted = true;
+            await DrawNextNumber();
+        }
+        else if (currentNumber != null && !isShowingAnimation)
+        {
+            await DrawNextNumber();
+        }
     }
 }
