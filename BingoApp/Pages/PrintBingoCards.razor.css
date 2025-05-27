@@ -227,4 +227,89 @@
 .bingo-card-container {
     margin-top: 2rem;
     min-height: 200px;
+    /* Ensure good contrast for card backgrounds */
+    color: var(--bingo-card-text, #222);
+    background: var(--bingo-card-bg, #fff);
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+
+.bingo-theme {
+    /* Overlay for theme backgrounds, but keep text readable */
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.18;
+    pointer-events: none;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.bingo-card-container .card-body {
+    position: relative;
+    z-index: 1;
+    color: var(--bingo-card-text, #222);
+    background: transparent;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Ensure high contrast text in all themes */
+.bingo-card-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+}
+
+.bingo-card-title {
+    color: var(--bingo-card-text, #000);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.bingo-card-text {
+    color: var(--bingo-card-text, #000);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.bingo-card-footer {
+    color: var(--bingo-card-text, #000);
+    opacity: 0.9;
+    font-size: 0.95rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .bingo-card-container {
+        --bingo-card-bg: #1a1d23;
+        --bingo-card-text: #ffffff;
+    }
+
+    .bingo-card-title,
+    .bingo-card-text,
+    .bingo-card-footer {
+        color: var(--bingo-card-text);
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .bingo-card-footer {
+        opacity: 0.95;
+    }
+
+    /* Override any Bootstrap dark theme text colors */
+    [data-bs-theme="dark"] .bingo-card-container .bingo-card-title,
+    [data-bs-theme="dark"] .bingo-card-container .bingo-card-text,
+    [data-bs-theme="dark"] .bingo-card-container .bingo-card-footer {
+        color: var(--bingo-card-text) !important;
+    }
+}
+
+/* Ensure theme overlays never reduce text contrast */
+.bingo-theme {
+    mix-blend-mode: lighten;
 }

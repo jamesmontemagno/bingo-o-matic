@@ -150,10 +150,10 @@ else
                         {
                             <div class="@(selectedTheme) bingo-theme"></div>
                         }
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Ready to Download</h5>
-                            <p class="card-text">@generatedCards.Count cards have been generated with the "@(string.IsNullOrEmpty(selectedThemeName) ? "Default" : selectedThemeName)" theme.</p>
-                            <p class="card-text"><small class="text-muted">Click "Download PDF" to save your bingo cards.</small></p>
+                        <div class="card-body text-center bingo-card-content">
+                            <h5 class="bingo-card-title">Ready to Download</h5>
+                            <p class="bingo-card-text">@generatedCards.Count cards have been generated with the "@(string.IsNullOrEmpty(selectedThemeName) ? "Default" : selectedThemeName)" theme.</p>
+                            <p class="bingo-card-footer">Click "Download PDF" to save your bingo cards.</p>
                         </div>
                     </div>
                 </div>

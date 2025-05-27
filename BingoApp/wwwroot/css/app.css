@@ -523,6 +523,20 @@ h1:focus {
   text-decoration: underline;
   margin-left: 1rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  background: rgba(255,255,255,0.15);
+  transition: background-color 0.2s;
+}
+#blazor-error-ui .reload:hover {
+  background: rgba(255,255,255,0.25);
+  text-decoration: none;
+}
+#blazor-error-ui .reload i {
+  font-size: 1.1rem;
 }
 #blazor-error-ui .dismiss {
   margin-left: auto;
@@ -534,6 +548,8 @@ h1:focus {
   color: var(--error-text);
   opacity: 0.7;
   transition: opacity 0.2s;
+  padding: 0.5rem;
+  margin: -0.5rem -0.5rem -0.5rem 0;
 }
 #blazor-error-ui .dismiss:hover {
   opacity: 1;
@@ -678,4 +694,67 @@ code {
     50% {
         transform: translateY(-10px);
     }
+}
+
+/* Loading Fallback UI */
+.loading-progress-fallback {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--loading-bg);
+    border-radius: 0.5rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.loading-progress-fallback p {
+    color: var(--loading-text);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.loading-progress-fallback ul {
+    color: var(--loading-text);
+    opacity: 0.9;
+    padding-left: 1.5rem;
+    margin-bottom: 0;
+}
+
+.loading-progress-fallback li {
+    margin: 0.5rem 0;
+}
+
+/* Enhanced Error UI */
+#blazor-error-ui {
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+#blazor-error-ui .reload {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    background: rgba(255,255,255,0.15);
+    transition: background-color 0.2s;
+}
+
+#blazor-error-ui .reload:hover {
+    background: rgba(255,255,255,0.25);
+    text-decoration: none;
+}
+
+#blazor-error-ui .reload i {
+    font-size: 1.1rem;
+}
+
+#blazor-error-ui .dismiss {
+    padding: 0.5rem;
+    margin: -0.5rem -0.5rem -0.5rem 0;
+}
+
+#blazor-error-ui .dismiss i {
+    font-size: 1.2rem;
+    display: block;
 }
