@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BingoApp", "BingoApp\BingoApp.csproj", "{C37B0291-18E5-4930-B880-9EA44ECE6473}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{60060628-3A71-41FB-BE9A-5A06089231BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{C37B0291-18E5-4930-B880-9EA44ECE6473}.Release|x64.Build.0 = Release|Any CPU
 		{C37B0291-18E5-4930-B880-9EA44ECE6473}.Release|x86.ActiveCfg = Release|Any CPU
 		{C37B0291-18E5-4930-B880-9EA44ECE6473}.Release|x86.Build.0 = Release|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Debug|x64.Build.0 = Debug|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Debug|x86.Build.0 = Debug|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Release|x64.ActiveCfg = Release|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Release|x64.Build.0 = Release|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Release|x86.ActiveCfg = Release|Any CPU
+		{60060628-3A71-41FB-BE9A-5A06089231BE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
