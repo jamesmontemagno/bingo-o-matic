@@ -777,8 +777,8 @@
             showConfetti = true;
             StateHasChanged();
 
-            // Keep confetti showing for 3 seconds
-            await Task.Delay(3000, confettiCts.Token);
+            // Keep confetti showing for 10 seconds
+            await Task.Delay(10000, confettiCts.Token);
         }
         catch (OperationCanceledException)
         {
