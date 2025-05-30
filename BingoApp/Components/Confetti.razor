@@ -5,7 +5,7 @@
     public bool Show { get; set; }
 
     [Parameter]
-    public double Duration { get; set; } = 3.0;
+    public double Duration { get; set; } = 5.0;
 
     [Parameter]
     public double ParticleCount { get; set; } = 200;
@@ -58,17 +58,17 @@
         for (int i = 0; i < 7; i++) // More bursts for better coverage
         {
             var x = 0.15 + (i * 0.12); // More evenly spread across the viewport
-            var angle = 80 + (i * 3); // Slightly varying angles
+            var angle = 260 + (i * 3); // Angles pointing downward
             topBursts.Add(JSRuntime.InvokeVoidAsync("confetti", new
             {
                 particleCount = ParticleCount / 6,
                 spread = 65,
-                startVelocity = 45 + (i * 3), // More varying velocities
-                decay = 0.94,
-                gravity = 0.8,
+                startVelocity = 25 + (i * 2), // Reduced initial velocity
+                decay = 0.96, // Slower decay for longer-lasting particles
+                gravity = 0.7, // Reduced gravity for gentler falling
                 drift = i - 3, // Adds some sideways motion
                 angle = angle,
-                origin = new { x = x, y = 0.35 }, // Start from higher in the viewport
+                origin = new { x = x, y = 0.1 }, // Start from top of the viewport
                 colors = colors
             }).AsTask());
         }
