@@ -81,7 +81,7 @@
                 @if (selectionMode == SelectionMode.Wheel)
                 {
                     <div class="wheel-overlay @(isWheelDramatic ? "dramatic" : "")">
-                        <div class="wheel-container">
+                        <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "") @(isWheelDramatic ? "dramatic-finale" : "")">
                         <div class="wheel @(isWheelDramatic ? "dramatic-glow" : "")" style="transform: rotate(@(wheelRotation)deg)">
                             @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
                             {
@@ -105,6 +105,23 @@
                             }
                         </div>
                             <div class="wheel-pointer @(isWheelDramatic ? "dramatic-pointer" : "")"></div>
+                            
+                            @* Dramatic effects *@
+                            @if (showWheelSparkles)
+                            {
+                                <div class="wheel-sparkles">
+                                    @for (int i = 0; i < 12; i++)
+                                    {
+                                        <div class="sparkle" style="--delay: @(i * 0.1)s; --angle: @(i * 30)deg;"></div>
+                                    }
+                                </div>
+                            }
+                            
+                            @if (isWheelDramatic)
+                            {
+                                <div class="dramatic-flash"></div>
+                                <div class="victory-burst"></div>
+                            }
                         </div>
                     </div>
                 }
@@ -520,6 +537,7 @@
             
             if (selectionMode == SelectionMode.Wheel)
             {
+                await Task.Delay(1000);
                 // Select the final item first
                 int randomIndex = random.Next(0, availableItems.Count);
                 currentItem = availableItems[randomIndex];
@@ -527,40 +545,57 @@
                 // Calculate the final rotation to make the selected item land at the pointer
                 double segmentAngle = 360.0 / availableItems.Count;
                 double itemAngle = segmentAngle * randomIndex;
+                
+                // Since the coordinate system in the wheel rendering has 0 degrees at the right side
+                // (notice the -90 in the clipPath calculation) and the pointer is also at the right,
+                // we need to align the center of the item's segment with the 0-degree mark
+                
+                // Center of the item's segment
                 double itemCenterAngle = itemAngle + (segmentAngle / 2);
-                // 3-4 rotations plus alignment angle
-                double targetRotation = (random.Next(3, 5) * 360) + (360 - itemCenterAngle);
+                // Fixed number of rotations (5-8) for visual effect plus the alignment angle
+                double targetRotation = (random.Next(5, 8) * 360) + (360 - itemCenterAngle);
                 
                 // Fix the rotation to ensure it's within proper range
                 targetRotation = targetRotation % 360 == 0 ? targetRotation + 1 : targetRotation;
                 
                 // Start the wheel spinning animation
                 wheelRotation = 0;
+                isWheelSlowingDown = false;
                 isWheelDramatic = false;
+                showWheelSparkles = false;
                 StateHasChanged();
                 
+                // Trigger the animation by setting the final rotation
                 await Task.Delay(50); // Small delay to ensure the initial state is rendered
                 wheelRotation = targetRotation;
                 StateHasChanged();
                 
-                // Main spin (2.0 seconds)
-                await Task.Delay(2000);
+                // Main spin (3.0 seconds)
+                await Task.Delay(3000);
                 
-                // Simple dramatic ending with subtle glow
-                isWheelDramatic = true;
+                // Subtle slowing down phase (0.3 seconds)
+                isWheelSlowingDown = true;
                 StateHasChanged();
+                await Task.Delay(300);
+                
+                // Elegant finale with sparkles (0.4 seconds)
+                isWheelDramatic = true;
+                showWheelSparkles = true;
+                StateHasChanged();
+                await Task.Delay(400);
                 
                 // Update game state
                 availableItems.RemoveAt(randomIndex);
                 calledItems.Add(currentItem);
                 displayItem = currentItem;
                 
-                // Brief pause to show the selection (1 second)
-                await Task.Delay(1000);
+                // Keep the final state visible (3 seconds)
+                await Task.Delay(3000);
                 
-                // Reset wheel position
-                wheelRotation = 0;
+                // Reset effects
                 isWheelDramatic = false;
+                showWheelSparkles = false;
+                isWheelSlowingDown = false;
                 StateHasChanged();
                 
                 // Reset wheel position
