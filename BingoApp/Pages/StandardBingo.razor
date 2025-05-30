@@ -1,4 +1,5 @@
 @page "/standard-bingo"
+@using BingoApp.Components
 
 <PageTitle>Standard Bingo - Bingo-o-matic</PageTitle>
 
@@ -8,6 +9,12 @@
             <button class="btn btn-primary me-2" @onclick="DrawNextNumber" disabled="@isShowingAnimation">
                 <i class="bi bi-shuffle"></i> Draw Number
             </button>
+            @if (calledNumbers.Count > 0)
+            {
+                <button class="btn btn-success btn-lg flex-shrink-0 bingo-button" @onclick="CelebrateBingo" disabled="@(isShowingAnimation || showConfetti)">
+                    <i class="bi bi-trophy"></i> Bingo!
+                </button>
+            }
         </div>
     </div>
 
@@ -129,6 +136,8 @@
     </div>
 </div>
 
+<Confetti Show="@showConfetti" />
+
 @code {
     [Inject]
     private IJSRuntime JS { get; set; } = default!;
@@ -146,6 +155,10 @@
     private int initialSpeed = 50; // initial speed for the animation
     private int finalSpeed = 500; // final speed before selection
     private int animationDuration = 6000; // total animation duration in milliseconds
+
+    // Confetti state
+    private bool showConfetti;
+    private CancellationTokenSource? confettiCts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -320,6 +333,32 @@
         else if (currentNumber != null && !isShowingAnimation)
         {
             await DrawNextNumber();
+        }
+    }
+
+    private async Task CelebrateBingo()
+    {
+        // Cancel any existing confetti animation
+        confettiCts?.Cancel();
+        confettiCts?.Dispose();
+        confettiCts = new CancellationTokenSource();
+
+        try
+        {
+            showConfetti = true;
+            StateHasChanged();
+
+            // Keep confetti showing for 3 seconds
+            await Task.Delay(3000, confettiCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Animation was cancelled
+        }
+        finally
+        {
+            showConfetti = false;
+            StateHasChanged();
         }
     }
 }

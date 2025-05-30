@@ -16,11 +16,18 @@
 <div class="bingo-container">
     <div class="bingo-header">
         <div class="bingo-controls">
-
             <div class="draw-toggle-row d-flex flex-column flex-md-row align-items-center gap-3 mt-2">
                 <button class="btn btn-primary btn-lg flex-shrink-0" @onclick="SelectNext" disabled="@(selectedSet == null || isSelecting)">
                     <i class="bi bi-shuffle"></i> Draw Item
                 </button>
+                @if (calledItems.Count > 0)
+                {
+                    <button class="btn btn-success btn-lg flex-shrink-0 bingo-button" 
+                            @onclick="CelebrateBingo"
+                            disabled="@(isSelecting || showConfetti)">
+                        <i class="bi bi-trophy"></i> Bingo!
+                    </button>
+                }
                 @if (!isMobileDevice)
                 {
                     <div class="mode-toggle @((selectedSet == null || isSelecting) ? "disabled" : "")" role="group" aria-label="Selection mode">
@@ -204,6 +211,8 @@
     </div>
 }
 
+<Confetti Show="@showConfetti" />
+
 @code {
     private enum SelectionMode
     {
@@ -300,6 +309,10 @@
     private bool showWheelSparkles = false;
     private const string WheelPreferenceKey = "bingo_wheel_preference";    private bool isMobileDevice;
     private IJSObjectReference? module;
+
+    // Confetti state
+    private bool showConfetti;
+    private CancellationTokenSource? confettiCts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -697,7 +710,7 @@
         await Task.CompletedTask;
     }
 
-    private async Task OnGridItemSelected(string item)
+    private Task OnGridItemSelected(string item)
     {
         if (availableItems.Contains(item))
         {
@@ -709,6 +722,7 @@
             isSelected = true;
             StateHasChanged();
         }
+        return Task.CompletedTask;
     }
 
     private async Task SetMode(SelectionMode mode)
@@ -751,6 +765,32 @@
         }
     }
 
+    private async Task CelebrateBingo()
+    {
+        // Cancel any existing confetti animation
+        confettiCts?.Cancel();
+        confettiCts?.Dispose();
+        confettiCts = new CancellationTokenSource();
+
+        try
+        {
+            showConfetti = true;
+            StateHasChanged();
+
+            // Keep confetti showing for 3 seconds
+            await Task.Delay(3000, confettiCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Animation was cancelled
+        }
+        finally
+        {
+            showConfetti = false;
+            StateHasChanged();
+        }
+    }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         // Clean up any resources when the component is disposed
@@ -758,6 +798,10 @@
         animationCts?.Cancel();
         animationCts?.Dispose();
         animationCts = null;
+
+        confettiCts?.Cancel();
+        confettiCts?.Dispose();
+        confettiCts = null;
 
         if (module is not null)
         {
