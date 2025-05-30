@@ -227,34 +227,52 @@
 .bingo-card-container {
     margin-top: 2rem;
     min-height: 200px;
-    /* Ensure good contrast for card backgrounds */
-    color: var(--bingo-card-text, #222);
-    background: var(--bingo-card-bg, #fff);
+    /* Use system theme colors with a slightly emphasized background */
+    background: color-mix(in srgb, var(--card-background) 95%, var(--primary-color) 5%);
+    color: var(--text-color);
     border-radius: 1rem;
+    /* Add a subtle accent border using the theme color */
+    border: 1px solid var(--primary-color);
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
     font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    /* Optional: Add a subtle gradient */
+    background-image: linear-gradient(
+        to bottom right,
+        color-mix(in srgb, var(--card-background) 98%, var(--primary-color) 2%),
+        var(--card-background)
+    );
+}
+
+[data-bs-theme="dark"] .bingo-card-container {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    border-color: color-mix(in srgb, var(--primary-color) 70%, transparent 30%);
 }
 
 .bingo-theme {
-    /* Overlay for theme backgrounds, but keep text readable */
+    /* Overlay for theme backgrounds */
     position: absolute;
     inset: 0;
     z-index: 0;
-    opacity: 0.18;
+    opacity: 0.12; /* Reduced opacity */
     pointer-events: none;
     border-radius: 1rem 1rem 0 0;
+    /* Special handling for confetti theme */
+    mix-blend-mode: soft-light;
 }
 
-.bingo-card-container .card-body {
-    position: relative;
-    z-index: 1;
-    color: var(--bingo-card-text, #222);
-    background: transparent;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+[data-bs-theme="dark"] .bingo-theme:not(.theme-confetti) {
+    opacity: 0.08; /* Even more subtle in dark mode */
+    filter: brightness(0.8);
 }
 
-/* Ensure high contrast text in all themes */
+/* Special handling for confetti theme */
+.theme-confetti .bingo-theme {
+    opacity: 0.15;
+    mix-blend-mode: overlay;
+}
+
 .bingo-card-content {
     position: relative;
     z-index: 1;
@@ -262,26 +280,26 @@
 }
 
 .bingo-card-title {
-    color: var(--bingo-card-text, #000);
+    color: var(--text-color);
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    /* Improved text readability */
+    text-shadow: 0 1px 1px color-mix(in srgb, var(--background-color) 50%, transparent 50%);
 }
 
 .bingo-card-text {
-    color: var(--bingo-card-text, #000);
+    color: var(--text-color);
     font-size: 1.1rem;
     font-weight: 500;
     margin-bottom: 0.75rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    opacity: 0.95;
 }
 
 .bingo-card-footer {
-    color: var(--bingo-card-text, #000);
-    opacity: 0.9;
+    color: var(--text-color);
+    opacity: 0.85;
     font-size: 0.95rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -144,17 +144,15 @@ else
 
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <div class="@GetThemeClass()">
-                    <div class="card bingo-card-container">
-                        @if (!string.IsNullOrEmpty(selectedTheme) && selectedTheme != "none")
-                        {
-                            <div class="@(selectedTheme) bingo-theme"></div>
-                        }
-                        <div class="card-body text-center bingo-card-content">
-                            <h5 class="bingo-card-title">Ready to Download</h5>
-                            <p class="bingo-card-text">@generatedCards.Count cards have been generated with the "@(string.IsNullOrEmpty(selectedThemeName) ? "Default" : selectedThemeName)" theme.</p>
-                            <p class="bingo-card-footer">Click "Download PDF" to save your bingo cards.</p>
-                        </div>
+                <div class="bingo-card-container @(selectedTheme != "none" ? selectedTheme : "")">
+                    @if (!string.IsNullOrEmpty(selectedTheme) && selectedTheme != "none")
+                    {
+                        <div class="@(selectedTheme) bingo-theme"></div>
+                    }
+                    <div class="text-center bingo-card-content">
+                        <h5 class="bingo-card-title">Ready to Download</h5>
+                        <p class="bingo-card-text">@generatedCards.Count cards have been generated with the "@(string.IsNullOrEmpty(selectedThemeName) ? "Default" : selectedThemeName)" theme.</p>
+                        <p class="bingo-card-footer">Click "Download PDF" to save your bingo cards.</p>
                     </div>
                 </div>
             </div>
