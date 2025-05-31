@@ -251,9 +251,7 @@ else
         {
             errorMessage = "Error generating cards: " + ex.Message;
         }
-    }
-
-    private async Task GeneratePdf()
+    }    private async Task GeneratePdf()
     {
         if (!generatedCards.Any()) return;
 
@@ -261,7 +259,14 @@ else
         {
             isGeneratingPdf = true;
             progress = 0;
-            objRef = DotNetObjectReference.Create(this);
+            objRef = DotNetObjectReference.Create(this);            // Use the dynamic loader helper to properly load PDF libraries
+            var loadResult = await JS.InvokeAsync<LoadResult>("loadJsPDFForPrinting");
+            
+            if (!loadResult.Success)
+            {
+                errorMessage = "Error loading PDF libraries: " + loadResult.Error;
+                return;
+            }
 
             var cards = generatedCards.Select((grid, index) => new
             {
@@ -306,9 +311,13 @@ else
 
         [Range(1, 100, ErrorMessage = "Please enter a number between 1 and 100")]
         public int NumberOfCards { get; set; } = 1;
+    }    private class GeneratePdfResult
+    {
+        public bool Success { get; set; }
+        public string? Error { get; set; }
     }
 
-    private class GeneratePdfResult
+    private class LoadResult
     {
         public bool Success { get; set; }
         public string? Error { get; set; }

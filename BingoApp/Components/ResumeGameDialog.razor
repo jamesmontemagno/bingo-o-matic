@@ -1,0 +1,57 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="modal-backdrop @(Show ? "show" : "")" style="display: @(Show ? "block" : "none")"></div>
+<div class="modal fade @(Show ? "show" : "")" tabindex="-1" role="dialog" style="display: @(Show ? "block" : "none")">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Previous Game Found
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="bi bi-question-circle-fill text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <p class="text-center mb-3">
+                    We found a previous @GameType game that was in progress. 
+                    Would you like to continue where you left off?
+                </p>
+                @if (!string.IsNullOrEmpty(GameDetails))
+                {
+                    <div class="alert alert-info">
+                        <small>@GameDetails</small>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" @onclick="OnNoClicked">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Start New Game
+                </button>
+                <button type="button" class="btn btn-primary" @onclick="OnYesClicked">
+                    <i class="bi bi-play-circle me-1"></i>
+                    Resume Game
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public string GameType { get; set; } = "Bingo";
+    [Parameter] public string? GameDetails { get; set; }
+    [Parameter] public EventCallback<bool> OnResult { get; set; }
+
+    private async Task OnYesClicked()
+    {
+        await OnResult.InvokeAsync(true);
+    }
+
+    private async Task OnNoClicked()
+    {
+        await OnResult.InvokeAsync(false);
+    }
+}
