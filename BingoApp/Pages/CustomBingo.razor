@@ -88,9 +88,9 @@
             {
                 @if (selectionMode == SelectionMode.Wheel)
                 {
-                    <div class="wheel-overlay @(isWheelDramatic ? "dramatic" : "")">
-                        <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "") @(isWheelDramatic ? "dramatic-finale" : "")">
-                        <div class="wheel @(isWheelDramatic ? "dramatic-glow" : "")" style="transform: rotate(@(wheelRotation)deg)">
+                    <div class="wheel-overlay">
+                        <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "")">
+                        <div class="wheel" style="transform: rotate(@(wheelRotation)deg)">
                             @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
                             {
                                 var segmentAngle = 360.0 / availableItems.Count;
@@ -113,23 +113,6 @@
                             }
                         </div>
                             <div class="wheel-pointer"></div>
-                            
-                            @* Dramatic effects *@
-                            @if (showWheelSparkles)
-                            {
-                                <div class="wheel-sparkles">
-                                    @for (int i = 0; i < 6; i++)
-                                    {
-                                        <div class="sparkle" style="--delay: @(i * 0.2)s; --angle: @(i * 60)deg;"></div>
-                                    }
-                                </div>
-                            }
-                            
-                            @if (isWheelDramatic)
-                            {
-                                <div class="dramatic-flash"></div>
-                                <div class="victory-burst"></div>
-                            }
                         </div>
                     </div>
                 }
@@ -300,15 +283,11 @@
     private bool showConfirmDialog = false;
     private string confirmTitle = "";
     private string confirmMessage = "";
-    private Func<Task>? confirmAction;
+    private Func<Task>? confirmAction;    // Wheel state
 
-    // Wheel state
-    private bool useWheel = false;
     private double wheelRotation = 0;
     private bool isWheelSlowingDown = false;
-    private bool isWheelDramatic = false;
-    private bool showWheelSparkles = false;
-    private const string WheelPreferenceKey = "bingo_wheel_preference";    private bool isMobileDevice;
+    private bool isMobileDevice;
     private IJSObjectReference? module;
 
     // Confetti state
@@ -338,8 +317,6 @@
             await LoadModePreferenceAsync();
         }
         
-        // Load wheel preference
-        await LoadWheelPreferenceAsync();
         
         // Load all bingo sets
         await LoadBingoSetsAsync();
@@ -379,32 +356,6 @@
         bingoSets = (await BingoService.GetAllAsync()).ToList();
     }
     
-    private async Task LoadWheelPreferenceAsync()
-    {
-        try
-        {
-            var savedPreference = await LocalStorageService.GetItemAsync<bool?>(WheelPreferenceKey);
-            useWheel = savedPreference ?? false;
-        }
-        catch
-        {
-            // If loading fails, default to false
-            useWheel = false;
-        }
-    }
-    
-    private async Task SaveWheelPreferenceAsync()
-    {
-        try
-        {
-            await LocalStorageService.SetItemAsync(WheelPreferenceKey, useWheel);
-        }
-        catch
-        {
-            // Silently fail if saving doesn't work
-        }
-    }
-    
     private void OnBingoSetsChanged()
     {
         InvokeAsync(async () => 
@@ -414,10 +365,6 @@
         });
     }
 
-    private async Task OnWheelPreferenceChanged()
-    {
-        await SaveWheelPreferenceAsync();
-    }
 
     private void OnBingoSetSelectionChanged()
     {
@@ -593,12 +540,9 @@
                 
                 // Fix the rotation to ensure it's within proper range
                 targetRotation = targetRotation % 360 == 0 ? targetRotation + 1 : targetRotation;
-                
-                // Start the wheel spinning animation
+                  // Start the wheel spinning animation
                 wheelRotation = 0;
                 isWheelSlowingDown = false;
-                isWheelDramatic = false;
-                showWheelSparkles = false;
                 StateHasChanged();
                 
                 // Trigger the animation by setting the final rotation
@@ -614,12 +558,6 @@
                 StateHasChanged();
                 await Task.Delay(300);
                 
-                // Elegant finale with sparkles (0.4 seconds)
-                isWheelDramatic = true;
-                showWheelSparkles = true;
-                StateHasChanged();
-                await Task.Delay(400);
-                
                 // Update game state
                 availableItems.RemoveAt(randomIndex);
                 calledItems.Add(currentItem);
@@ -628,12 +566,10 @@
                 // Auto-save game state after item selection
                 await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
                 
-                // Keep the final state visible (3 seconds)
-                await Task.Delay(3000);
+                // Keep the final state visible (2 seconds)
+                await Task.Delay(2000);
                 
                 // Reset effects
-                isWheelDramatic = false;
-                showWheelSparkles = false;
                 isWheelSlowingDown = false;
                 StateHasChanged();
                 
@@ -857,19 +793,27 @@
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        // Clean up any resources when the component is disposed
-        BingoService.OnSetsChanged -= OnBingoSetsChanged;
-        animationCts?.Cancel();
-        animationCts?.Dispose();
-        animationCts = null;
+        try
+        { 
+            // Clean up any resources when the component is disposed
+            BingoService.OnSetsChanged -= OnBingoSetsChanged;
+            animationCts?.Cancel();
+            animationCts?.Dispose();
+            animationCts = null;
 
-        confettiCts?.Cancel();
-        confettiCts?.Dispose();
-        confettiCts = null;
+            confettiCts?.Cancel();
+            confettiCts?.Dispose();
+            confettiCts = null;
 
-        if (module is not null)
-        {
-            await module.DisposeAsync();
+            if (module is not null)
+            {
+                await module.DisposeAsync();
+            }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during disposal: {ex.Message}");
+        }
+       
     }
 }
