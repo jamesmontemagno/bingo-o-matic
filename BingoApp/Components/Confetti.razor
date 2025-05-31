@@ -1,3 +1,4 @@
+@using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 
 @code {
@@ -15,14 +16,17 @@
         if (Show)
         {
             await TriggerConfetti();
-        }    }
-
-    private async Task TriggerConfetti()
-    {
-        try
+        }    }    private async Task TriggerConfetti()
+    {        try
         {
-            // Dynamically import confetti library if not already loaded
-            await JSRuntime.InvokeVoidAsync("import", "./js/confetti.browser.js");
+            // Use the dynamic loader helper to load confetti
+            var loadResult = await JSRuntime.InvokeAsync<LoadResult>("loadConfettiForAnimation");
+            
+            if (!loadResult.Success)
+            {
+                Console.WriteLine($"Failed to load confetti library: {loadResult.Error}");
+                return;
+            }
             
             // Create an array of exciting colors
             var colors = new[] { "#26ccff", "#a25afd", "#ff5e7e", "#88ff5a", "#fcff42", "#ffa62d", "#ff36ff" };
@@ -133,11 +137,16 @@
                     ticks = finaleTicks
                 }).AsTask()
             );
-        }
-        catch (Exception ex)
+        }        catch (Exception ex)
         {
             // Gracefully handle confetti loading failures
             Console.WriteLine($"Failed to load or execute confetti animation: {ex.Message}");
         }
+    }
+
+    private class LoadResult
+    {
+        public bool Success { get; set; }
+        public string? Error { get; set; }
     }
 }

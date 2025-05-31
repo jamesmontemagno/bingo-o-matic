@@ -370,12 +370,16 @@
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
         confettiCts?.Dispose();
-        confettiCts = new CancellationTokenSource();
-
-        try
+        confettiCts = new CancellationTokenSource();        try
         {
-            // Dynamically import confetti when needed
-            await JS.InvokeVoidAsync("import", "./js/confetti.browser.js");
+            // Use the dynamic loader helper to load confetti
+            var loadResult = await JS.InvokeAsync<LoadResult>("loadConfettiForAnimation");
+            
+            if (!loadResult.Success)
+            {
+                Console.WriteLine($"Failed to load confetti library: {loadResult.Error}");
+                return;
+            }
             
             showConfetti = true;
             StateHasChanged();
@@ -414,9 +418,7 @@
         showGlow = currentNumber.HasValue;
         
         StateHasChanged();
-    }
-
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    }    async ValueTask IAsyncDisposable.DisposeAsync()
     {
         try
         {
@@ -429,5 +431,11 @@
         {
             Console.Error.WriteLine($"Error during StandardBingo disposal: {ex.Message}");
         }
+    }
+
+    private class LoadResult
+    {
+        public bool Success { get; set; }
+        public string? Error { get; set; }
     }
 }
