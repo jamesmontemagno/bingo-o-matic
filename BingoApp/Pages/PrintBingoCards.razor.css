@@ -228,26 +228,22 @@
     margin-top: 2rem;
     min-height: 200px;
     /* Use system theme colors with a slightly emphasized background */
-    background: color-mix(in srgb, var(--card-background) 95%, var(--primary-color) 5%);
+    background: color-mix(in srgb, var(--card-background) 97%, var(--primary-color) 3%);
     color: var(--text-color);
     border-radius: 1rem;
     /* Add a subtle accent border using the theme color */
     border: 1px solid var(--primary-color);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
     font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-    /* Optional: Add a subtle gradient */
-    background-image: linear-gradient(
-        to bottom right,
-        color-mix(in srgb, var(--card-background) 98%, var(--primary-color) 2%),
-        var(--card-background)
-    );
 }
 
 [data-bs-theme="dark"] .bingo-card-container {
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-    border-color: color-mix(in srgb, var(--primary-color) 70%, transparent 30%);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    border-color: color-mix(in srgb, var(--primary-color) 80%, transparent 20%);
+    /* Darker background in dark mode for better contrast */
+    background: color-mix(in srgb, var(--card-background) 95%, black 5%);
 }
 
 .bingo-theme {
@@ -255,7 +251,7 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    opacity: 0.12; /* Reduced opacity */
+    opacity: 0.08; /* Reduced opacity for better text contrast */
     pointer-events: none;
     border-radius: 1rem 1rem 0 0;
     /* Special handling for confetti theme */
@@ -263,8 +259,8 @@
 }
 
 [data-bs-theme="dark"] .bingo-theme:not(.theme-confetti) {
-    opacity: 0.08; /* Even more subtle in dark mode */
-    filter: brightness(0.8);
+    opacity: 0.06;
+    filter: brightness(0.7);
 }
 
 /* Special handling for confetti theme */
@@ -284,8 +280,9 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    /* Improved text readability */
-    text-shadow: 0 1px 1px color-mix(in srgb, var(--background-color) 50%, transparent 50%);
+    opacity: 1;
+    /* Improved contrast with text shadow */
+    text-shadow: 0 1px 2px color-mix(in srgb, var(--background-color) 70%, transparent);
 }
 
 .bingo-card-text {
@@ -293,38 +290,26 @@
     font-size: 1.1rem;
     font-weight: 500;
     margin-bottom: 0.75rem;
-    opacity: 0.95;
+    opacity: 1;
+    /* Subtle text shadow for better readability */
+    text-shadow: 0 1px 1px color-mix(in srgb, var(--background-color) 60%, transparent);
 }
 
 .bingo-card-footer {
     color: var(--text-color);
-    opacity: 0.85;
+    opacity: 0.95;
     font-size: 0.95rem;
+    /* Subtle text shadow for better readability */
+    text-shadow: 0 1px 1px color-mix(in srgb, var(--background-color) 60%, transparent);
 }
 
-@media (prefers-color-scheme: dark) {
-    .bingo-card-container {
-        --bingo-card-bg: #1a1d23;
-        --bingo-card-text: #ffffff;
-    }
-
-    .bingo-card-title,
-    .bingo-card-text,
-    .bingo-card-footer {
-        color: var(--bingo-card-text);
-        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-
-    .bingo-card-footer {
-        opacity: 0.95;
-    }
-
-    /* Override any Bootstrap dark theme text colors */
-    [data-bs-theme="dark"] .bingo-card-container .bingo-card-title,
-    [data-bs-theme="dark"] .bingo-card-container .bingo-card-text,
-    [data-bs-theme="dark"] .bingo-card-container .bingo-card-footer {
-        color: var(--bingo-card-text) !important;
-    }
+[data-bs-theme="dark"] .bingo-card-title,
+[data-bs-theme="dark"] .bingo-card-text,
+[data-bs-theme="dark"] .bingo-card-footer {
+    /* Enhanced text shadow for dark mode */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    /* Ensuring full opacity in dark mode */
+    opacity: 1;
 }
 
 /* Ensure theme overlays never reduce text contrast */
