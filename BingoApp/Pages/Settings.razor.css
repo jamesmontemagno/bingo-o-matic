@@ -43,68 +43,110 @@
     color: var(--text-color-muted);
 }
 
-/* Theme toggle specific styles */
-.form-check.form-switch {
+/* Theme selector specific styles */
+.theme-selector {
     padding: 0.5rem 0;
+}
+
+.theme-segment-control {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.theme-option {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    margin: 0;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--bs-border-color);
+    transition: all 0.3s ease;
 }
 
-.form-check-input {
-    width: 3rem !important;
-    height: 1.5rem !important;
-    margin: 0 !important;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.form-check-input:checked {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color-dark);
-}
-
-.form-check-label {
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    margin: 0;
-    user-select: none;
-}
-
-.form-check-label i {
+.theme-option i {
     font-size: 1.25rem;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
-.form-check-label:hover i {
+.theme-option span {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.theme-option:hover i {
     transform: scale(1.1);
 }
 
-/* Theme-specific icon colors */
-[data-bs-theme="light"] .form-check-label i.bi-sun {
+/* Checked state styling */
+.btn-check:checked + .theme-option {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+.btn-check:checked + .theme-option i {
+    color: white;
+    animation: bounce 0.5s ease-in-out;
+}
+
+/* Theme-specific icon colors for unchecked state */
+[data-bs-theme="light"] .theme-option .bi-sun {
     color: #ffc107;
 }
 
-[data-bs-theme="dark"] .form-check-label i.bi-moon-stars {
+[data-bs-theme="light"] .theme-option .bi-moon-stars {
     color: #6f42c1;
 }
 
-/* Improve focus styles */
-.form-check-input:focus {
-    border-color: var(--primary-color);
+[data-bs-theme="light"] .theme-option .bi-circle-half {
+    color: #6c757d;
+}
+
+[data-bs-theme="dark"] .theme-option .bi-sun {
+    color: #ffc107;
+}
+
+[data-bs-theme="dark"] .theme-option .bi-moon-stars {
+    color: #a78bfa;
+}
+
+[data-bs-theme="dark"] .theme-option .bi-circle-half {
+    color: #adb5bd;
+}
+
+.theme-description {
+    font-size: 0.8rem;
+    text-align: center;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Animation for theme selection */
+@keyframes bounce {
+    0%, 20%, 60%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+    80% { transform: translateY(-2px); }
+}
+
+/* Focus styles */
+.btn-check:focus + .theme-option {
+    border-color: var(--bs-primary);
     box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
 }
 
-/* Animation for theme switch */
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.form-check-input:checked ~ .form-check-label i {
-    animation: rotate 0.5s ease-in-out;
+/* Responsive design */
+@media (max-width: 576px) {
+    .theme-option {
+        padding: 0.5rem 0.75rem;
+        gap: 0.125rem;
+    }
+    
+    .theme-option i {
+        font-size: 1rem;
+    }
+    
+    .theme-option span {
+        font-size: 0.75rem;
+    }
 }
