@@ -176,11 +176,6 @@
                 RestoreGameState(savedGame);
                 return;
             }
-            else
-            {
-                // User chose not to resume, clear the saved game
-                await GameStateService.ClearStandardGameStateAsync();
-            }
         }
         
         await ResetGame(false);
@@ -259,7 +254,7 @@
         calledNumbers.Add(currentNumber.Value);
         
         // Auto-save game state after each number is drawn
-        _ = GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
+        await GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
         
         // Trigger final animations
         isShowingAnimation = false;
@@ -317,7 +312,7 @@
         }
         
         // Auto-save after manual number toggle
-        _ = GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
+        await GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
     }
 
     private string GetBingoLetter(int number)

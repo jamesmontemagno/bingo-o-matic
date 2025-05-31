@@ -356,11 +356,6 @@
                 await RestoreGameStateAsync(savedGame);
                 hasResumedGame = true;
             }
-            else
-            {
-                // User chose not to resume, clear the saved game
-                await GameStateService.ClearCustomGameStateAsync();
-            }
         }
         
         // Only check query string if we didn't resume a saved game
@@ -631,7 +626,7 @@
                 displayItem = currentItem;
                 
                 // Auto-save game state after item selection
-                _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
+                await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
                 
                 // Keep the final state visible (3 seconds)
                 await Task.Delay(3000);
@@ -703,7 +698,7 @@
                     calledItems.Add(currentItem);
                     
                     // Auto-save game state after item selection
-                    _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
+                    await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
                 }
             }
 
@@ -742,13 +737,12 @@
         }
         
         // Auto-save after manual item toggle
-        _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
+        await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
         
         StateHasChanged();
-        await Task.CompletedTask;
     }
 
-    private Task OnGridItemSelected(string item)
+    private async Task OnGridItemSelected(string item)
     {
         if (availableItems.Contains(item))
         {
@@ -760,11 +754,10 @@
             isSelected = true;
             
             // Auto-save game state after grid selection
-            _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
+            await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
             
             StateHasChanged();
         }
-        return Task.CompletedTask;
     }
 
     private async Task SetMode(SelectionMode mode)
