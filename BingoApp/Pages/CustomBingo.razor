@@ -343,15 +343,38 @@
         // Load all bingo sets
         await LoadBingoSetsAsync();
         
-        // Check if there's a set name in the query string
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var query = HttpUtility.ParseQueryString(uri.Query);
-        var setName = query["set"];
-        if (!string.IsNullOrEmpty(setName))
+        // Check for saved game first
+        var savedGame = await LoadGameStateAsync();
+        bool hasResumedGame = false;
+        
+        if (savedGame != null)
         {
-            selectedSetName = setName;
-            pendingSetName = setName;
-            await LoadSelectedSetAsync();
+            var shouldResume = await PromptResumeGameAsync();
+            if (shouldResume)
+            {
+                await RestoreGameStateAsync(savedGame);
+                hasResumedGame = true;
+            }
+            else
+            {
+                // User chose not to resume, clear the saved game
+                await ClearSavedGameAsync();
+            }
+        }
+        
+        // Only check query string if we didn't resume a saved game
+        if (!hasResumedGame)
+        {
+            // Check if there's a set name in the query string
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var query = HttpUtility.ParseQueryString(uri.Query);
+            var setName = query["set"];
+            if (!string.IsNullOrEmpty(setName))
+            {
+                selectedSetName = setName;
+                pendingSetName = setName;
+                await LoadSelectedSetAsync();
+            }
         }
     }
     
@@ -485,6 +508,10 @@
             } while (darkColors.Length > 1 && newColor == previousColor);
             currentThemeColor = newColor;
             wheelRotation = 0;
+            
+            // Clear any saved game state
+            _ = ClearSavedGameAsync();
+            
             StateHasChanged();
         }
     }
@@ -602,6 +629,9 @@
                 calledItems.Add(currentItem);
                 displayItem = currentItem;
                 
+                // Auto-save game state after item selection
+                _ = SaveGameStateAsync();
+                
                 // Keep the final state visible (3 seconds)
                 await Task.Delay(3000);
                 
@@ -670,6 +700,9 @@
                     displayItem = currentItem;
                     availableItems.RemoveAt(randomIndex);
                     calledItems.Add(currentItem);
+                    
+                    // Auto-save game state after item selection
+                    _ = SaveGameStateAsync();
                 }
             }
 
@@ -706,6 +739,10 @@
             calledItems.Add(item);
             availableItems.Remove(item);
         }
+        
+        // Auto-save after manual item toggle
+        _ = SaveGameStateAsync();
+        
         StateHasChanged();
         await Task.CompletedTask;
     }
@@ -720,6 +757,10 @@
             calledItems.Add(item);
             isSelecting = false;
             isSelected = true;
+            
+            // Auto-save game state after grid selection
+            _ = SaveGameStateAsync();
+            
             StateHasChanged();
         }
         return Task.CompletedTask;
@@ -767,6 +808,9 @@
 
     private async Task CelebrateBingo()
     {
+        // Clear saved game when bingo is called (game completed)
+        await ClearSavedGameAsync();
+        
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
         confettiCts?.Dispose();
@@ -789,6 +833,88 @@
             showConfetti = false;
             StateHasChanged();
         }
+    }
+
+    // Game state save/load functionality
+    private const string CustomBingoSaveKey = "custom_bingo_game_state";
+
+    private async Task SaveGameStateAsync()
+    {
+        try
+        {
+            if (calledItems.Count > 0 && !string.IsNullOrEmpty(selectedSetName)) // Only save if there's a game in progress
+            {
+                var gameState = new CustomBingoGameState
+                {
+                    CalledItems = calledItems.ToList(),
+                    AvailableItems = availableItems.ToList(),
+                    SelectedSetName = selectedSetName,
+                    CurrentItem = currentItem,
+                    SavedAt = DateTime.UtcNow
+                };
+                await LocalStorageService.SetItemAsync(CustomBingoSaveKey, gameState);
+            }
+        }
+        catch
+        {
+            // Silently fail if saving doesn't work
+        }
+    }
+
+    private async Task<CustomBingoGameState?> LoadGameStateAsync()
+    {
+        try
+        {
+            return await LocalStorageService.GetItemAsync<CustomBingoGameState>(CustomBingoSaveKey);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task ClearSavedGameAsync()
+    {
+        try
+        {
+            await LocalStorageService.RemoveItemAsync(CustomBingoSaveKey);
+        }
+        catch
+        {
+            // Silently fail if clearing doesn't work
+        }
+    }
+
+    private async Task<bool> PromptResumeGameAsync()
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", 
+            "A previous game was found. Would you like to resume where you left off?");
+    }
+
+    private async Task RestoreGameStateAsync(CustomBingoGameState gameState)
+    {
+        // Restore basic state
+        calledItems = gameState.CalledItems.ToList();
+        availableItems = gameState.AvailableItems.ToList();
+        selectedSetName = gameState.SelectedSetName ?? "";
+        pendingSetName = selectedSetName;
+        currentItem = gameState.CurrentItem;
+        displayItem = currentItem;
+        
+        // Load the selected set
+        if (!string.IsNullOrEmpty(selectedSetName))
+        {
+            await LoadSelectedSetAsync();
+            
+            // Override the reset that LoadSelectedSetAsync does
+            calledItems = gameState.CalledItems.ToList();
+            availableItems = gameState.AvailableItems.ToList();
+            currentItem = gameState.CurrentItem;
+            displayItem = currentItem;
+            isSelected = currentItem != null;
+        }
+        
+        StateHasChanged();
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

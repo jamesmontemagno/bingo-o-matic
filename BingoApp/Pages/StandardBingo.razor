@@ -1,5 +1,9 @@
 @page "/standard-bingo"
 @using BingoApp.Components
+@using BingoApp.Models
+@using BingoApp.Services
+
+@inject ILocalBrowserStorageService LocalStorageService
 
 <PageTitle>Standard Bingo - Bingo-o-matic</PageTitle>
 
@@ -162,6 +166,23 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Check for saved game first
+        var savedGame = await LoadGameStateAsync();
+        if (savedGame != null)
+        {
+            var shouldResume = await PromptResumeGameAsync();
+            if (shouldResume)
+            {
+                RestoreGameState(savedGame);
+                return;
+            }
+            else
+            {
+                // User chose not to resume, clear the saved game
+                await ClearSavedGameAsync();
+            }
+        }
+        
         await ResetGame(false);
     }
 
@@ -236,6 +257,10 @@
         }
 
         calledNumbers.Add(currentNumber.Value);
+        
+        // Auto-save game state after each number is drawn
+        _ = SaveGameStateAsync();
+        
         // Trigger final animations
         isShowingAnimation = false;
         isAnimating = true;
@@ -270,6 +295,9 @@
         showGlow = false;
         animationProgress = 0;
         gameStarted = false;
+        
+        // Clear any saved game state
+        await ClearSavedGameAsync();
     }
 
     private async Task ToggleNumber(int number)
@@ -287,6 +315,9 @@
             calledNumbers.Add(number);
             availableNumbers.Remove(number);
         }
+        
+        // Auto-save after manual number toggle
+        _ = SaveGameStateAsync();
     }
 
     private string GetBingoLetter(int number)
@@ -338,6 +369,9 @@
 
     private async Task CelebrateBingo()
     {
+        // Clear saved game when bingo is called (game completed)
+        await ClearSavedGameAsync();
+        
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
         confettiCts?.Dispose();
@@ -360,5 +394,76 @@
             showConfetti = false;
             StateHasChanged();
         }
+    }
+
+    // Game state save/load functionality
+    private const string StandardBingoSaveKey = "standard_bingo_game_state";
+
+    private async Task SaveGameStateAsync()
+    {
+        try
+        {
+            if (calledNumbers.Count > 0) // Only save if there's a game in progress
+            {
+                var gameState = new StandardBingoGameState
+                {
+                    CalledNumbers = calledNumbers.ToList(),
+                    CurrentNumber = currentNumber,
+                    SavedAt = DateTime.UtcNow
+                };
+                await LocalStorageService.SetItemAsync(StandardBingoSaveKey, gameState);
+            }
+        }
+        catch
+        {
+            // Silently fail if saving doesn't work
+        }
+    }
+
+    private async Task<StandardBingoGameState?> LoadGameStateAsync()
+    {
+        try
+        {
+            return await LocalStorageService.GetItemAsync<StandardBingoGameState>(StandardBingoSaveKey);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task ClearSavedGameAsync()
+    {
+        try
+        {
+            await LocalStorageService.RemoveItemAsync(StandardBingoSaveKey);
+        }
+        catch
+        {
+            // Silently fail if clearing doesn't work
+        }
+    }
+
+    private async Task<bool> PromptResumeGameAsync()
+    {
+        return await JS.InvokeAsync<bool>("confirm", 
+            "A previous game was found. Would you like to resume where you left off?");
+    }
+
+    private void RestoreGameState(StandardBingoGameState gameState)
+    {
+        calledNumbers = gameState.CalledNumbers.ToHashSet();
+        currentNumber = gameState.CurrentNumber;
+        displayNumber = currentNumber ?? 0;
+        
+        // Reconstruct available numbers (1-75 minus called numbers)
+        availableNumbers = Enumerable.Range(1, 75)
+            .Where(n => !calledNumbers.Contains(n))
+            .ToList();
+        
+        gameStarted = calledNumbers.Count > 0;
+        showGlow = currentNumber.HasValue;
+        
+        StateHasChanged();
     }
 }
