@@ -11,6 +11,7 @@ public class BingoSetService : IAsyncDisposable
     private const string StoreName = "BingoSets";
     private bool _isInitialized = false;
     private bool _IsInitializing = false;
+    private bool _disposed = false;
     private SemaphoreSlim _initializationLock = new(1, 1);
     
     public event Action? OnSetsChanged;
@@ -23,12 +24,24 @@ public class BingoSetService : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        // Save any pending changes when the service is disposed
-        await SaveSetsAsync();
+        if (_disposed) return;
+
+        try
+        {
+            // Save any pending changes when the service is disposed
+            await SaveSetsAsync();
+        }
+        finally
+        {
+            // Dispose the semaphore to prevent memory leaks
+            _initializationLock?.Dispose();
+            _disposed = true;
+        }
     }
 
     private async Task InitializeAsync()
     {
+        if (_disposed) return;
 
         if (_IsInitializing)
             return;
@@ -44,7 +57,7 @@ public class BingoSetService : IAsyncDisposable
 
             await _storageService.InitializeAsync(StoreName);
             var storedSets = await _storageService.GetAllItemsAsync<BingoSet>();
-            
+
             if (storedSets.Any())
             {
                 _sets.Clear();
@@ -56,7 +69,7 @@ public class BingoSetService : IAsyncDisposable
                 _sets.AddRange(MockBingoData.GetMockSets().Take(5));
                 await SaveSetsAsync();
             }
-            
+
             _isInitialized = true;
         }
         finally
@@ -65,9 +78,10 @@ public class BingoSetService : IAsyncDisposable
             _initializationLock.Release();
         }
     }
-    
-    private async Task SaveSetsAsync()
+      private async Task SaveSetsAsync()
     {
+        if (_disposed) return;
+        
         await InitializeAsync();
         // Convert sets to dictionary with ID as key
         var setsDictionary = _sets.ToDictionary(s => s.Id.ToString(), s => s);
@@ -178,12 +192,20 @@ public class BingoSetService : IAsyncDisposable
         };
 
         if (!set.Items.Any())
-            throw new ArgumentException("Set must contain at least one item");
-
-        _sets.Add(set);
+            throw new ArgumentException("Set must contain at least one item");        _sets.Add(set);
         
-        // Save asynchronously
-        _ = SaveSetsAsync();
+        // Save asynchronously with proper error handling
+        Task.Run(async () =>
+        {
+            try
+            {
+                await SaveSetsAsync();
+            }
+            catch
+            {
+                // Silently handle errors to prevent unhandled exceptions
+            }
+        });
     }
 
     public async Task UpdateSetAsync(Guid id, BingoSet updatedSet)
@@ -247,13 +269,21 @@ public class BingoSetService : IAsyncDisposable
         };
 
         if (!newSet.Items.Any())
-            throw new ArgumentException("Set must contain at least one item");
-
-        var index = _sets.IndexOf(existingSet);
+            throw new ArgumentException("Set must contain at least one item");        var index = _sets.IndexOf(existingSet);
         _sets[index] = newSet;
         
-        // Save asynchronously
-        _ = SaveSetsAsync();
+        // Save asynchronously with proper error handling
+        Task.Run(async () =>
+        {
+            try
+            {
+                await SaveSetsAsync();
+            }
+            catch
+            {
+                // Silently handle errors to prevent unhandled exceptions
+            }
+        });
     }
 
     public async Task DeleteSetAsync(Guid id)
@@ -282,11 +312,20 @@ public class BingoSetService : IAsyncDisposable
         
         var set = _sets.FirstOrDefault(s => s.Id == id)
             ?? throw new ArgumentException("Set not found");
+          _sets.Remove(set);
         
-        _sets.Remove(set);
-        
-        // Save asynchronously
-        _ = SaveSetsAsync();
+        // Save asynchronously with proper error handling
+        Task.Run(async () =>
+        {
+            try
+            {
+                await SaveSetsAsync();
+            }
+            catch
+            {
+                // Silently handle errors to prevent unhandled exceptions
+            }
+        });
     }
 
     // Keep the name-based methods for backward compatibility

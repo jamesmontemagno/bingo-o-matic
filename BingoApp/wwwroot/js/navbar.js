@@ -1,6 +1,13 @@
 import { DeviceDetector } from './deviceDetector.js';
 
 export const NavbarHelpers = {
+    // Store event handler references for cleanup
+    _handlers: {
+        clickHandler: null,
+        resizeHandler: null,
+        navLinkHandlers: []
+    },
+
     // Toggle the navbar programmatically
     toggleNavbar: function() {
         const navbarContent = document.querySelector('#navbarContent');
@@ -37,7 +44,12 @@ export const NavbarHelpers = {
     
     // Close the navbar when clicking outside
     setupNavbarAutoClose: function () {
-        document.addEventListener('click', function (event) {
+        // Remove existing handler if any
+        if (this._handlers.clickHandler) {
+            document.removeEventListener('click', this._handlers.clickHandler);
+        }
+
+        this._handlers.clickHandler = function (event) {
             // Only run if navbar is expanded
             const navbarToggler = document.querySelector('.navbar-toggler');
             if (!navbarToggler || navbarToggler.getAttribute('aria-expanded') !== 'true') {
@@ -53,12 +65,20 @@ export const NavbarHelpers = {
                 const bsCollapse = bootstrap.Collapse.getInstance(navbarMenu) || new bootstrap.Collapse(navbarMenu);
                 bsCollapse.hide();
             }
+        };
+        
+        document.addEventListener('click', this._handlers.clickHandler);
+        
+        // Remove existing nav link handlers
+        this._handlers.navLinkHandlers.forEach(({element, handler}) => {
+            element.removeEventListener('click', handler);
         });
+        this._handlers.navLinkHandlers = [];
         
         // Close menu when clicking on a nav link
         const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
         navLinks.forEach(function(link) {
-            link.addEventListener('click', function() {
+            const handler = function() {
                 const navbarMenu = document.getElementById('navbarContent');
                 if (navbarMenu && window.innerWidth < 992) { // Only on mobile
                     const bsCollapse = bootstrap.Collapse.getInstance(navbarMenu);
@@ -66,13 +86,21 @@ export const NavbarHelpers = {
                         bsCollapse.hide();
                     }
                 }
-            });
+            };
+            
+            link.addEventListener('click', handler);
+            NavbarHelpers._handlers.navLinkHandlers.push({element: link, handler: handler});
         });
     },
     
     // Watch for resize events to ensure proper mobile/desktop behavior
     setupResizeHandler: function() {
-        window.addEventListener('resize', function() {
+        // Remove existing handler if any
+        if (this._handlers.resizeHandler) {
+            window.removeEventListener('resize', this._handlers.resizeHandler);
+        }
+
+        this._handlers.resizeHandler = function() {
             // Reset expanded state when switching between mobile and desktop
             const navbarToggler = document.querySelector('.navbar-toggler');
             if (window.innerWidth >= 992 && navbarToggler && navbarToggler.getAttribute('aria-expanded') === 'true') {
@@ -83,6 +111,29 @@ export const NavbarHelpers = {
                 }
                 navbarToggler.setAttribute('aria-expanded', 'false');
             }
+        };
+        
+        window.addEventListener('resize', this._handlers.resizeHandler);
+    },
+
+    // Cleanup all event listeners to prevent memory leaks
+    cleanup: function() {
+        // Remove document click handler
+        if (this._handlers.clickHandler) {
+            document.removeEventListener('click', this._handlers.clickHandler);
+            this._handlers.clickHandler = null;
+        }
+
+        // Remove window resize handler
+        if (this._handlers.resizeHandler) {
+            window.removeEventListener('resize', this._handlers.resizeHandler);
+            this._handlers.resizeHandler = null;
+        }
+
+        // Remove nav link handlers
+        this._handlers.navLinkHandlers.forEach(({element, handler}) => {
+            element.removeEventListener('click', handler);
         });
+        this._handlers.navLinkHandlers = [];
     }
 };

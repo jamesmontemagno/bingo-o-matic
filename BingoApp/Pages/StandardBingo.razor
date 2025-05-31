@@ -142,6 +142,8 @@
 
 <Confetti Show="@showConfetti" />
 
+@implements IAsyncDisposable
+
 @code {
     [Inject]
     private IJSRuntime JS { get; set; } = default!;
@@ -406,5 +408,20 @@
         showGlow = currentNumber.HasValue;
         
         StateHasChanged();
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        try
+        {
+            // Clean up confetti animation cancellation token
+            confettiCts?.Cancel();
+            confettiCts?.Dispose();
+            confettiCts = null;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during StandardBingo disposal: {ex.Message}");
+        }
     }
 }

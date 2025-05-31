@@ -192,11 +192,23 @@
             animationCts = null;
         }
     }
-        
-    public void Dispose()
+          public void Dispose()
     {
         animationCts?.Cancel();
         animationCts?.Dispose();
+        
+        // Remove resize event listener
+        if (dotNetRef != null)
+        {
+            try
+            {
+                JSRuntime.InvokeVoidAsync("GridHelper.removeResizeListener", dotNetRef);
+            }
+            catch
+            {
+                // Silently handle errors during cleanup
+            }
+        }
         
         // Dispose of the .NET reference to prevent memory leaks
         dotNetRef?.Dispose();

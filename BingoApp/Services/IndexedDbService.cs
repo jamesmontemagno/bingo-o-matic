@@ -183,5 +183,7 @@ public class IndexedDbService : IBrowserStorageService, IAsyncDisposable
         {
             await _module.DisposeAsync();
         }
+
+        _initializationLock?.Dispose();
     }
 }

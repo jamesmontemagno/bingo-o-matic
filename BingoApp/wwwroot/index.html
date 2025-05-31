@@ -106,10 +106,11 @@
             Blazor.start().then(() => {
                 clearTimeout(fallbackTimer);
                 document.querySelector('.loading-progress-overlay')?.remove();
-            });
-
-            // Error UI handling
+            });            // Error UI handling with proper cleanup
             const errorUI = document.getElementById('blazor-error-ui');
+            let keydownHandler = null;
+            let observer = null;
+            
             const dismissError = () => {
                 errorUI.style.display = 'none';
                 errorUI.setAttribute('aria-expanded', 'false');
@@ -118,15 +119,16 @@
             // Dismiss with button click
             document.querySelector('#blazor-error-ui .dismiss')?.addEventListener('click', dismissError);
 
-            // Dismiss with Escape key
-            document.addEventListener('keydown', (e) => {
+            // Dismiss with Escape key - store reference for cleanup
+            keydownHandler = (e) => {
                 if (e.key === 'Escape' && errorUI.style.display !== 'none') {
                     dismissError();
                 }
-            });
+            };
+            document.addEventListener('keydown', keydownHandler);
 
             // Update aria-expanded when error is shown
-            const observer = new MutationObserver((mutations) => {
+            observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                         errorUI.setAttribute('aria-expanded', 
@@ -135,6 +137,17 @@
                 });
             });
             observer.observe(errorUI, { attributes: true });
+              // Cleanup function for page unload
+            window.addEventListener('beforeunload', () => {
+                if (keydownHandler) {
+                    document.removeEventListener('keydown', keydownHandler);
+                }
+                if (observer) {
+                    observer.disconnect();
+                }
+                // Cleanup navbar event listeners
+                NavbarHelpers.cleanup();
+            });
         });
     </script>
 </body>

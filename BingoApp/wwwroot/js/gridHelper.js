@@ -117,21 +117,52 @@ window.GridHelper = {
         
         return result;
     },
-    
-    // Add resize listener to update grid when window size changes
+      // Add resize listener to update grid when window size changes with proper cleanup
     setupResizeListener: function(dotnetReference) {
         let resizeTimeout;
         
-        window.addEventListener('resize', function() {
+        const handler = function() {
             // Debounce the resize event
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
                 // Call the .NET method to recalculate grid
                 dotnetReference.invokeMethodAsync('HandleWindowResize');
             }, 250);
-        });
+        };
+        
+        window.addEventListener('resize', handler);
+        
+        // Store the handler for cleanup
+        if (!window.GridHelper._handlers) {
+            window.GridHelper._handlers = new Map();
+        }
+        window.GridHelper._handlers.set(dotnetReference, handler);
         
         // Return true to indicate success
         return true;
+    },
+    
+    // Cleanup resize listener
+    removeResizeListener: function(dotnetReference) {
+        if (!dotnetReference || !window.GridHelper._handlers) return;
+        
+        const handler = window.GridHelper._handlers.get(dotnetReference);
+        if (handler) {
+            window.removeEventListener('resize', handler);
+            window.GridHelper._handlers.delete(dotnetReference);
+        }
+    },
+    
+    // Debounce utility
+    debounce: function(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 };
