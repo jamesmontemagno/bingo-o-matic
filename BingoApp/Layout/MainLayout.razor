@@ -66,5 +66,9 @@
         {
             await module.DisposeAsync();
         }
+        if (ThemeService is IAsyncDisposable asyncDisposable)
+        {
+            await asyncDisposable.DisposeAsync();
+        }
     }
 }

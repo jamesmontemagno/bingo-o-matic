@@ -1,5 +1,6 @@
 @page "/settings"
 @using BingoApp.Services
+@using BingoApp.Models
 @inject ThemeService ThemeService
 @implements IAsyncDisposable
 
@@ -11,14 +12,35 @@
             <h2 class="h5 mb-0">Theme Settings</h2>
         </div>
         <div class="card-body">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="themeToggle" 
-                       checked="@ThemeService.IsDarkMode" @onchange="OnThemeToggle" 
-                       aria-label="Toggle theme">
-                <label class="form-check-label" for="themeToggle">
-                    <i class="bi @(ThemeService.IsDarkMode ? "bi-moon-stars" : "bi-sun")"></i>
-                    <span>@(ThemeService.IsDarkMode ? "Dark" : "Light") Mode</span>
-                </label>
+            <div class="theme-selector">
+                <div class="btn-group theme-segment-control" role="group" aria-label="Theme selection">
+                    <input type="radio" class="btn-check" name="themeOptions" id="lightTheme" 
+                           checked="@(ThemeService.CurrentThemeMode == ThemeMode.Light)" 
+                           @onchange="() => OnThemeModeChanged(ThemeMode.Light)">
+                    <label class="btn btn-outline-primary theme-option" for="lightTheme">
+                        <i class="bi bi-sun"></i>
+                        <span>Light</span>
+                    </label>
+
+                    <input type="radio" class="btn-check" name="themeOptions" id="darkTheme" 
+                           checked="@(ThemeService.CurrentThemeMode == ThemeMode.Dark)" 
+                           @onchange="() => OnThemeModeChanged(ThemeMode.Dark)">
+                    <label class="btn btn-outline-primary theme-option" for="darkTheme">
+                        <i class="bi bi-moon-stars"></i>
+                        <span>Dark</span>
+                    </label>
+
+                    <input type="radio" class="btn-check" name="themeOptions" id="autoTheme" 
+                           checked="@(ThemeService.CurrentThemeMode == ThemeMode.Auto)" 
+                           @onchange="() => OnThemeModeChanged(ThemeMode.Auto)">
+                    <label class="btn btn-outline-primary theme-option" for="autoTheme">
+                        <i class="bi bi-circle-half"></i>
+                        <span>Auto</span>
+                    </label>
+                </div>
+                <small class="theme-description text-muted">
+                    @GetThemeDescription()
+                </small>
             </div>
         </div>
     </div>
@@ -41,11 +63,12 @@
     {
         await ThemeService.InitializeThemeAsync();
         ThemeService.ThemeChanged += OnThemeChanged;
+        ThemeService.ThemeModeChanged += OnThemeModeChangedHandler;
     }
 
-    private async Task OnThemeToggle()
+    private async Task OnThemeModeChanged(ThemeMode themeMode)
     {
-        await ThemeService.ToggleThemeAsync();
+        await ThemeService.SetThemeModeAsync(themeMode);
     }
 
     private void OnThemeChanged(bool isDark)
@@ -53,9 +76,26 @@
         StateHasChanged();
     }
 
+    private void OnThemeModeChangedHandler(ThemeMode themeMode)
+    {
+        StateHasChanged();
+    }
+
+    private string GetThemeDescription()
+    {
+        return ThemeService.CurrentThemeMode switch
+        {
+            ThemeMode.Light => "Always use light theme",
+            ThemeMode.Dark => "Always use dark theme", 
+            ThemeMode.Auto => "Follow your system's theme preference",
+            _ => ""
+        };
+    }
+
     public async ValueTask DisposeAsync()
     {
         ThemeService.ThemeChanged -= OnThemeChanged;
+        ThemeService.ThemeModeChanged -= OnThemeModeChangedHandler;
         await ValueTask.CompletedTask;
     }
 }
