@@ -11,6 +11,7 @@
 @inject BingoSetService BingoService
 @inject NavigationManager NavigationManager
 @inject ILocalBrowserStorageService LocalStorageService
+@inject IGameStateService GameStateService
 @inject IJSRuntime JSRuntime
 
 <div class="bingo-container">
@@ -344,12 +345,12 @@
         await LoadBingoSetsAsync();
         
         // Check for saved game first
-        var savedGame = await LoadGameStateAsync();
+        var savedGame = await GameStateService.LoadCustomGameStateAsync();
         bool hasResumedGame = false;
         
         if (savedGame != null)
         {
-            var shouldResume = await PromptResumeGameAsync();
+            var shouldResume = await GameStateService.PromptResumeGameAsync();
             if (shouldResume)
             {
                 await RestoreGameStateAsync(savedGame);
@@ -358,7 +359,7 @@
             else
             {
                 // User chose not to resume, clear the saved game
-                await ClearSavedGameAsync();
+                await GameStateService.ClearCustomGameStateAsync();
             }
         }
         
@@ -510,7 +511,7 @@
             wheelRotation = 0;
             
             // Clear any saved game state
-            _ = ClearSavedGameAsync();
+            _ = GameStateService.ClearCustomGameStateAsync();
             
             StateHasChanged();
         }
@@ -630,7 +631,7 @@
                 displayItem = currentItem;
                 
                 // Auto-save game state after item selection
-                _ = SaveGameStateAsync();
+                _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
                 
                 // Keep the final state visible (3 seconds)
                 await Task.Delay(3000);
@@ -702,7 +703,7 @@
                     calledItems.Add(currentItem);
                     
                     // Auto-save game state after item selection
-                    _ = SaveGameStateAsync();
+                    _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
                 }
             }
 
@@ -741,7 +742,7 @@
         }
         
         // Auto-save after manual item toggle
-        _ = SaveGameStateAsync();
+        _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
         
         StateHasChanged();
         await Task.CompletedTask;
@@ -759,7 +760,7 @@
             isSelected = true;
             
             // Auto-save game state after grid selection
-            _ = SaveGameStateAsync();
+            _ = GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
             
             StateHasChanged();
         }
@@ -809,7 +810,7 @@
     private async Task CelebrateBingo()
     {
         // Clear saved game when bingo is called (game completed)
-        await ClearSavedGameAsync();
+        await GameStateService.ClearCustomGameStateAsync();
         
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
@@ -833,62 +834,6 @@
             showConfetti = false;
             StateHasChanged();
         }
-    }
-
-    // Game state save/load functionality
-    private const string CustomBingoSaveKey = "custom_bingo_game_state";
-
-    private async Task SaveGameStateAsync()
-    {
-        try
-        {
-            if (calledItems.Count > 0 && !string.IsNullOrEmpty(selectedSetName)) // Only save if there's a game in progress
-            {
-                var gameState = new CustomBingoGameState
-                {
-                    CalledItems = calledItems.ToList(),
-                    AvailableItems = availableItems.ToList(),
-                    SelectedSetName = selectedSetName,
-                    CurrentItem = currentItem,
-                    SavedAt = DateTime.UtcNow
-                };
-                await LocalStorageService.SetItemAsync(CustomBingoSaveKey, gameState);
-            }
-        }
-        catch
-        {
-            // Silently fail if saving doesn't work
-        }
-    }
-
-    private async Task<CustomBingoGameState?> LoadGameStateAsync()
-    {
-        try
-        {
-            return await LocalStorageService.GetItemAsync<CustomBingoGameState>(CustomBingoSaveKey);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private async Task ClearSavedGameAsync()
-    {
-        try
-        {
-            await LocalStorageService.RemoveItemAsync(CustomBingoSaveKey);
-        }
-        catch
-        {
-            // Silently fail if clearing doesn't work
-        }
-    }
-
-    private async Task<bool> PromptResumeGameAsync()
-    {
-        return await JSRuntime.InvokeAsync<bool>("confirm", 
-            "A previous game was found. Would you like to resume where you left off?");
     }
 
     private async Task RestoreGameStateAsync(CustomBingoGameState gameState)

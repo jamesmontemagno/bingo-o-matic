@@ -3,7 +3,7 @@
 @using BingoApp.Models
 @using BingoApp.Services
 
-@inject ILocalBrowserStorageService LocalStorageService
+@inject IGameStateService GameStateService
 
 <PageTitle>Standard Bingo - Bingo-o-matic</PageTitle>
 
@@ -167,10 +167,10 @@
     protected override async Task OnInitializedAsync()
     {
         // Check for saved game first
-        var savedGame = await LoadGameStateAsync();
+        var savedGame = await GameStateService.LoadStandardGameStateAsync();
         if (savedGame != null)
         {
-            var shouldResume = await PromptResumeGameAsync();
+            var shouldResume = await GameStateService.PromptResumeGameAsync();
             if (shouldResume)
             {
                 RestoreGameState(savedGame);
@@ -179,7 +179,7 @@
             else
             {
                 // User chose not to resume, clear the saved game
-                await ClearSavedGameAsync();
+                await GameStateService.ClearStandardGameStateAsync();
             }
         }
         
@@ -259,7 +259,7 @@
         calledNumbers.Add(currentNumber.Value);
         
         // Auto-save game state after each number is drawn
-        _ = SaveGameStateAsync();
+        _ = GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
         
         // Trigger final animations
         isShowingAnimation = false;
@@ -297,7 +297,7 @@
         gameStarted = false;
         
         // Clear any saved game state
-        await ClearSavedGameAsync();
+        await GameStateService.ClearStandardGameStateAsync();
     }
 
     private async Task ToggleNumber(int number)
@@ -317,7 +317,7 @@
         }
         
         // Auto-save after manual number toggle
-        _ = SaveGameStateAsync();
+        _ = GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
     }
 
     private string GetBingoLetter(int number)
@@ -370,7 +370,7 @@
     private async Task CelebrateBingo()
     {
         // Clear saved game when bingo is called (game completed)
-        await ClearSavedGameAsync();
+        await GameStateService.ClearStandardGameStateAsync();
         
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
@@ -394,60 +394,6 @@
             showConfetti = false;
             StateHasChanged();
         }
-    }
-
-    // Game state save/load functionality
-    private const string StandardBingoSaveKey = "standard_bingo_game_state";
-
-    private async Task SaveGameStateAsync()
-    {
-        try
-        {
-            if (calledNumbers.Count > 0) // Only save if there's a game in progress
-            {
-                var gameState = new StandardBingoGameState
-                {
-                    CalledNumbers = calledNumbers.ToList(),
-                    CurrentNumber = currentNumber,
-                    SavedAt = DateTime.UtcNow
-                };
-                await LocalStorageService.SetItemAsync(StandardBingoSaveKey, gameState);
-            }
-        }
-        catch
-        {
-            // Silently fail if saving doesn't work
-        }
-    }
-
-    private async Task<StandardBingoGameState?> LoadGameStateAsync()
-    {
-        try
-        {
-            return await LocalStorageService.GetItemAsync<StandardBingoGameState>(StandardBingoSaveKey);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private async Task ClearSavedGameAsync()
-    {
-        try
-        {
-            await LocalStorageService.RemoveItemAsync(StandardBingoSaveKey);
-        }
-        catch
-        {
-            // Silently fail if clearing doesn't work
-        }
-    }
-
-    private async Task<bool> PromptResumeGameAsync()
-    {
-        return await JS.InvokeAsync<bool>("confirm", 
-            "A previous game was found. Would you like to resume where you left off?");
     }
 
     private void RestoreGameState(StandardBingoGameState gameState)
