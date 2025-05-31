@@ -197,6 +197,12 @@
 
 <Confetti Show="@showConfetti" />
 
+<ResumeGameDialog 
+    Show="@showResumeDialog" 
+    GameType="Custom Bingo" 
+    GameDetails="@resumeGameDetails"
+    OnResult="OnResumeDialogResult" />
+
 @code {
     private enum SelectionMode
     {
@@ -288,11 +294,14 @@
     private double wheelRotation = 0;
     private bool isWheelSlowingDown = false;
     private bool isMobileDevice;
-    private IJSObjectReference? module;
-
-    // Confetti state
+    private IJSObjectReference? module;    // Confetti state
     private bool showConfetti;
     private CancellationTokenSource? confettiCts;
+
+    // Resume dialog state
+    private bool showResumeDialog = false;
+    private string resumeGameDetails = "";
+    private CustomBingoGameState? pendingGameState;
 
     protected override async Task OnInitializedAsync()
     {
@@ -320,19 +329,18 @@
         
         // Load all bingo sets
         await LoadBingoSetsAsync();
-        
-        // Check for saved game first
+          // Check for saved game first
         var savedGame = await GameStateService.LoadCustomGameStateAsync();
         bool hasResumedGame = false;
         
         if (savedGame != null)
         {
-            var shouldResume = await GameStateService.PromptResumeGameAsync();
-            if (shouldResume)
-            {
-                await RestoreGameStateAsync(savedGame);
-                hasResumedGame = true;
-            }
+            // Show the custom dialog instead of the basic JavaScript confirm
+            pendingGameState = savedGame;
+            resumeGameDetails = GameStateService.GetCustomGameDetails(savedGame);
+            showResumeDialog = true;
+            StateHasChanged();
+            return; // Wait for user response
         }
         
         // Only check query string if we didn't resume a saved game
@@ -738,9 +746,6 @@
 
     private async Task CelebrateBingo()
     {
-        // Clear saved game when bingo is called (game completed)
-        await GameStateService.ClearCustomGameStateAsync();
-        
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
         confettiCts?.Dispose();
@@ -785,10 +790,38 @@
             availableItems = gameState.AvailableItems.ToList();
             currentItem = gameState.CurrentItem;
             displayItem = currentItem;
-            isSelected = currentItem != null;
-        }
+            isSelected = currentItem != null;        }
         
         StateHasChanged();
+    }
+
+    private async Task OnResumeDialogResult(bool shouldResume)
+    {
+        showResumeDialog = false;
+        StateHasChanged();
+
+        if (shouldResume && pendingGameState != null)
+        {
+            await RestoreGameStateAsync(pendingGameState);
+        }
+        else
+        {
+            // Clear the saved game and continue normal initialization
+            await GameStateService.ClearCustomGameStateAsync();
+            
+            // Continue with normal initialization (query string check)
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var query = HttpUtility.ParseQueryString(uri.Query);
+            var setName = query["set"];
+            if (!string.IsNullOrEmpty(setName))
+            {
+                selectedSetName = setName;
+                pendingSetName = setName;
+                await LoadSelectedSetAsync();
+            }
+        }
+        
+        pendingGameState = null;
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

@@ -43,11 +43,17 @@ public interface IGameStateService
     /// <summary>
     /// Clears the saved Custom Bingo game state from local storage
     /// </summary>
-    Task ClearCustomGameStateAsync();
+    Task ClearCustomGameStateAsync();    /// <summary>
+    /// Gets a formatted string with details about a Standard Bingo game state
+    /// </summary>
+    /// <param name="gameState">The game state to get details for</param>
+    /// <returns>A formatted string with game details</returns>
+    string GetStandardGameDetails(StandardBingoGameState gameState);
 
     /// <summary>
-    /// Prompts the user to resume a previous game
+    /// Gets a formatted string with details about a Custom Bingo game state
     /// </summary>
-    /// <returns>True if the user wants to resume, false otherwise</returns>
-    Task<bool> PromptResumeGameAsync();
+    /// <param name="gameState">The game state to get details for</param>
+    /// <returns>A formatted string with game details</returns>
+    string GetCustomGameDetails(CustomBingoGameState gameState);
 }

@@ -114,9 +114,24 @@ public class GameStateService : IGameStateService
         }
     }
 
-    public async Task<bool> PromptResumeGameAsync()
+    public string GetStandardGameDetails(StandardBingoGameState gameState)
     {
-        return await _jsRuntime.InvokeAsync<bool>("confirm", 
-            "A previous game was found. Would you like to resume where you left off?");
+        var numbersCount = gameState.CalledNumbers.Count;
+        var lastNumber = gameState.CurrentNumber;
+        var savedTime = gameState.SavedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' h:mm tt");
+        
+        return $"Last played: {savedTime} • {numbersCount} numbers called" + 
+               (lastNumber.HasValue ? $" • Last number: {lastNumber}" : "");
+    }
+
+    public string GetCustomGameDetails(CustomBingoGameState gameState)
+    {
+        var itemsCount = gameState.CalledItems.Count;
+        var setName = gameState.SelectedSetName;
+        var lastItem = gameState.CurrentItem;
+        var savedTime = gameState.SavedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' h:mm tt");
+        
+        return $"Last played: {savedTime} • Set: {setName} • {itemsCount} items called" + 
+               (!string.IsNullOrEmpty(lastItem) ? $" • Last item: {lastItem}" : "");
     }
 }

@@ -2,6 +2,7 @@
 @using BingoApp.Components
 @using BingoApp.Models
 @using BingoApp.Services
+@using Microsoft.JSInterop
 
 @inject IGameStateService GameStateService
 
@@ -9,14 +10,13 @@
 
 <div class="bingo-container">
     <div class="bingo-header">
-        <div class="bingo-controls">
-            <button class="btn btn-primary me-2" @onclick="DrawNextNumber" disabled="@isShowingAnimation">
-                <i class="bi bi-shuffle"></i> Draw Number
+        <div class="bingo-controls">            <button class="btn btn-primary me-2" @onclick="DrawNextNumber" disabled="@isShowingAnimation">
+                <i class="bi bi-play-circle-fill"></i> Draw Number
             </button>
             @if (calledNumbers.Count > 0)
             {
-                <button class="btn btn-success btn-lg flex-shrink-0 bingo-button" @onclick="CelebrateBingo" disabled="@(isShowingAnimation || showConfetti)">
-                    <i class="bi bi-trophy"></i> Bingo!
+                <button class="btn btn-success me-2" @onclick="HandleBingoClick" disabled="@isShowingAnimation">
+                    <i class="bi bi-trophy-fill"></i> BINGO!
                 </button>
             }
         </div>
@@ -142,6 +142,12 @@
 
 <Confetti Show="@showConfetti" />
 
+<ResumeGameDialog 
+    Show="@showResumeDialog" 
+    GameType="Standard Bingo" 
+    GameDetails="@resumeGameDetails"
+    OnResult="OnResumeDialogResult" />
+
 @implements IAsyncDisposable
 
 @code {
@@ -166,21 +172,46 @@
     private bool showConfetti;
     private CancellationTokenSource? confettiCts;
 
+    // Resume dialog state
+    private bool showResumeDialog = false;
+    private string resumeGameDetails = "";
+    private StandardBingoGameState? pendingGameState;
+
     protected override async Task OnInitializedAsync()
     {
         // Check for saved game first
         var savedGame = await GameStateService.LoadStandardGameStateAsync();
         if (savedGame != null)
         {
-            var shouldResume = await GameStateService.PromptResumeGameAsync();
-            if (shouldResume)
-            {
-                RestoreGameState(savedGame);
-                return;
-            }
+            // Show the custom dialog instead of the basic JavaScript confirm
+            pendingGameState = savedGame;
+            resumeGameDetails = GameStateService.GetStandardGameDetails(savedGame);
+            showResumeDialog = true;
+            StateHasChanged();
+        }
+        else
+        {
+            await ResetGame(false);
+        }
+    }
+
+    private async Task OnResumeDialogResult(bool shouldResume)
+    {
+        showResumeDialog = false;
+        StateHasChanged();
+
+        if (shouldResume && pendingGameState != null)
+        {
+            RestoreGameState(pendingGameState);
+        }
+        else
+        {
+            // Clear the saved game and start fresh
+            await GameStateService.ClearStandardGameStateAsync();
+            await ResetGame(false);
         }
         
-        await ResetGame(false);
+        pendingGameState = null;
     }
 
     private void ShuffleNumbers()
@@ -349,9 +380,7 @@
         return calledNumbers
             .Where(n => n >= range.Item1 && n <= range.Item2)
             .OrderBy(n => n);
-    }
-
-    private async Task HandleBallClick()
+    }    private async Task HandleBallClick()
     {
         if (!gameStarted)
         {
@@ -362,11 +391,15 @@
         {
             await DrawNextNumber();
         }
-    }    private async Task CelebrateBingo()
+    }
+
+    private async Task HandleBingoClick()
     {
-        // Clear saved game when bingo is called (game completed)
-        await GameStateService.ClearStandardGameStateAsync();
-        
+        await CelebrateBingo();
+    }
+
+    private async Task CelebrateBingo()
+    {
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
         confettiCts?.Dispose();
