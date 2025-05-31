@@ -15,120 +15,129 @@
         if (Show)
         {
             await TriggerConfetti();
-        }
-    }
+        }    }
 
     private async Task TriggerConfetti()
     {
-        // Create an array of exciting colors
-        var colors = new[] { "#26ccff", "#a25afd", "#ff5e7e", "#88ff5a", "#fcff42", "#ffa62d", "#ff36ff" };
-        
-        // Calculate ticks for each phase (approximately 50 ticks per second)
-        var totalTicks = (int)(Duration * 50);
-        var initialBurstTicks = (int)(totalTicks * 0.3);
-        var topWaveTicks = (int)(totalTicks * 0.2);
-        var finaleTicks = totalTicks - initialBurstTicks - topWaveTicks;
-        
-        // Initial burst wave
-        await Task.WhenAll(
-            // Center burst
-            JSRuntime.InvokeVoidAsync("confetti", new
-            {
-                particleCount = ParticleCount / 2,
-                spread = 360,
-                startVelocity = 35,
-                origin = new { x = 0.5, y = 0.5 },
-                ticks = initialBurstTicks
-            }).AsTask(),
-            // Left burst
-            JSRuntime.InvokeVoidAsync("confetti", new
-            {
-                particleCount = ParticleCount / 3,
-                angle = 80,
-                spread = 60,
-                origin = new { x = 0.2, y = 0.5 },
-                colors = colors,
-                ticks = initialBurstTicks
-            }).AsTask(),
-            // Right burst
-            JSRuntime.InvokeVoidAsync("confetti", new
-            {
-                particleCount = ParticleCount / 3,
-                angle = 100,
-                spread = 60,
-                origin = new { x = 0.8, y = 0.5 },
-                colors = colors,
-                ticks = initialBurstTicks
-            }).AsTask()
-        );
-        
-        
-        // Top wave bursts in parallel
-        var topBursts = new List<Task>();
-        for (int i = 0; i < 7; i++)
+        try
         {
-            var x = 0.15 + (i * 0.12);
-            var angle = 260 + (i * 3);
-            topBursts.Add(JSRuntime.InvokeVoidAsync("confetti", new
-            {
-                particleCount = ParticleCount / 6,
-                spread = 65,
-                startVelocity = 25 + (i * 2),
-                decay = 0.96,
-                gravity = 0.7,
-                drift = i - 3,
-                angle = angle,
-                origin = new { x = x, y = 0.0 },
-                colors = colors,
-                ticks = topWaveTicks
-            }).AsTask());
-        }
-        await Task.WhenAll(topBursts);
+            // Dynamically import confetti library if not already loaded
+            await JSRuntime.InvokeVoidAsync("import", "./js/confetti.browser.js");
+            
+            // Create an array of exciting colors
+            var colors = new[] { "#26ccff", "#a25afd", "#ff5e7e", "#88ff5a", "#fcff42", "#ffa62d", "#ff36ff" };
+            
+            // Calculate ticks for each phase (approximately 50 ticks per second)
+            var totalTicks = (int)(Duration * 50);
+            var initialBurstTicks = (int)(totalTicks * 0.3);
+            var topWaveTicks = (int)(totalTicks * 0.2);
+            var finaleTicks = totalTicks - initialBurstTicks - topWaveTicks;
         
-        // Grand finale
-        await Task.WhenAll(
-            // Center grand finale
-            JSRuntime.InvokeVoidAsync("confetti", new
+            // Initial burst wave
+            await Task.WhenAll(
+                // Center burst
+                JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount / 2,
+                    spread = 360,
+                    startVelocity = 35,
+                    origin = new { x = 0.5, y = 0.5 },
+                    ticks = initialBurstTicks
+                }).AsTask(),
+                // Left burst
+                JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount / 3,
+                    angle = 80,
+                    spread = 60,
+                    origin = new { x = 0.2, y = 0.5 },
+                    colors = colors,
+                    ticks = initialBurstTicks
+                }).AsTask(),
+                // Right burst
+                JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount / 3,
+                    angle = 100,
+                    spread = 60,
+                    origin = new { x = 0.8, y = 0.5 },
+                    colors = colors,
+                    ticks = initialBurstTicks
+                }).AsTask()
+            );
+            
+            // Top wave bursts in parallel
+            var topBursts = new List<Task>();
+            for (int i = 0; i < 7; i++)
             {
-                particleCount = ParticleCount,
-                spread = 130,
-                startVelocity = 35,
-                decay = 0.92,
-                gravity = 0.85,
-                drift = 0,
-                ticks = finaleTicks,
-                origin = new { x = 0.5, y = 0.5 },
-                colors = colors,
-                shapes = new[] { "square", "circle", "star" }
-            }).AsTask(),
-            // Left shower
-            JSRuntime.InvokeVoidAsync("confetti", new
-            {
-                particleCount = ParticleCount / 2,
-                angle = 80,
-                spread = 45,
-                startVelocity = 45,
-                decay = 0.92,
-                origin = new { x = 0.25, y = 0.35 },
-                gravity = 0.8,
-                drift = 1,
-                colors = colors,
-                ticks = finaleTicks
-            }).AsTask(),
-            // Right shower
-            JSRuntime.InvokeVoidAsync("confetti", new
-            {
-                particleCount = ParticleCount / 2,
-                angle = 100,
-                spread = 45,
-                startVelocity = 45,
-                decay = 0.92,
-                origin = new { x = 0.75, y = 0.35 },
-                gravity = 0.8,
-                drift = -1,
-                colors = colors,
-                ticks = finaleTicks
-            }).AsTask()
-        );
+                var x = 0.15 + (i * 0.12);
+                var angle = 260 + (i * 3);
+                topBursts.Add(JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount / 6,
+                    spread = 65,
+                    startVelocity = 25 + (i * 2),
+                    decay = 0.96,
+                    gravity = 0.7,
+                    drift = i - 3,
+                    angle = angle,
+                    origin = new { x = x, y = 0.0 },
+                    colors = colors,
+                    ticks = topWaveTicks
+                }).AsTask());
+            }
+            await Task.WhenAll(topBursts);
+            
+            // Grand finale
+            await Task.WhenAll(
+                // Center grand finale
+                JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount,
+                    spread = 130,
+                    startVelocity = 35,
+                    decay = 0.92,
+                    gravity = 0.85,
+                    drift = 0,
+                    ticks = finaleTicks,
+                    origin = new { x = 0.5, y = 0.5 },
+                    colors = colors,
+                    shapes = new[] { "square", "circle", "star" }
+                }).AsTask(),
+                // Left shower
+                JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount / 2,
+                    angle = 80,
+                    spread = 45,
+                    startVelocity = 45,
+                    decay = 0.92,
+                    origin = new { x = 0.25, y = 0.35 },
+                    gravity = 0.8,
+                    drift = 1,
+                    colors = colors,
+                    ticks = finaleTicks
+                }).AsTask(),
+                // Right shower
+                JSRuntime.InvokeVoidAsync("confetti", new
+                {
+                    particleCount = ParticleCount / 2,
+                    angle = 100,
+                    spread = 45,
+                    startVelocity = 45,
+                    decay = 0.92,
+                    origin = new { x = 0.75, y = 0.35 },
+                    gravity = 0.8,
+                    drift = -1,
+                    colors = colors,
+                    ticks = finaleTicks
+                }).AsTask()
+            );
+        }
+        catch (Exception ex)
+        {
+            // Gracefully handle confetti loading failures
+            Console.WriteLine($"Failed to load or execute confetti animation: {ex.Message}");
+        }
     }
 }

@@ -251,9 +251,7 @@ else
         {
             errorMessage = "Error generating cards: " + ex.Message;
         }
-    }
-
-    private async Task GeneratePdf()
+    }    private async Task GeneratePdf()
     {
         if (!generatedCards.Any()) return;
 
@@ -262,6 +260,10 @@ else
             isGeneratingPdf = true;
             progress = 0;
             objRef = DotNetObjectReference.Create(this);
+
+            // Dynamically load PDF generation libraries
+            await JS.InvokeVoidAsync("import", "./js/jspdf.umd.min.js");
+            await JS.InvokeVoidAsync("import", "./js/print-cards.js");
 
             var cards = generatedCards.Select((grid, index) => new
             {

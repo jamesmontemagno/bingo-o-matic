@@ -362,9 +362,7 @@
         {
             await DrawNextNumber();
         }
-    }
-
-    private async Task CelebrateBingo()
+    }    private async Task CelebrateBingo()
     {
         // Clear saved game when bingo is called (game completed)
         await GameStateService.ClearStandardGameStateAsync();
@@ -376,6 +374,9 @@
 
         try
         {
+            // Dynamically import confetti when needed
+            await JS.InvokeVoidAsync("import", "./js/confetti.browser.js");
+            
             showConfetti = true;
             StateHasChanged();
 
@@ -385,6 +386,11 @@
         catch (OperationCanceledException)
         {
             // Animation was cancelled
+        }
+        catch (Exception ex)
+        {
+            // Handle confetti loading gracefully - it's not critical
+            Console.WriteLine($"Confetti failed to load: {ex.Message}");
         }
         finally
         {
