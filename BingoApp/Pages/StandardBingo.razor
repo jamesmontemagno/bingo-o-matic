@@ -1,5 +1,9 @@
 @page "/standard-bingo"
 @using BingoApp.Components
+@using BingoApp.Models
+@using BingoApp.Services
+
+@inject IGameStateService GameStateService
 
 <PageTitle>Standard Bingo - Bingo-o-matic</PageTitle>
 
@@ -162,6 +166,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Check for saved game first
+        var savedGame = await GameStateService.LoadStandardGameStateAsync();
+        if (savedGame != null)
+        {
+            var shouldResume = await GameStateService.PromptResumeGameAsync();
+            if (shouldResume)
+            {
+                RestoreGameState(savedGame);
+                return;
+            }
+        }
+        
         await ResetGame(false);
     }
 
@@ -236,6 +252,10 @@
         }
 
         calledNumbers.Add(currentNumber.Value);
+        
+        // Auto-save game state after each number is drawn
+        await GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
+        
         // Trigger final animations
         isShowingAnimation = false;
         isAnimating = true;
@@ -270,6 +290,9 @@
         showGlow = false;
         animationProgress = 0;
         gameStarted = false;
+        
+        // Clear any saved game state
+        await GameStateService.ClearStandardGameStateAsync();
     }
 
     private async Task ToggleNumber(int number)
@@ -287,6 +310,9 @@
             calledNumbers.Add(number);
             availableNumbers.Remove(number);
         }
+        
+        // Auto-save after manual number toggle
+        await GameStateService.SaveStandardGameStateAsync(calledNumbers, currentNumber);
     }
 
     private string GetBingoLetter(int number)
@@ -338,6 +364,9 @@
 
     private async Task CelebrateBingo()
     {
+        // Clear saved game when bingo is called (game completed)
+        await GameStateService.ClearStandardGameStateAsync();
+        
         // Cancel any existing confetti animation
         confettiCts?.Cancel();
         confettiCts?.Dispose();
@@ -360,5 +389,22 @@
             showConfetti = false;
             StateHasChanged();
         }
+    }
+
+    private void RestoreGameState(StandardBingoGameState gameState)
+    {
+        calledNumbers = gameState.CalledNumbers.ToHashSet();
+        currentNumber = gameState.CurrentNumber;
+        displayNumber = currentNumber ?? 0;
+        
+        // Reconstruct available numbers (1-75 minus called numbers)
+        availableNumbers = Enumerable.Range(1, 75)
+            .Where(n => !calledNumbers.Contains(n))
+            .ToList();
+        
+        gameStarted = calledNumbers.Count > 0;
+        showGlow = currentNumber.HasValue;
+        
+        StateHasChanged();
     }
 }
