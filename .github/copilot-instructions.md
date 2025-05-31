@@ -30,6 +30,63 @@
 - Lazy load components when possible
 - Use `ShouldRender()` to optimize rendering
 
+## Memory Management & Leak Prevention
+### IDisposable/IAsyncDisposable Patterns
+- Always dispose `SemaphoreSlim` in try-finally blocks within DisposeAsync
+- Use disposal guard flags (`_disposed`) to prevent multiple disposals
+- Implement `IAsyncDisposable` for components using `CancellationTokenSource`
+- Dispose `CancellationTokenSource` in components (especially for animations/timers)
+- Call `Cancel()` before `Dispose()` on CancellationTokenSource
+
+### JavaScript Interop Cleanup
+- Always dispose `DotNetObjectReference` instances in Dispose methods
+- Track event listeners in JavaScript and provide cleanup functions
+- Call JavaScript cleanup functions before disposing DotNetObjectReference
+- Use Map or similar structures to track handlers for proper cleanup
+- Example pattern:
+  ```javascript
+  const _handlers = new Map();
+  function setupListener(element, event, handler) {
+    _handlers.set(`${event}-${element.id}`, handler);
+    element.addEventListener(event, handler);
+  }
+  function cleanup() {
+    _handlers.forEach((handler, key) => {
+      const [event, elementId] = key.split('-');
+      document.getElementById(elementId)?.removeEventListener(event, handler);
+    });
+    _handlers.clear();
+  }
+  ```
+
+### Async Operation Management
+- Avoid fire-and-forget async operations (`_ = SomeAsyncMethod()`)
+- Use `Task.Run()` with proper error handling for background operations
+- Always handle exceptions in background tasks
+- Use `CancellationToken` for long-running operations
+- Example safe pattern:
+  ```csharp
+  Task.Run(async () => {
+    try {
+      await SomeAsyncOperation();
+    } catch (Exception ex) {
+      // Log error appropriately
+    }
+  });
+  ```
+
+### Event Handler Cleanup
+- Remove all DOM event listeners in cleanup functions
+- Use AbortController for modern event listener cleanup when possible
+- Clean up MutationObserver instances
+- Remove global event handlers (window, document) on component disposal
+
+### Service Disposal Best Practices
+- Implement disposal guards in all public methods of disposable services
+- Use ConfigureAwait(false) in disposal methods when possible
+- Dispose resources in reverse order of creation
+- Handle disposal of injected services appropriately
+
 ## Error Handling
 - Implement error boundaries
 - Use try-catch blocks in lifecycle methods
