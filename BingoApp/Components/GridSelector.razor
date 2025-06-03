@@ -209,7 +209,7 @@
         {
             HighlightedItem = Items[random.Next(Items.Count)];
             StateHasChanged();
-            await Task.Delay(300 + (i * 60), token); // Increased base delay and increment
+            await Task.Delay(250 + (i * 60), token); // Increased base delay and increment
         }
 
         // Slow phase - even more dramatic pauses
@@ -217,7 +217,7 @@
         {
             HighlightedItem = Items[random.Next(Items.Count)];
             StateHasChanged();
-            await Task.Delay(600 + (i * 150), token); // Increased base delay and increment
+            await Task.Delay(400 + (i * 150), token); // Increased base delay and increment
         }
         
         // Return the last highlighted item as the selection
