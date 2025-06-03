@@ -47,7 +47,9 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/emoji-icons.css" />
     <link rel="stylesheet" href="css/bingo-themes.css" />    
-    <link rel="stylesheet" href="css/bootstrap-icons.min.css">    <link rel="icon" type="image/png" href="favicon.png" />      <!-- Custom JS -->
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css">    
+    <link rel="icon" type="image/png" href="favicon.png" />      
+    <!-- Custom JS -->
     <script src="js/gridHelper.js"></script>
     <script src="js/dynamic-loader.js"></script>
     <!-- confetti.browser.js moved to dynamic loading -->
@@ -82,7 +84,8 @@
         <button class="dismiss" aria-label="Dismiss error message">
             <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
-    </div>      <script src="_framework/blazor.webassembly.js"></script>
+    </div>      
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
     <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jspdf.umd.min.js and print-cards.js moved to dynamic loading -->
@@ -104,7 +107,10 @@
             Blazor.start().then(() => {
                 clearTimeout(fallbackTimer);
                 document.querySelector('.loading-progress-overlay')?.remove();
-            });            // Error UI handling with proper cleanup
+            });
+
+
+            // Error UI handling with proper cleanup
             const errorUI = document.getElementById('blazor-error-ui');
             let keydownHandler = null;
             let observer = null;

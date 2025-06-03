@@ -58,7 +58,7 @@
 .grid-item.highlighted {
     border-color: var(--theme-color);
     background: color-mix(in srgb, var(--theme-color) 10%, var(--bs-body-bg));
-    transform: scale(1.05);
+    transform: scale(1.35);
     z-index: 10;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     color: var(--bs-emphasis-color);
@@ -76,7 +76,7 @@
     opacity: 1;
     border-color: var(--theme-color);
     background: color-mix(in srgb, var(--theme-color) 15%, var(--bs-body-bg));
-    transform: scale(1.5);
+    transform: scale(1.6);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     z-index: 20;
     font-weight: 800;

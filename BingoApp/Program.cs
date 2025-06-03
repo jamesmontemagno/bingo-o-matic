@@ -15,5 +15,6 @@ builder.Services.AddSingleton<NavbarService>();
 builder.Services.AddScoped<BingoCardService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddScoped<IGameStateService, GameStateService>();
+builder.Services.AddSingleton<SelectionModeService>();
 
 await builder.Build().RunAsync();
