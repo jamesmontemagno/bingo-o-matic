@@ -1,5 +1,9 @@
 @using Microsoft.JSInterop
 @using System.Diagnostics
+@using BingoApp.Services
+@using BingoApp.Models
+
+@inject SelectionModeService SelectionModeService
 
 @if (IsSelecting)
 {
@@ -134,40 +138,29 @@
             animationCts = new CancellationTokenSource();
             var token = animationCts.Token;
 
-            // Randomize the number of iterations for each phase
-            int fastPhaseCount = random.Next(12, 20);    // e.g. 12-19
-            int mediumPhaseCount = random.Next(6, 11);   // e.g. 6-10
-            int finalPhaseCount = random.Next(3, 7);     // e.g. 3-6
+            var selectionMode = await SelectionModeService.GetSelectionModeAsync();
 
-            // Fast highlighting phase - more dramatic scaling and rotation
-            for (int i = 0; i < fastPhaseCount && !token.IsCancellationRequested; i++)
+            string? selectedItem = null;
+            
+            switch (selectionMode)
             {
-                HighlightedItem = Items[random.Next(Items.Count)];
-                StateHasChanged();
-                await Task.Delay(100, token); // Faster initial phase
+                case ItemSelectionMode.Random:
+                    selectedItem = await AnimateRandomSelectionAsync(token);
+                    break;
+
+                case ItemSelectionMode.Horizontal:
+                    selectedItem = await AnimateHorizontalSelectionAsync(token);
+                    break;
+
+                case ItemSelectionMode.Vertical:
+                    selectedItem = await AnimateVerticalSelectionAsync(token);
+                    break;
             }
 
-            // Medium speed phase - increasing delays for dramatic effect
-            for (int i = 0; i < mediumPhaseCount && !token.IsCancellationRequested; i++)
+            if (!token.IsCancellationRequested && selectedItem != null)
             {
-                HighlightedItem = Items[random.Next(Items.Count)];
-                StateHasChanged();
-                await Task.Delay(200 + (i * 40), token); // Progressive slowdown
-            }
-
-            // Final dramatic phase - longer pauses
-            for (int i = 0; i < finalPhaseCount && !token.IsCancellationRequested; i++)
-            {
-                HighlightedItem = Items[random.Next(Items.Count)];
-                StateHasChanged();
-                await Task.Delay(300 + (i * 100), token); // Much more dramatic pauses
-            }
-
-            if (!token.IsCancellationRequested)
-            {
-                // Select final item
-                SelectedItem = Items[random.Next(Items.Count)];
-                HighlightedItem = SelectedItem;
+                SelectedItem = selectedItem;
+                HighlightedItem = selectedItem;
                 IsFinalizing = true;
                 StateHasChanged();
 
@@ -177,7 +170,7 @@
                 // Notify parent of selection
                 if (OnItemSelected.HasDelegate)
                 {
-                    await OnItemSelected.InvokeAsync(SelectedItem);
+                    await OnItemSelected.InvokeAsync(selectedItem);
                 }
             }
         }
@@ -192,7 +185,204 @@
             animationCts = null;
         }
     }
-          public void Dispose()
+
+    private async Task<string?> AnimateRandomSelectionAsync(CancellationToken token)
+    {
+        if (Items.Count == 0)
+            return null;
+            
+        // Randomize the number of iterations for each phase with increased counts
+        int fastPhaseCount = random.Next(15, 25);    // More initial fast selections
+        int mediumPhaseCount = random.Next(10, 15);  // More medium-speed selections
+        int slowPhaseCount = random.Next(5, 8);      // More dramatic slow selections
+
+        // Fast phase - slightly slower than before
+        for (int i = 0; i < fastPhaseCount && !token.IsCancellationRequested; i++)
+        {
+            HighlightedItem = Items[random.Next(Items.Count)];
+            StateHasChanged();
+            await Task.Delay(150, token); // Increased from 100ms
+        }
+
+        // Medium phase - more pronounced slowdown
+        for (int i = 0; i < mediumPhaseCount && !token.IsCancellationRequested; i++)
+        {
+            HighlightedItem = Items[random.Next(Items.Count)];
+            StateHasChanged();
+            await Task.Delay(250 + (i * 60), token); // Increased base delay and increment
+        }
+
+        // Slow phase - even more dramatic pauses
+        for (int i = 0; i < slowPhaseCount && !token.IsCancellationRequested; i++)
+        {
+            HighlightedItem = Items[random.Next(Items.Count)];
+            StateHasChanged();
+            await Task.Delay(400 + (i * 150), token); // Increased base delay and increment
+        }
+        
+        // Return the last highlighted item as the selection
+        return HighlightedItem;
+    }
+
+    private async Task<string?> AnimateHorizontalSelectionAsync(CancellationToken token)
+    {
+        if (Items.Count == 0)
+            return null;
+            
+        // Random number of iterations between 50-120
+        int totalIterations = random.Next(50, 121);
+        
+        // Calculate timings to fit approximately in 6 seconds
+        int initialDelay = 100;  // milliseconds per step at the start
+        int finalDelay = 500;   // much longer final delay to emphasize the stopping point
+        
+        // Start from a random row
+        int currentRow = random.Next(rows);
+        int currentCol = 0;
+        
+        // Track the number of iterations completed
+        int iterationCount = 0;
+        string? lastHighlightedItem = null;
+        
+        // Speed up phase
+        int speedUpIterations = (int)(totalIterations * 0.3); // First 30% speeds up
+        // Constant speed phase
+        int constantSpeedIterations = (int)(totalIterations * 0.4); // Next 40% maintains speed
+        // Slow down phase
+        int slowDownIterations = totalIterations - speedUpIterations - constantSpeedIterations; // Last 30% slows down
+        
+        int currentDelay = initialDelay;
+        
+        // Keep animating until we reach the desired number of iterations
+        while (iterationCount < totalIterations && !token.IsCancellationRequested)
+        {
+            // Calculate index and highlight the item if it exists
+            int index = currentRow * columns + currentCol;
+            if (index < Items.Count)
+            {
+                lastHighlightedItem = Items[index];
+                HighlightedItem = lastHighlightedItem;
+                StateHasChanged();
+                
+                // Calculate current delay based on which phase we're in
+                if (iterationCount < speedUpIterations)
+                {
+                    // Speed up phase - gradually decrease delay
+                    double progress = (double)iterationCount / speedUpIterations;
+                    currentDelay = (int)(initialDelay - (initialDelay * 0.5 * progress));
+                }
+                else if (iterationCount < speedUpIterations + constantSpeedIterations)
+                {
+                    // Constant speed phase - maintain minimum delay
+                    currentDelay = (int)(initialDelay * 0.5);
+                }
+                else
+                {
+                    // Slow down phase - gradually increase delay
+                    double progress = (double)(iterationCount - speedUpIterations - constantSpeedIterations) / slowDownIterations;
+                    currentDelay = (int)((initialDelay * 0.5) + (finalDelay - (initialDelay * 0.5)) * Math.Pow(progress, 2));
+                }
+                
+                await Task.Delay(currentDelay, token);
+            }
+            
+            // Move to the next column
+            currentCol++;
+            
+            // If we've reached the end of a row, move to the next row
+            if (currentCol >= columns)
+            {
+                currentCol = 0;
+                currentRow = (currentRow + 1) % rows; // Wrap around to the first row when we reach the end
+            }
+            
+            iterationCount++;
+        }
+        
+        // Return the last highlighted item as the selection
+        return lastHighlightedItem;
+    }
+
+    private async Task<string?> AnimateVerticalSelectionAsync(CancellationToken token)
+    {
+        if (Items.Count == 0)
+            return null;
+            
+        // Random number of iterations between 50-120
+        int totalIterations = random.Next(50, 121);
+        
+        // Calculate timings to fit approximately in 6 seconds
+        int initialDelay = 100;  // milliseconds per step at the start
+        int finalDelay = 500;   // much longer final delay to emphasize the stopping point
+        
+        // Start from a random column
+        int currentCol = random.Next(columns);
+        int currentRow = 0;
+        
+        // Track the number of iterations completed
+        int iterationCount = 0;
+        string? lastHighlightedItem = null;
+        
+        // Speed up phase
+        int speedUpIterations = (int)(totalIterations * 0.3); // First 30% speeds up
+        // Constant speed phase
+        int constantSpeedIterations = (int)(totalIterations * 0.4); // Next 40% maintains speed
+        // Slow down phase
+        int slowDownIterations = totalIterations - speedUpIterations - constantSpeedIterations; // Last 30% slows down
+        
+        int currentDelay = initialDelay;
+        
+        // Keep animating until we reach the desired number of iterations
+        while (iterationCount < totalIterations && !token.IsCancellationRequested)
+        {
+            // Calculate index and highlight the item if it exists
+            int index = currentRow * columns + currentCol;
+            if (index < Items.Count)
+            {
+                lastHighlightedItem = Items[index];
+                HighlightedItem = lastHighlightedItem;
+                StateHasChanged();
+                
+                // Calculate current delay based on which phase we're in
+                if (iterationCount < speedUpIterations)
+                {
+                    // Speed up phase - gradually decrease delay
+                    double progress = (double)iterationCount / speedUpIterations;
+                    currentDelay = (int)(initialDelay - (initialDelay * 0.5 * progress));
+                }
+                else if (iterationCount < speedUpIterations + constantSpeedIterations)
+                {
+                    // Constant speed phase - maintain minimum delay
+                    currentDelay = (int)(initialDelay * 0.5);
+                }
+                else
+                {
+                    // Slow down phase - gradually increase delay
+                    double progress = (double)(iterationCount - speedUpIterations - constantSpeedIterations) / slowDownIterations;
+                    currentDelay = (int)((initialDelay * 0.5) + (finalDelay - (initialDelay * 0.5)) * Math.Pow(progress, 2));
+                }
+                
+                await Task.Delay(currentDelay, token);
+            }
+            
+            // Move to the next row
+            currentRow++;
+            
+            // If we've reached the end of a column, move to the next column
+            if (currentRow >= rows)
+            {
+                currentRow = 0;
+                currentCol = (currentCol + 1) % columns; // Wrap around to the first column when we reach the end
+            }
+            
+            iterationCount++;
+        }
+        
+        // Return the last highlighted item as the selection
+        return lastHighlightedItem;
+    }
+
+    public void Dispose()
     {
         animationCts?.Cancel();
         animationCts?.Dispose();
