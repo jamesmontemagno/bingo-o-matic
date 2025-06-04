@@ -45,7 +45,6 @@ jobs:
           output_location: "wwwroot" # Built app content directory - optional
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
-
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
@@ -57,4 +56,6 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_HAPPY_ROCK_07485531E }}
           app_location: "./BingoApp"
+          api_location: "Api"
+          output_location: "wwwroot" 
           action: "close"
