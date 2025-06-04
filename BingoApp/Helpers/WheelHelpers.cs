@@ -90,66 +90,44 @@ namespace BingoApp.Helpers
             var itemCount = items.Count();
             var maxLength = items.Any() ? items.Max(s => s.Length) : 0;
             
-            // Use larger font sizes to improve readability
-            if (itemCount > 50)
+            // Use moderately sized fonts that will work with word wrapping
+            if (maxLength > 20)  // Very long text - reduce font size
             {
-                if (maxLength > 15)
-                {
-                    if (itemCount <= 3) return "1.2rem";
-                    if (itemCount <= 8) return "1.1rem";
-                    if (itemCount <= 15) return "1.0rem";
-                    return "0.9rem";
-                }
-                else if (maxLength > 10)
-                {
-                    if (itemCount <= 3) return "1.4rem";
-                    if (itemCount <= 8) return "1.2rem";
-                    if (itemCount <= 15) return "1.1rem";
-                    if (itemCount <= 25) return "1.0rem";
-                    return "0.9rem";
-                }
-                else
-                {
-                    if (itemCount <= 3) return "1.6rem";
-                    if (itemCount <= 8) return "1.4rem";
-                    if (itemCount <= 15) return "1.2rem";
-                    if (itemCount <= 25) return "1.1rem";
-                    if (itemCount <= 35) return "1.0rem";
-                    return "0.9rem";
-                }
+                if (itemCount <= 3) return "1.2rem";
+                if (itemCount <= 8) return "1.1rem";
+                if (itemCount <= 15) return "1rem";
+                return "0.9rem";
             }
-            
-            // Increased sizes for better visibility
-            if (maxLength > 15)
+            else if (maxLength > 15)
             {
-                // Larger sizes for very long text
-                if (itemCount <= 3) return "1.8rem";
-                if (itemCount <= 8) return "1.6rem";
-                if (itemCount <= 15) return "1.4rem";
-                return "1.2rem";
+                // Moderate sizes for very long text with wrapping
+                if (itemCount <= 3) return "1.4rem";
+                if (itemCount <= 8) return "1.3rem";
+                if (itemCount <= 15) return "1.2rem";
+                return "1.1rem";
             }
             else if (maxLength > 10)
             {
                 // Larger sizes for long text
-                if (itemCount <= 3) return "2.0rem";
-                if (itemCount <= 8) return "1.8rem";
-                if (itemCount <= 15) return "1.6rem";
-                if (itemCount <= 25) return "1.4rem";
+                if (itemCount <= 3) return "1.6rem";
+                if (itemCount <= 8) return "1.5rem";
+                if (itemCount <= 15) return "1.4rem";
+                if (itemCount <= 25) return "1.3rem";
                 return "1.2rem";
             }
             else
             {
                 // Larger sizes for shorter text
-                if (itemCount <= 3) return "2.4rem";
-                if (itemCount <= 8) return "2.1rem";
-                if (itemCount <= 15) return "1.8rem";
-                if (itemCount <= 25) return "1.6rem";
-                if (itemCount <= 35) return "1.4rem";
+                if (itemCount <= 3) return "2.0rem";
+                if (itemCount <= 8) return "1.8rem";
+                if (itemCount <= 15) return "1.6rem";
+                if (itemCount <= 25) return "1.4rem";
+                if (itemCount <= 35) return "1.3rem";
                 return "1.2rem";
             }
         }public static (double translateX, double translateY) GetDynamicTextPosition(IEnumerable<string> items)
         {
-            // Position text closer to the edge of the wheel
+            // Position text closer to the edge of the wheel with better handling for long words
             var itemCount = items.Count();
             
             // Calculate position with placement closer to the edge
@@ -160,33 +138,33 @@ namespace BingoApp.Helpers
             var maxLength = items.Any() ? items.Max(s => s.Length) : 0;
             double textDistanceRatio;
             
-            // Position text closer to the edge but still prevent text cutoff
+            // Position text at appropriate distance from center based on text length
             if (maxLength > 15)
             {
-                textDistanceRatio = 0.70; // Move closer to edge but still be careful with very long text
+                textDistanceRatio = 0.60; // More conservative for very long text
             }
             else if (maxLength > 10)
             {
-                textDistanceRatio = 0.75; // Position longer text closer to edge
+                textDistanceRatio = 0.65; // Position longer text more conservatively
             }
             else
             {
-                // For normal length text, place closer to the edge
+                // For normal length text, place appropriately
                 if (itemCount <= 3)
                 {
-                    textDistanceRatio = 0.80; // Large segments can have text quite close to edge
+                    textDistanceRatio = 0.70; // Large segments need space for text
                 }
                 else if (itemCount <= 8)
                 {
-                    textDistanceRatio = 0.82; // Move closer to edge for medium segments
+                    textDistanceRatio = 0.72; // Medium segments
                 }
                 else if (itemCount <= 15)
                 {
-                    textDistanceRatio = 0.85; // Even closer for smaller segments
+                    textDistanceRatio = 0.75; // Smaller segments
                 }
                 else
                 {
-                    textDistanceRatio = 0.87; // Closest to edge for many small segments
+                    textDistanceRatio = 0.78; // Many small segments
                 }
             }
             

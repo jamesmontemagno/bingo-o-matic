@@ -58,14 +58,16 @@
                 -2px -2px 4px rgba(0, 0, 0, 0.8),
                 2px -2px 4px rgba(0, 0, 0, 0.8),
                 -2px 2px 4px rgba(0, 0, 0, 0.8);
-    white-space: nowrap;
+    white-space: normal; /* Allow text wrapping */
     font-weight: bold;
     z-index: 1;
     pointer-events: none;
-    text-align: left;
+    text-align: right;
     width: auto;
-    max-width: none;
-    overflow: visible;
+    max-width: 45%; /* Limit width to prevent overflowing */
+    overflow: hidden; /* Hide overflow */
+    word-wrap: break-word; /* Break long words */
+    hyphens: auto; /* Add hyphens where possible */
 }
 
 .wheel-pointer {
