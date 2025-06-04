@@ -192,9 +192,9 @@
             return null;
             
         // Randomize the number of iterations for each phase with increased counts
-        int fastPhaseCount = random.Next(15, 25);    // More initial fast selections
-        int mediumPhaseCount = random.Next(10, 15);  // More medium-speed selections
-        int slowPhaseCount = random.Next(5, 8);      // More dramatic slow selections
+        int fastPhaseCount = random.Next(10, 20);    // More initial fast selections
+        int mediumPhaseCount = random.Next(6, 12);  // More medium-speed selections
+        int slowPhaseCount = random.Next(2, 5);      // More dramatic slow selections
 
         // Fast phase - slightly slower than before
         for (int i = 0; i < fastPhaseCount && !token.IsCancellationRequested; i++)
@@ -217,7 +217,7 @@
         {
             HighlightedItem = Items[random.Next(Items.Count)];
             StateHasChanged();
-            await Task.Delay(400 + (i * 150), token); // Increased base delay and increment
+            await Task.Delay(320 + (i * 150), token); // Increased base delay and increment
         }
         
         // Return the last highlighted item as the selection
