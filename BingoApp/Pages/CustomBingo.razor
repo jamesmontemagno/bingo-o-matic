@@ -88,9 +88,10 @@
             {                
                 @if (selectionMode == SelectionMode.Wheel)
                 {
-                    <BingoWheel Items="@availableItems" 
-                               Rotation="@wheelRotation" 
-                               IsSlowingDown="@isWheelSlowingDown" />
+                    <BingoWheel @ref="wheelRef"
+                               Items="@availableItems"
+                               IsVisible="@wheelVisible"
+                               OnSelectionComplete="OnWheelSelectionComplete" />
                 }
                 else if (selectionMode == SelectionMode.Grid)
                 {
@@ -196,8 +197,7 @@
     private BingoSet? selectedSet;
     private bool isSelecting = false;
     private bool isSelected = false;
-    
-    // Bingo board state
+      // Bingo board state
     private List<string> availableItems = new List<string>();
     private List<string> calledItems = new List<string>();
     private Random random = new Random();
@@ -206,71 +206,15 @@
     private bool isAnimating = false;
     private CancellationTokenSource? animationCts;
     private string currentThemeColor = "";
-    private readonly string[] darkColors = new[]
-    {
-        "#1E40AF", // Deep Blue
-        "#065F46", // Forest Green
-        "#831843", // Dark Pink
-        "#3730A3", // Indigo
-        "#7E22CE", // Purple
-        "#9D174D", // Raspberry
-        "#B45309", // Burnt Orange
-        "#064E3B", // Dark Emerald
-        "#134E4A", // Dark Teal
-        "#450A0A", // Dark Red
-        "#2563EB", // Medium Blue
-        "#0891B2", // Cyan
-        "#4338CA", // Medium Indigo
-        "#7C3AED", // Medium Purple
-        "#C026D3", // Medium Pink
-        "#E11D48", // Medium Red
-        "#EA580C", // Medium Orange
-        "#65A30D", // Medium Green
-        "#0D9488", // Medium Teal
-        "#6D28D9", // Medium Violet
-        "#BE185D", // Medium Magenta
-        "#92400E", // Brown
-        "#166534", // Medium Forest
-        "#075985"  // Ocean Blue
-    };
-
-    private string GetWheelSegmentColor(int index)
-    {
-        return WheelHelpers.GetWheelSegmentColor(index, availableItems.Count);
-    }
-
-    private string GetDynamicFontSize()
-    {
-        return WheelHelpers.GetDynamicFontSize(availableItems);
-    }
-
-    private (double translateX, double translateY) GetDynamicTextPosition()
-    {
-        return WheelHelpers.GetDynamicTextPosition(availableItems);
-    }
-
-    /// <summary>
-    /// Shuffles a list in place using the Fisher-Yates algorithm
-    /// </summary>
-    private void ShuffleList<T>(List<T> list)
-    {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            int j = random.Next(0, i + 1);
-            (list[i], list[j]) = (list[j], list[i]);
-        }
-    }
 
     // Confirmation dialog state
     private bool showConfirmDialog = false;
     private string confirmTitle = "";
-    private string confirmMessage = "";
-    private Func<Task>? confirmAction;    // Wheel state
-
-    private double wheelRotation = 0;
-    private bool isWheelSlowingDown = false;
+    private string confirmMessage = "";    private Func<Task>? confirmAction;    // Wheel state
+    private Components.BingoWheel? wheelRef;
+    private bool wheelVisible = false;
     private bool isMobileDevice;
-    private IJSObjectReference? module;    // Confetti state
+    private IJSObjectReference? module;// Confetti state
     private bool showConfetti;
     private CancellationTokenSource? confettiCts;
 
@@ -425,16 +369,8 @@
             displayItem = null;
             isSelecting = false;
             isSelected = false;
-            isAnimating = false;
-            // Assign a new random color theme
-            string previousColor = currentThemeColor;
-            string newColor;
-            do
-            {
-                newColor = darkColors[random.Next(darkColors.Length)];
-            } while (darkColors.Length > 1 && newColor == previousColor);
-            currentThemeColor = newColor;
-            wheelRotation = 0;
+            isAnimating = false;            // Assign a new random color theme
+            currentThemeColor = BingoApp.Helpers.ColorHelpers.GetRandomDarkColor(random, currentThemeColor);
             
             // Clear any saved game state
             _ = GameStateService.ClearCustomGameStateAsync();
@@ -496,71 +432,35 @@
         {
             isSelecting = true;
             isSelected = false;
-            
-            // Shuffle the available items before selection
-            ShuffleList(availableItems);
+              // Shuffle the available items before selection
+            ListUtils.ShuffleList(availableItems);
             
             StateHasChanged();
-            
             if (selectionMode == SelectionMode.Wheel)
-            {
-                await Task.Delay(1000);
-                // Select the final item first
-                int randomIndex = random.Next(0, availableItems.Count);
-                currentItem = availableItems[randomIndex];
-                
-                // Calculate the final rotation to make the selected item land at the pointer
-                double segmentAngle = 360.0 / availableItems.Count;
-                double itemAngle = segmentAngle * randomIndex;
-                
-                // Since the coordinate system in the wheel rendering has 0 degrees at the right side
-                // (notice the -90 in the clipPath calculation) and the pointer is also at the right,
-                // we need to align the center of the item's segment with the 0-degree mark
-                
-                // Center of the item's segment
-                double itemCenterAngle = itemAngle + (segmentAngle / 2);
-                // Fixed number of rotations (5-8) for visual effect plus the alignment angle
-                double targetRotation = (random.Next(5, 8) * 360) + (360 - itemCenterAngle);
-                
-                // Fix the rotation to ensure it's within proper range
-                targetRotation = targetRotation % 360 == 0 ? targetRotation + 1 : targetRotation;
-                  // Start the wheel spinning animation
-                wheelRotation = 0;
-                isWheelSlowingDown = false;
-                StateHasChanged();
-                
-                // Trigger the animation by setting the final rotation
-                await Task.Delay(50); // Small delay to ensure the initial state is rendered
-                wheelRotation = targetRotation;
-                StateHasChanged();
-                
-                // Main spin (3.0 seconds)
-                await Task.Delay(3000);
-                
-                // Subtle slowing down phase (0.3 seconds)
-                isWheelSlowingDown = true;
-                StateHasChanged();
-                await Task.Delay(300);
-                
-                // Update game state
-                availableItems.RemoveAt(randomIndex);
-                calledItems.Add(currentItem);
-                displayItem = currentItem;
-                
-                // Auto-save game state after item selection
-                await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
-                
-                // Keep the final state visible (2 seconds)
-                await Task.Delay(2000);
-                
-                // Reset effects
-                isWheelSlowingDown = false;
-                StateHasChanged();
-                
-                // Reset wheel position
-                wheelRotation = 0;
-                StateHasChanged();
-            }
+                {
+                    await Task.Delay(1000);
+                    
+                    // Use the BingoWheel component to spin and select an item
+                    wheelVisible = true;
+                    StateHasChanged();
+                      // The wheel component now handles all spinning logic
+                    currentItem = wheelRef != null ? await wheelRef.SpinAsync() : null;
+                    
+                    if (!string.IsNullOrEmpty(currentItem))
+                    {
+                        // Update game state with the selected item
+                        int itemIndex = availableItems.IndexOf(currentItem);
+                        if (itemIndex >= 0)
+                        {
+                            availableItems.RemoveAt(itemIndex);
+                            calledItems.Add(currentItem);
+                            displayItem = currentItem;
+                            
+                            // Auto-save game state after item selection
+                            await GameStateService.SaveCustomGameStateAsync(calledItems, availableItems, selectedSet?.Name, currentItem);
+                        }
+                    }
+                }
             else if (selectionMode == SelectionMode.Grid)
             {
                 await Task.Delay(1000);
@@ -808,21 +708,28 @@
             BingoService.OnSetsChanged -= OnBingoSetsChanged;
             animationCts?.Cancel();
             animationCts?.Dispose();
-            animationCts = null;
-
+            animationCts = null;            
             confettiCts?.Cancel();
             confettiCts?.Dispose();
             confettiCts = null;
 
-            if (module is not null)
+            if (module != null)
             {
                 await module.DisposeAsync();
             }
-        }
-        catch (Exception ex)
+        }        catch
         {
-            Console.Error.WriteLine($"Error during disposal: {ex.Message}");
+            // Ignore any errors during disposal
         }
-       
+    }
+    
+    private Task OnWheelSelectionComplete(string selectedItem)
+    {
+        // Handle the selected item from the wheel
+        wheelVisible = false;
+        isSelecting = false;
+        isSelected = true;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 }
