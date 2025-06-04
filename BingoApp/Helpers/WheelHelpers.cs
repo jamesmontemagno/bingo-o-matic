@@ -84,113 +84,109 @@ namespace BingoApp.Helpers
                 
                 return wheelColors[colorIndex];
             }
-        }
-
-        public static string GetDynamicFontSize(IEnumerable<string> items)
+        }        public static string GetDynamicFontSize(IEnumerable<string> items)
         {
             // Calculate font size based on number of items and length of longest item
             var itemCount = items.Count();
             var maxLength = items.Any() ? items.Max(s => s.Length) : 0;
             
-            // If more than 50 items, keep original smaller sizes
+            // Use larger font sizes to improve readability
             if (itemCount > 50)
             {
                 if (maxLength > 15)
                 {
-                    if (itemCount <= 3) return "1.0rem";
-                    if (itemCount <= 8) return "0.9rem";
-                    if (itemCount <= 15) return "0.8rem";
-                    return "0.7rem";
+                    if (itemCount <= 3) return "1.2rem";
+                    if (itemCount <= 8) return "1.1rem";
+                    if (itemCount <= 15) return "1.0rem";
+                    return "0.9rem";
                 }
                 else if (maxLength > 10)
                 {
-                    if (itemCount <= 3) return "1.2rem";
-                    if (itemCount <= 8) return "1.0rem";
-                    if (itemCount <= 15) return "0.9rem";
-                    if (itemCount <= 25) return "0.8rem";
-                    return "0.7rem";
+                    if (itemCount <= 3) return "1.4rem";
+                    if (itemCount <= 8) return "1.2rem";
+                    if (itemCount <= 15) return "1.1rem";
+                    if (itemCount <= 25) return "1.0rem";
+                    return "0.9rem";
                 }
                 else
                 {
-                    if (itemCount <= 3) return "1.4rem";
-                    if (itemCount <= 8) return "1.2rem";
-                    if (itemCount <= 15) return "1.0rem";
-                    if (itemCount <= 25) return "0.9rem";
-                    if (itemCount <= 35) return "0.8rem";
-                    return "0.7rem";
+                    if (itemCount <= 3) return "1.6rem";
+                    if (itemCount <= 8) return "1.4rem";
+                    if (itemCount <= 15) return "1.2rem";
+                    if (itemCount <= 25) return "1.1rem";
+                    if (itemCount <= 35) return "1.0rem";
+                    return "0.9rem";
                 }
             }
             
-            // Increased sizes by 1.5x for <= 50 items
+            // Increased sizes for better visibility
             if (maxLength > 15)
             {
-                // Very conservative sizes for very long text
-                if (itemCount <= 3) return "1.5rem";
-                if (itemCount <= 8) return "1.35rem";
-                if (itemCount <= 15) return "1.2rem";
-                return "1.05rem";
+                // Larger sizes for very long text
+                if (itemCount <= 3) return "1.8rem";
+                if (itemCount <= 8) return "1.6rem";
+                if (itemCount <= 15) return "1.4rem";
+                return "1.2rem";
             }
             else if (maxLength > 10)
             {
-                // Conservative sizes for long text
-                if (itemCount <= 3) return "1.8rem";
-                if (itemCount <= 8) return "1.5rem";
-                if (itemCount <= 15) return "1.35rem";
-                if (itemCount <= 25) return "1.2rem";
-                return "1.05rem";
+                // Larger sizes for long text
+                if (itemCount <= 3) return "2.0rem";
+                if (itemCount <= 8) return "1.8rem";
+                if (itemCount <= 15) return "1.6rem";
+                if (itemCount <= 25) return "1.4rem";
+                return "1.2rem";
             }
             else
             {
-                // Normal sizing for shorter text
-                if (itemCount <= 3) return "2.1rem";
-                if (itemCount <= 8) return "1.8rem";
-                if (itemCount <= 15) return "1.5rem";
-                if (itemCount <= 25) return "1.35rem";
-                if (itemCount <= 35) return "1.2rem";
-                return "1.05rem";
+                // Larger sizes for shorter text
+                if (itemCount <= 3) return "2.4rem";
+                if (itemCount <= 8) return "2.1rem";
+                if (itemCount <= 15) return "1.8rem";
+                if (itemCount <= 25) return "1.6rem";
+                if (itemCount <= 35) return "1.4rem";
+                return "1.2rem";
             }
-        }
-
-        public static (double translateX, double translateY) GetDynamicTextPosition(IEnumerable<string> items)
+        }public static (double translateX, double translateY) GetDynamicTextPosition(IEnumerable<string> items)
         {
-            // Position text with more conservative inward placement
+            // Position text closer to the edge of the wheel
             var itemCount = items.Count();
             
-            // Calculate position with more conservative inward placement
-            // The wheel radius is approximately 250px (half of min 500px wheel size)
-            var baseRadius = 200; // Further reduced to keep text well inside wheel
+            // Calculate position with placement closer to the edge
+            // The wheel radius is now responsive based on viewport
+            var baseRadius = 250; // Base radius for positioning calculations
             
             // Adjust text distance from center based on number of items and text length
             var maxLength = items.Any() ? items.Max(s => s.Length) : 0;
             double textDistanceRatio;
             
-            // More conservative placement for longer text
+            // Position text closer to the edge but still prevent text cutoff
             if (maxLength > 15)
             {
-                textDistanceRatio = 0.60; // Very conservative for very long text
+                textDistanceRatio = 0.70; // Move closer to edge but still be careful with very long text
             }
             else if (maxLength > 10)
             {
-                textDistanceRatio = 0.65; // Conservative for long text
+                textDistanceRatio = 0.75; // Position longer text closer to edge
             }
             else
             {
-                // For normal length text, still be more conservative than before
+                // For normal length text, place closer to the edge
                 if (itemCount <= 3)
                 {
-                    textDistanceRatio = 0.70; // Much more inward for large segments
+                    textDistanceRatio = 0.80; // Large segments can have text quite close to edge
                 }
                 else if (itemCount <= 8)
                 {
-                    textDistanceRatio = 0.75; // More inward for medium segments
+                    textDistanceRatio = 0.82; // Move closer to edge for medium segments
                 }
                 else if (itemCount <= 15)
                 {
-                    textDistanceRatio = 0.80; // Slightly more inward for smaller segments
+                    textDistanceRatio = 0.85; // Even closer for smaller segments
                 }
                 else
                 {
-                    textDistanceRatio = 0.85; // Still keep some safe distance from edge
+                    textDistanceRatio = 0.87; // Closest to edge for many small segments
                 }
             }
             
@@ -200,23 +196,23 @@ namespace BingoApp.Helpers
             double translateY;
             if (maxLength > 15)
             {
-                translateY = -20; // Larger offset for very long text
+                translateY = -25; // Larger offset for very long text
             }
             else if (maxLength > 10)
             {
-                translateY = -18; // Large offset for long text
+                translateY = -22; // Large offset for long text
             }
             else if (itemCount <= 5)
             {
-                translateY = -15; // Normal offset for few items
+                translateY = -18; // Normal offset for few items
             }
             else if (itemCount <= 15)
             {
-                translateY = -12; // Slightly smaller offset
+                translateY = -15; // Slightly smaller offset
             }
             else
             {
-                translateY = -10; // Minimal offset for many items
+                translateY = -12; // Minimal offset for many items
             }
             
             return (translateX, translateY);

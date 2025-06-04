@@ -85,36 +85,12 @@
     {
         <div class="game-content">
             @if (isSelecting)
-            {
+            {                
                 @if (selectionMode == SelectionMode.Wheel)
                 {
-                    <div class="wheel-overlay">
-                        <div class="wheel-container @(isWheelSlowingDown ? "slowing-down" : "")">
-                        <div class="wheel" style="transform: rotate(@(wheelRotation)deg)">
-                            @foreach (var (item, index) in availableItems.Select((value, i) => (value, i)))
-                            {
-                                var segmentAngle = 360.0 / availableItems.Count;
-                                var startAngle = segmentAngle * index;
-                                var endAngle = segmentAngle * (index + 1);
-                                
-                                // Add small overlap to eliminate gaps between segments
-                                // Use larger overlap for fewer segments to prevent gaps
-                                var overlapAngle = availableItems.Count <= 5 ? 2.0 : 0.5; // Larger overlap for fewer segments
-                                var adjustedStartAngle = startAngle - overlapAngle;
-                                var adjustedEndAngle = endAngle + overlapAngle;
-                                
-                                var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
-                                var (translateX, translateY) = GetDynamicTextPosition();
-                                var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((adjustedStartAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedStartAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((adjustedEndAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedEndAngle - 90) * Math.PI / 180)}%)";
-                                <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
-                                </div>
-                                <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(@(translateX)px) translateY(@(translateY)%); font-size: @GetDynamicFontSize();">@item</span>
-
-                            }
-                        </div>
-                            <div class="wheel-pointer"></div>
-                        </div>
-                    </div>
+                    <BingoWheel Items="@availableItems" 
+                               Rotation="@wheelRotation" 
+                               IsSlowingDown="@isWheelSlowingDown" />
                 }
                 else if (selectionMode == SelectionMode.Grid)
                 {
