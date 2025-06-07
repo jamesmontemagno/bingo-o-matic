@@ -133,6 +133,7 @@
                             <button class="item-display selected clickable" 
                                     style="background-color: @currentThemeColor"
                                     @onclick="HandleItemClick"
+                                    @onkeydown="HandleItemKeyDown"
                                     aria-label="Pick next bingo item">
                                 <span class="item">@(displayItem ?? "Ready to draw...")</span>
                             </button>
@@ -154,6 +155,7 @@
                         <button class="item-display selected clickable" 
                                 style="background-color: @currentThemeColor"
                                 @onclick="HandleItemClick"
+                                @onkeydown="HandleItemKeyDown"
                                 aria-label="Pick next bingo item">
                             <span class="item">@(displayItem ?? "Ready to draw...")</span>
                         </button>
@@ -697,6 +699,15 @@
         if (isSelected && currentItem != null && availableItems.Count > 0 && !isSelecting)
         {
             await SelectNext();
+        }
+    }
+
+    private async Task HandleItemKeyDown(KeyboardEventArgs e)
+    {
+        // Handle Enter and Space keys for accessibility
+        if (e.Key == "Enter" || e.Key == " ")
+        {
+            await HandleItemClick();
         }
     }
 
