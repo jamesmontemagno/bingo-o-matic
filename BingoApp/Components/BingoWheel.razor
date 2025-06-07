@@ -1,0 +1,184 @@
+@using BingoApp.Helpers
+@using System.Threading
+@using System.Threading.Tasks
+@implements IDisposable
+
+<div class="wheel-overlay" style="display: @(IsVisible ? "flex" : "none")">
+    <div class="wheel-container @(isSlowingDown ? "slowing-down" : "")">
+        <div class="wheel" style="transform: rotate(@(rotation)deg)">
+            @foreach (var (item, index) in Items.Select((value, i) => (value, i)))
+            {
+                var segmentAngle = 360.0 / Items.Count;
+                var startAngle = segmentAngle * index;
+                var endAngle = segmentAngle * (index + 1);
+                
+                // Add small overlap to eliminate gaps between segments
+                // Use larger overlap for fewer segments to prevent gaps
+                var overlapAngle = Items.Count <= 5 ? 2.0 : 0.5; // Larger overlap for fewer segments
+                var adjustedStartAngle = startAngle - overlapAngle;
+                var adjustedEndAngle = endAngle + overlapAngle;
+                
+                var textAngle = startAngle + (segmentAngle / 2); // Center text in segment
+                var (translateX, translateY) = GetDynamicTextPosition();
+                var clipPath = $"polygon(50% 50%, {50 + 50 * Math.Cos((adjustedStartAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedStartAngle - 90) * Math.PI / 180)}%, {50 + 50 * Math.Cos((adjustedEndAngle - 90) * Math.PI / 180)}% {50 + 50 * Math.Sin((adjustedEndAngle - 90) * Math.PI / 180)}%)";
+                <div class="wheel-segment" style="background-color: @(GetWheelSegmentColor(index)); clip-path: @clipPath">
+                </div>
+                <span class="wheel-text" style="transform: rotate(@(textAngle)deg) translateX(@(translateX)px) translateY(@(translateY)%); font-size: @GetDynamicFontSize(); width: @(Math.Min(200, translateX*1.5))px;">@item</span>
+            }
+        </div>
+        <div class="wheel-pointer"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<string> Items { get; set; } = new();
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public int MainSpinDurationMs { get; set; } = 3000;
+
+    [Parameter]
+    public int SlowdownDurationMs { get; set; } = 300;
+
+    [Parameter]
+    public int FinalDisplayDurationMs { get; set; } = 2000;
+
+    [Parameter]
+    public int MinRotations { get; set; } = 5;
+
+    [Parameter]
+    public int MaxRotations { get; set; } = 8;
+
+    [Parameter]
+    public EventCallback<string> OnSelectionComplete { get; set; }
+
+    [Parameter]
+    public EventCallback OnSpinStarted { get; set; }
+
+    [Parameter]
+    public EventCallback OnSpinCompleted { get; set; }
+
+    private double rotation = 0;
+    private bool isSlowingDown = false;
+    private Random random = new Random();
+    private CancellationTokenSource? spinCts;
+    private string? selectedItem;
+
+    public void Dispose()
+    {
+        // Dispose the cancellation token source if it exists
+        if (spinCts != null)
+        {
+            spinCts.Cancel();
+            spinCts.Dispose();
+            spinCts = null;
+        }
+    }
+
+    /// <summary>
+    /// Spins the wheel to randomly select an item
+    /// </summary>
+    /// <returns>The selected item</returns>
+    public async Task<string> SpinAsync()
+    {
+        if (Items.Count == 0)
+        {
+            throw new InvalidOperationException("Cannot spin wheel with no items");
+        }
+
+        // Cancel any existing spin
+        if (spinCts != null)
+        {
+            spinCts.Cancel();
+            spinCts.Dispose();
+        }
+
+        spinCts = new CancellationTokenSource();
+        var token = spinCts.Token;
+
+        try
+        {
+            // Notify that spin has started
+            await OnSpinStarted.InvokeAsync();
+
+            // Reset wheel state
+            rotation = 0;
+            isSlowingDown = false;
+            StateHasChanged();
+
+            // Select the final item first
+            int randomIndex = random.Next(0, Items.Count);
+            selectedItem = Items[randomIndex];
+
+            // Calculate the final rotation to make the selected item land at the pointer
+            double segmentAngle = 360.0 / Items.Count;
+            double itemAngle = segmentAngle * randomIndex;
+
+            // Center of the item's segment
+            double itemCenterAngle = itemAngle + (segmentAngle / 2);
+            
+            // Fixed number of rotations for visual effect plus the alignment angle
+            double targetRotation = (random.Next(MinRotations, MaxRotations) * 360) + (360 - itemCenterAngle);
+
+            // Fix the rotation to ensure it's within proper range
+            targetRotation = targetRotation % 360 == 0 ? targetRotation + 1 : targetRotation;
+
+            // Small delay to ensure the initial state is rendered
+            await Task.Delay(50, token);
+
+            // Start the wheel spinning animation
+            rotation = targetRotation;
+            StateHasChanged();
+
+            // Main spin duration
+            await Task.Delay(MainSpinDurationMs, token);
+
+            // Subtle slowing down phase
+            isSlowingDown = true;
+            StateHasChanged();
+            await Task.Delay(SlowdownDurationMs, token);
+
+            // Keep the final state visible
+            await Task.Delay(FinalDisplayDurationMs, token);
+
+            // Notify that selection is complete
+            await OnSelectionComplete.InvokeAsync(selectedItem);
+
+            // Reset effects
+            isSlowingDown = false;
+            StateHasChanged();
+
+            // Reset wheel position
+            rotation = 0;
+            StateHasChanged();
+
+            // Notify that spin has completed
+            await OnSpinCompleted.InvokeAsync();
+
+            return selectedItem;
+        }
+        catch (OperationCanceledException)
+        {
+            // Spin was cancelled
+            return string.Empty;
+        }
+    }
+
+    private string GetWheelSegmentColor(int index)
+    {
+        return WheelHelpers.GetWheelSegmentColor(index, Items.Count);
+    }
+
+    private string GetDynamicFontSize()
+    {
+        return WheelHelpers.GetDynamicFontSize(Items);
+    }
+
+    private (double translateX, double translateY) GetDynamicTextPosition()
+    {
+        return WheelHelpers.GetDynamicTextPosition(Items);
+    }
+}
