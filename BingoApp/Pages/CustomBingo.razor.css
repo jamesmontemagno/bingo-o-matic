@@ -143,6 +143,16 @@
         margin: 1rem auto;
         padding: 0.5rem;
     }
+    
+    .item-display.clickable:hover {
+        /* Reduce hover effects on mobile for better touch experience */
+        transform: scale(1.05) translateY(-1px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .item-display.clickable:active {
+        transform: scale(1.02);
+    }
 }
 
 
@@ -169,6 +179,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.item-display.clickable {
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    transition: all 0.3s ease, transform 0.2s ease;
+}
+
+.item-display.clickable:hover,
+.item-display.clickable:focus {
+    transform: scale(1.12) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.1);
+}
+
+.item-display.clickable:active {
+    transform: scale(1.08) translateY(0);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.item-display.clickable:focus {
+    outline: 3px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 4px;
 }
 
 .item-display.idle {

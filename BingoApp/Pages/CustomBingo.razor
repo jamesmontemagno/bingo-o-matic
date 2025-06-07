@@ -128,18 +128,42 @@
                 else
                 {
                     <div class="current-item selecting @(isAnimating ? "animate" : "")" aria-live="polite">
-                        <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
-                            <span class="item">@(displayItem ?? "Ready to draw...")</span>
-                        </div>
+                        @if (isSelected && currentItem != null && availableItems.Count > 0 && !isSelecting)
+                        {
+                            <button class="item-display selected clickable" 
+                                    style="background-color: @currentThemeColor"
+                                    @onclick="HandleItemClick"
+                                    aria-label="Pick next bingo item">
+                                <span class="item">@(displayItem ?? "Ready to draw...")</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
+                                <span class="item">@(displayItem ?? "Ready to draw...")</span>
+                            </div>
+                        }
                     </div>
                 }
             }
             else
             {
                 <div class="current-item @(isSelecting ? "selecting" : "") @(isAnimating ? "animate" : "")" aria-live="polite">
-                    <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
-                        <span class="item">@(displayItem ?? "Ready to draw...")</span>
-                    </div>
+                    @if (isSelected && currentItem != null && availableItems.Count > 0 && !isSelecting)
+                    {
+                        <button class="item-display selected clickable" 
+                                style="background-color: @currentThemeColor"
+                                @onclick="HandleItemClick"
+                                aria-label="Pick next bingo item">
+                            <span class="item">@(displayItem ?? "Ready to draw...")</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="item-display @(isSelected ? "selected" : "idle")" style="background-color: @currentThemeColor">
+                            <span class="item">@(displayItem ?? "Ready to draw...")</span>
+                        </div>
+                    }
                 </div>
             }
 
@@ -664,6 +688,15 @@
                 animationCts.Dispose();
                 animationCts = null;
             }
+        }
+    }
+
+    private async Task HandleItemClick()
+    {
+        // Only proceed if we have a selected item and more items are available
+        if (isSelected && currentItem != null && availableItems.Count > 0 && !isSelecting)
+        {
+            await SelectNext();
         }
     }
 
