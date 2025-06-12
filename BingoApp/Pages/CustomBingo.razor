@@ -67,9 +67,9 @@
                             class="btn btn-outline-primary grid-animation-toggle"
                             @onclick="ToggleGridAnimationMode"
                             disabled="@isSelecting"
+                            aria-label="@GetGridAnimationModeText()"
                             title="Click to cycle through grid animation modes">
                         <i class="@GetGridAnimationModeIcon()"></i>
-                        <span>@GetGridAnimationModeText()</span>
                     </button>
                 }
 
