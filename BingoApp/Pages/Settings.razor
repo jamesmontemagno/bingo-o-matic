@@ -2,7 +2,6 @@
 @using BingoApp.Services
 @using BingoApp.Models
 @inject ThemeService ThemeService
-@inject SelectionModeService SelectionModeService
 @implements IAsyncDisposable
 
 <div class="settings-container">
@@ -46,44 +45,6 @@
         </div>
     </div>    
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <h2 class="h5 mb-0">Grid Animation Mode</h2>
-        </div>
-        <div class="card-body">
-            <div class="selection-mode-selector">
-                <div class="btn-group selection-segment-control" role="group" aria-label="Selection mode">
-                    <input type="radio" class="btn-check" name="selectionOptions" id="randomMode" 
-                           checked="@(_currentSelectionMode == ItemSelectionMode.Random)" 
-                           @onchange="() => OnSelectionModeChanged(ItemSelectionMode.Random)">
-                    <label class="btn btn-outline-primary selection-option" for="randomMode">
-                        <i class="bi bi-shuffle"></i>
-                        <span>Random</span>
-                    </label>
-
-                    <input type="radio" class="btn-check" name="selectionOptions" id="horizontalMode" 
-                           checked="@(_currentSelectionMode == ItemSelectionMode.Horizontal)" 
-                           @onchange="() => OnSelectionModeChanged(ItemSelectionMode.Horizontal)">
-                    <label class="btn btn-outline-primary selection-option" for="horizontalMode">
-                        <i class="bi bi-arrow-right"></i>
-                        <span>Left to Right</span>
-                    </label>
-
-                    <input type="radio" class="btn-check" name="selectionOptions" id="verticalMode" 
-                           checked="@(_currentSelectionMode == ItemSelectionMode.Vertical)" 
-                           @onchange="() => OnSelectionModeChanged(ItemSelectionMode.Vertical)">
-                    <label class="btn btn-outline-primary selection-option" for="verticalMode">
-                        <i class="bi bi-arrow-down"></i>
-                        <span>Top to Bottom</span>
-                    </label>
-                </div>
-                <small class="selection-description text-muted">
-                    @GetSelectionModeDescription()
-                </small>
-            </div>
-        </div>
-    </div>
-
     <div class="card">
         <div class="card-header">
             <h2 class="h5 mb-0">Custom Bingo Sets</h2>
@@ -98,15 +59,11 @@
 </div>
 
 @code {
-    private ItemSelectionMode _currentSelectionMode = ItemSelectionMode.Random;
-
     protected override async Task OnInitializedAsync()
     {
         await ThemeService.InitializeThemeAsync();
-        _currentSelectionMode = await SelectionModeService.GetSelectionModeAsync();
         ThemeService.ThemeChanged += OnThemeChanged;
         ThemeService.ThemeModeChanged += OnThemeModeChangedHandler;
-        SelectionModeService.SelectionModeChanged += OnSelectionModeChangedHandler;
     }
 
     private async Task OnThemeModeChanged(ThemeMode themeMode)
@@ -124,18 +81,6 @@
         StateHasChanged();
     }
 
-    private async Task OnSelectionModeChanged(ItemSelectionMode mode)
-    {
-        await SelectionModeService.SetSelectionModeAsync(mode);
-        _currentSelectionMode = mode;
-    }
-
-    private void OnSelectionModeChangedHandler(ItemSelectionMode mode)
-    {
-        _currentSelectionMode = mode;
-        StateHasChanged();
-    }
-
     private string GetThemeDescription()
     {
         return ThemeService.CurrentThemeMode switch
@@ -147,22 +92,10 @@
         };
     }
 
-    private string GetSelectionModeDescription()
-    {
-        return _currentSelectionMode switch
-        {
-            ItemSelectionMode.Random => "Pick items randomly",
-            ItemSelectionMode.Horizontal => "Pick items from left to right, top to bottom",
-            ItemSelectionMode.Vertical => "Pick items from top to bottom, left to right",
-            _ => ""
-        };
-    }
-
     public async ValueTask DisposeAsync()
     {
         ThemeService.ThemeChanged -= OnThemeChanged;
         ThemeService.ThemeModeChanged -= OnThemeModeChangedHandler;
-        SelectionModeService.SelectionModeChanged -= OnSelectionModeChangedHandler;
         await ValueTask.CompletedTask;
     }
 }

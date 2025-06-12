@@ -13,6 +13,7 @@
 @inject ILocalBrowserStorageService LocalStorageService
 @inject IGameStateService GameStateService
 @inject IJSRuntime JSRuntime
+@inject SelectionModeService SelectionModeService
 
 <div class="bingo-container">
     <div class="bingo-header">
@@ -57,6 +58,20 @@
                             <span>Grid</span>
                         </button>
                     </div>
+                }
+
+                @* Grid Animation Mode Toggle - only show when Grid is selected *@
+                @if (!isMobileDevice && selectionMode == SelectionMode.Grid)
+                {
+                    <button type="button"
+                            class="btn btn-outline-primary grid-animation-toggle"
+                            @onclick="ToggleGridAnimationMode"
+                            disabled="@isSelecting"
+                            aria-label="@GetGridAnimationModeText()"
+                            title="Click to cycle through grid animation modes">
+                        <i class="@GetGridAnimationModeIcon()"></i>
+                        <span>@GetGridAnimationModeText()</span>
+                    </button>
                 }
 
                 @if ((selectedSet == null || calledItems.Count == 0) && !isSelecting)
@@ -239,6 +254,9 @@
 
     private SelectionMode selectionMode = SelectionMode.Cards;
     private GridSelector? gridSelector;
+    
+    // Grid animation mode state
+    private ItemSelectionMode currentGridAnimationMode = ItemSelectionMode.Random;
 
     private string selectedSetName = "";
     private string pendingSetName = "";
@@ -352,6 +370,9 @@
             await LoadModePreferenceAsync();
         }
         
+        // Load grid animation mode
+        currentGridAnimationMode = await SelectionModeService.GetSelectionModeAsync();
+        
         
         // Load all bingo sets
         await LoadBingoSetsAsync();
@@ -455,6 +476,42 @@
         {
             selectedSet = null;
         }
+    }
+    private async Task ToggleGridAnimationMode()
+    {
+        // Cycle through the modes: Random -> Horizontal -> Vertical -> Random
+        currentGridAnimationMode = currentGridAnimationMode switch
+        {
+            ItemSelectionMode.Random => ItemSelectionMode.Horizontal,
+            ItemSelectionMode.Horizontal => ItemSelectionMode.Vertical,
+            ItemSelectionMode.Vertical => ItemSelectionMode.Random,
+            _ => ItemSelectionMode.Random
+        };
+        
+        // Save the new mode
+        await SelectionModeService.SetSelectionModeAsync(currentGridAnimationMode);
+    }
+    
+    private string GetGridAnimationModeText()
+    {
+        return currentGridAnimationMode switch
+        {
+            ItemSelectionMode.Random => "Random",
+            ItemSelectionMode.Horizontal => "Horizontal",
+            ItemSelectionMode.Vertical => "Vertical",
+            _ => "Random"
+        };
+    }
+    
+    private string GetGridAnimationModeIcon()
+    {
+        return currentGridAnimationMode switch
+        {
+            ItemSelectionMode.Random => "bi-shuffle",
+            ItemSelectionMode.Horizontal => "bi-arrow-right",
+            ItemSelectionMode.Vertical => "bi-arrow-down",
+            _ => "bi-shuffle"
+        };
     }
 
     private void ResetGame()
