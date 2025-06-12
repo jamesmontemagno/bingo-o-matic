@@ -70,6 +70,7 @@
                             aria-label="@GetGridAnimationModeText()"
                             title="Click to cycle through grid animation modes">
                         <i class="@GetGridAnimationModeIcon()"></i>
+                        <span>@GetGridAnimationModeText()</span>
                     </button>
                 }
 
@@ -496,8 +497,8 @@
         return currentGridAnimationMode switch
         {
             ItemSelectionMode.Random => "Random",
-            ItemSelectionMode.Horizontal => "Left to Right",
-            ItemSelectionMode.Vertical => "Top to Bottom",
+            ItemSelectionMode.Horizontal => "Horizontal",
+            ItemSelectionMode.Vertical => "Vertical",
             _ => "Random"
         };
     }
