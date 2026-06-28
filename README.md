@@ -2,6 +2,9 @@
 
 A modern, interactive bingo game web application built with [Blazor WebAssembly](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor). Create custom bingo games or play with standard bingo rules.
 
+<img width="1359" height="743" alt="image" src="https://github.com/user-attachments/assets/05309c15-7c70-4cc5-b7e4-96cbb958b6db" />
+
+
 ## Features
 
 - **Standard Bingo:** Classic bingo gameplay, easy to start and play with B-I-N-G-O columns
